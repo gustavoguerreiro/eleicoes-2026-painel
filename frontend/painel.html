@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apuração 2026</title>
+<style>
+:root{
+  --bg:#f4f5f7; --card:#fff; --tx:#1b1f27; --mut:#6b7280; --bd:#e5e7eb; --bar:#e8eaee;
+  --acc:#2563eb; --ok:#16a34a; --warn:#d97706; --bad:#dc2626; --flash:#fef08a;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0d1017; --card:#161b25; --tx:#e7eaf0; --mut:#8c95a6; --bd:#252c3a; --bar:#232a38;
+  --acc:#60a5fa; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171; --flash:#5b4b00;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--bd);padding:12px 20px;
+  display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+h1{font-size:18px;margin:0;font-weight:700}
+.live{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:13px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);animation:pulse 1.6s infinite}
+.dot.off{background:var(--bad);animation:none}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.55)}100%{box-shadow:0 0 0 9px rgba(22,163,74,0)}}
+.tabs{margin-left:auto;display:flex;gap:6px}
+.tabs button{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:7px 14px;border-radius:999px;
+  font:inherit;cursor:pointer}
+.tabs select{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:7px 10px;border-radius:999px;font:inherit;cursor:pointer}
+.tabs button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+main{max-width:1200px;margin:0 auto;padding:20px;display:grid;gap:16px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(360px,1fr))}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px 18px}
+.card h2{font-size:15px;margin:0 0 2px;font-weight:700}
+.sub{color:var(--mut);font-size:12.5px;margin-bottom:12px}
+.apur{height:5px;background:var(--bar);border-radius:3px;margin:6px 0 12px;overflow:hidden}
+.apur i{display:block;height:100%;background:var(--acc);transition:width .6s}
+.row{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:7px 8px;border-radius:8px;margin:0 -8px}
+.row.flash{animation:fl 2.4s ease-out}
+@keyframes fl{0%{background:var(--flash)}100%{background:transparent}}
+.nome{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nome small{font-weight:400;color:var(--mut);margin-left:6px}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.num b{font-size:15px}.num span{color:var(--mut);font-size:12px;margin-left:6px}
+.barra{grid-column:1/-1;position:relative;height:8px;background:var(--bar);border-radius:4px}
+.barra i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;transition:width .6s}
+.barra u{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--mut);opacity:.7}
+.row.top .nome{font-size:16px}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;margin:2px 6px 8px 0}
+.b-eleito,.b-1turno{background:rgba(22,163,74,.15);color:var(--ok)}
+.b-2turno{background:rgba(217,119,6,.18);color:var(--warn)}
+.b-aberto{background:rgba(37,99,235,.14);color:var(--acc)}
+.nota{color:var(--mut);font-size:12.5px;margin-top:8px}
+.chip{display:inline-block;padding:1px 8px;border-radius:6px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
+.lista{display:grid;gap:0}
+.item{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;padding:6px 8px;margin:0 -8px;border-radius:8px}
+.item .pos{color:var(--mut);font-size:12px;text-align:right}
+.item.fora{opacity:.55}
+.item .v{font-variant-numeric:tabular-nums;color:var(--mut);font-size:13px}
+.sep{border-top:1px dashed var(--bd);margin:6px 0;color:var(--mut);font-size:11.5px;padding-top:4px}
+.bancadas{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.camara{display:flex;height:26px;border-radius:7px;overflow:hidden;margin:6px 0 10px}
+.camara i{display:block;height:100%}
+.mini{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--bd)}
+.mini:last-child{border-bottom:0}
+.mini .uf{font-weight:800;color:var(--mut)}
+.mini .info{min-width:0}.mini .info div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini .info small{color:var(--mut)}
+.resumo{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.vazio{color:var(--mut);padding:14px 0}
+.erro{background:rgba(220,38,38,.12);color:var(--bad);padding:10px 14px;border-radius:10px}
+@media(max-width:600px){main{padding:12px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Apuração 2026</h1>
+  <div class="live"><span class="dot" id="dot"></span><span id="status">carregando…</span></div>
+  <div class="tabs">
+    <select id="sel-uf" title="Escolha o estado"></select>
+    <button id="t-uf" class="on">Estado</button>
+    <button id="t-br">Brasil</button>
+    <button id="t-cg">Congresso</button>
+  </div>
+</header>
+<main id="app"><div class="vazio">Carregando dados do TSE…</div></main>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const milhar = n => Math.round(n).toLocaleString("pt-BR");
+const pct = n => n.toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2}) + "%";
+// Cores pela identidade visual de cada partido (esquerda → direita em ESPECTRO, usado também no hemiciclo)
+const PARTIDOS = {
+  PSTU:"#7f1d1d", PCO:"#991b1b", PCB:"#b91c1c", UP:"#be123c",
+  PSOL:"#c2185b", PT:"#dc2626", PCDOB:"#9f1239", "PC DO B":"#9f1239", PV:"#84cc16", REDE:"#10b981",
+  PSB:"#f97316", PDT:"#0ea5e9", CIDADANIA:"#ec4899", PSDB:"#0369a1",
+  MDB:"#eab308", PSD:"#0d9488", PODE:"#06b6d4", AVANTE:"#7c3aed", SOLIDARIEDADE:"#f59e0b", PRD:"#6b7280",
+  MOBILIZA:"#a16207", DC:"#64748b", PMB:"#92400e", AGIR:"#4d7c0f",
+  "UNIÃO":"#3b82f6", PP:"#1e3a8a", REPUBLICANOS:"#6366f1", MISSÃO:"#374151", PRTB:"#15803d",
+  PL:"#16a34a", NOVO:"#c2410c"
+};
+const ESPECTRO = Object.keys(PARTIDOS);
+const norm = sg => String(sg).split("/")[0].trim().toUpperCase();
+const cor = sg => {
+  const k = norm(sg);
+  if (PARTIDOS[k]) return PARTIDOS[k].replace("-", "");
+  let h = 0; for (const c of k) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h} 35% 45%)`;
+};
+const ordemEspectro = (a, b) => {
+  const ia = ESPECTRO.indexOf(norm(a)), ib = ESPECTRO.indexOf(norm(b));
+  return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+};
+const chip = sg => `<span class="chip" style="background:${cor(sg)}">${esc(sg)}</span>`;
+const apurBar = a => `<div class="apur"><i style="width:${a}%"></i></div>`;
+
+let aba = "uf", ultimo = null, anterior = {}, atual = {};
+try { aba = localStorage.getItem("aba") || "uf"; } catch (e) {}
+
+function marca(chave, valor) {            // devolve " flash" quando o valor mudou desde a última leitura
+  atual[chave] = valor;
+  return chave in anterior && anterior[chave] !== valor ? " flash" : "";
+}
+
+function badge(s) { return s ? `<span class="badge b-${s.tipo}">${esc(s.rotulo)}</span>` : ""; }
+
+function cardMajoritario(titulo, d, linha50) {
+  if (!d) return `<div class="card"><h2>${esc(titulo)}</h2><div class="vazio">Sem dados ainda.</div></div>`;
+  const rows = d.cands.map((c, i) => `
+    <div class="row${i === 0 ? " top" : ""}${marca(titulo + c.nome, c.votos)}">
+      <div class="nome">${c.eleito ? "★ " : c.t2 ? "② " : ""}${esc(c.nome)}<small>${esc(c.sg)}</small></div>
+      <div class="num"><b>${pct(c.pct)}</b><span>${milhar(c.votos)}</span></div>
+      <div class="barra"><i style="width:${Math.min(c.pct, 100)}%;background:${cor(c.sg)}"></i>${linha50 ? '<u style="left:50%"></u>' : ""}</div>
+    </div>`).join("");
+  return `<div class="card"><h2>${esc(titulo)}</h2>
+    <div class="sub">${pct(d.apur)} das seções apuradas · TSE ${esc(d.ht)}</div>${apurBar(d.apur)}
+    ${badge(d.situacao)}<div class="nota" style="margin:0 0 6px">${esc(d.situacao ? d.situacao.texto : "")}</div>${rows}
+    ${linha50 ? '<div class="nota">Linha vertical = 50% dos votos válidos (maioria absoluta).</div>' : ""}</div>`;
+}
+
+function cardSenado(titulo, d) {
+  if (!d) return `<div class="card"><h2>${esc(titulo)}</h2><div class="vazio">Sem dados ainda.</div></div>`;
+  const rows = d.cands.map((c, i) => `
+    <div class="row${i < d.nv ? " top" : ""}${marca(titulo + c.nome, c.votos)}">
+      <div class="nome">${i < d.nv ? (c.eleito ? "★ " : "▶ ") : ""}${esc(c.nome)}<small>${esc(c.sg)}</small></div>
+      <div class="num"><b>${pct(c.pct)}</b><span>${milhar(c.votos)}</span></div>
+      <div class="barra"><i style="width:${Math.min(c.pct * 2, 100)}%;background:${cor(c.sg)}"></i></div>
+    </div>`).join("");
+  return `<div class="card"><h2>${esc(titulo)}</h2>
+    <div class="sub">${d.nv} vagas · ${pct(d.apur)} apurado · TSE ${esc(d.ht)}</div>${apurBar(d.apur)}
+    ${badge(d.situacao)}<div class="nota" style="margin:0 0 6px">${esc(d.situacao.texto)}</div>${rows}</div>`;
+}
+
+function cardProporcional(titulo, d) {
+  if (!d) return `<div class="card"><h2>${esc(titulo)}</h2><div class="vazio">Sem dados ainda.</div></div>`;
+  const itens = d.eleitos.map((c, i) => `
+    <div class="item${marca(titulo + c.nome, c.votos)}">
+      <span class="pos">${i + 1}</span>
+      <div class="nome">${c.tse ? "★ " : ""}${esc(c.nome)} ${chip(c.sg)}</div>
+      <span class="v">${milhar(c.votos)}</span></div>`).join("");
+  const fora = d.fora.map(c => `
+    <div class="item fora"><span class="pos">–</span>
+      <div class="nome">${esc(c.nome)} ${chip(c.sg)}</div><span class="v">${milhar(c.votos)}</span></div>`).join("");
+  const band = d.bancadas.map(([n, q]) => `<span class="chip" style="background:${cor(n)}">${esc(n)} · ${q}</span>`).join("");
+  return `<div class="card"><h2>${esc(titulo)}</h2>
+    <div class="sub">${d.nv} vagas · quociente ${milhar(d.qe)} · ${pct(d.apur)} apurado · projeção</div>${apurBar(d.apur)}
+    <div class="lista">${itens}${fora ? '<div class="sep">primeiros fora, se encerrasse agora</div>' + fora : ""}</div>
+    <div class="bancadas">${band}</div>
+    <div class="nota">★ eleito pelo TSE · demais = se elegeriam com os votos de agora. Projeção própria (QE, 80%/20% e sobras); o oficial é o do TSE.</div></div>`;
+}
+
+function viewUF(d) {
+  const u = d.uf;
+  if (!u) return '<div class="vazio">Painel iniciado sem estado.</div>';
+  return `<div class="grid">
+    ${cardMajoritario("Governador " + u.sigla, u.gov, true)}
+    ${cardSenado("Senador " + u.sigla, u.sen)}
+    ${cardProporcional("Deputado federal " + u.sigla, u.fed)}
+    ${cardProporcional((u.sigla === "DF" ? "Deputado distrital " : "Deputado estadual ") + u.sigla, u.est)}
+  </div>`;
+}
+
+function viewBR(d) {
+  const pres = d.pres ? cardMajoritario("Presidente", d.pres, true) : "";
+  const gov = d.gov_br || [], sen = d.sen_br || [];
+  const cont = t => gov.filter(g => g.tipo === t).length;
+  const govHtml = gov.map(g => `
+    <div class="mini${marca("g" + g.uf, g.votos)}"><span class="uf">${g.uf}</span>
+      <div class="info"><div><b>${esc(g.nome)}</b> ${chip(g.sg)}</div>
+        <small>${g.seg ? "x " + esc(g.seg) + " · " : ""}${pct(g.apur)} apurado</small></div>
+      <div class="num"><b>${pct(g.pct)}</b><br><span class="badge b-${g.tipo}" style="margin:0">${esc(g.rotulo)}</span></div></div>`).join("");
+  const senHtml = sen.map(s => `
+    <div class="mini${marca("s" + s.uf, s.sig)}"><span class="uf">${s.uf}</span>
+      <div class="info">${s.eleitos.map(e => `<div>${esc(e.nome)} ${chip(e.sg)} <small>${pct(e.pct)}</small></div>`).join("")}</div>
+      <div class="num"><small class="nota">${pct(s.apur)}</small><br>${s.tse ? '<span class="badge b-eleito" style="margin:0">eleitos</span>' : ""}</div></div>`).join("");
+  const cam = d.camara;
+  let camHtml = '<div class="vazio">Sem dados.</div>';
+  if (cam && cam.partidos.length) {
+    const tot = cam.partidos.reduce((a, p) => a + p[1], 0);
+    camHtml = `<div class="camara">${cam.partidos.map(([n, q]) => `<i title="${esc(n)} ${q}" style="width:${q / tot * 100}%;background:${cor(n)}"></i>`).join("")}</div>
+      <div class="bancadas" style="margin-top:0">${cam.partidos.map(([n, q]) => `<span class="chip" style="background:${cor(n)}">${esc(n)} · ${q}</span>`).join("")}</div>
+      <div class="nota">${cam.vagas} vagas projetadas${cam.faltam.length ? " · sem dados: " + cam.faltam.join(", ") : ""}.</div>`;
+  }
+  return `<div class="grid">${pres}
+    <div class="card"><h2>Câmara dos Deputados</h2><div class="sub">projeção da bancada por partido (soma dos 27 estados)</div>${camHtml}</div></div>
+    <div class="grid">
+    <div class="card"><h2>Governadores</h2>
+      <div class="resumo"><span class="badge b-eleito">eleitos/1º turno: ${cont("eleito") + cont("1turno")}</span>
+      <span class="badge b-2turno">2º turno: ${cont("2turno")}</span></div>${govHtml}</div>
+    <div class="card"><h2>Senadores</h2><div class="sub">os 2 mais votados em cada estado agora</div>${senHtml}</div></div>`;
+}
+
+// Hemiciclo: cadeiras em anéis concêntricos, ordenadas da esquerda para a direita pelo espectro dos partidos.
+function hemiciclo(partidos, total, rotuloCentro, fora = 0) {
+  const lista = partidos.slice().sort((a, b) => ordemEspectro(a[0], b[0]));
+  const cores = [];
+  for (const [n, q] of lista) for (let i = 0; i < q; i++) cores.push([n, cor(n)]);
+  const N = cores.length, R = Math.max(3, Math.round(Math.sqrt(N / 7)));
+  const ext = fora ? 160 : 190, int = ext * 0.42, dr = (ext - int) / (R - 1);
+  const raios = Array.from({length: R}, (_, i) => int + i * dr), soma = raios.reduce((a, b) => a + b, 0);
+  const qtd = raios.map(r => Math.round(N * r / soma));
+  qtd[R - 1] += N - qtd.reduce((a, b) => a + b, 0);
+  const pts = [];
+  raios.forEach((r, i) => { for (let k = 0; k < qtd[i]; k++) {
+    const a = Math.PI - Math.PI * (qtd[i] === 1 ? 0.5 : k / (qtd[i] - 1));
+    pts.push({x: 200 + r * Math.cos(a), y: 200 - r * Math.sin(a), a, r});
+  }});
+  pts.sort((p, q) => q.a - p.a || p.r - q.r);
+  const rd = Math.min(...raios.map((r, i) => 0.46 * Math.min(dr, Math.PI * r / Math.max(qtd[i] - 1, 1))));
+  let bolas = pts.map((p, i) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rd.toFixed(1)}" fill="${cores[i][1]}"><title>${esc(cores[i][0])}</title></circle>`).join("");
+  for (let k = 0; k < fora; k++) {            // cadeiras fora de disputa: anel externo cinza
+    const a = Math.PI - Math.PI * k / (fora - 1);
+    bolas += `<circle cx="${(200 + 190 * Math.cos(a)).toFixed(1)}" cy="${(200 - 190 * Math.sin(a)).toFixed(1)}" r="${(rd * 0.9).toFixed(1)}" fill="var(--bar)"><title>mandato até 2031 (eleito em 2022)</title></circle>`;
+  }
+  return `<svg viewBox="0 0 400 215" style="width:100%;max-width:560px;display:block;margin:0 auto">${bolas}
+    <text x="200" y="182" text-anchor="middle" font-size="34" font-weight="800" fill="currentColor">${total + fora}</text>
+    <text x="200" y="202" text-anchor="middle" font-size="11" fill="var(--mut)">${esc(rotuloCentro)}</text></svg>`;
+}
+
+function legenda(partidos, extra) {
+  return `<div class="bancadas">${partidos.map(([n, q]) => `<span class="chip" style="background:${cor(n)}">${esc(n)} · ${q}</span>`).join("")}${extra || ""}</div>`;
+}
+
+function viewCongresso(d) {
+  const c = d.camara, s = d.senado;
+  let cam = '<div class="vazio">Sem dados.</div>', sen = cam;
+  if (c && c.partidos.length) {
+    const tot = c.partidos.reduce((a, p) => a + p[1], 0);
+    const maior = c.partidos[0];
+    cam = hemiciclo(c.partidos, tot, "deputados federais") + legenda(c.partidos) +
+      `<div class="nota">Maioria: 257 cadeiras. Maior bancada projetada: ${esc(maior[0])} com ${maior[1]}.
+      Soma dos 27 estados${c.faltam.length ? " (sem dados: " + c.faltam.join(", ") + ")" : ""}; projeção própria até o TSE marcar os eleitos.</div>`;
+  }
+  if (s && s.partidos.length) {
+    const tot = s.partidos.reduce((a, p) => a + p[1], 0);
+    const resto = 81 - tot;
+    const cinza = resto > 0 ? `<span class="chip" style="background:var(--bar);color:var(--mut)">mandato até 2031 · ${resto}</span>` : "";
+    sen = hemiciclo(s.partidos, tot, "senadores", resto) + legenda(s.partidos, cinza) +
+      `<div class="nota">Em 2026 são ${tot} das 81 cadeiras (2 por estado). As ${resto} restantes (cinza) foram eleitas em 2022 e
+      não estão em disputa — o painel ainda não carrega o partido delas. Maioria: 41. ${s.tse} das ${tot} vagas já confirmadas pelo TSE.</div>`;
+  }
+  return `<div class="grid">
+    <div class="card"><h2>Câmara dos Deputados</h2><div class="sub">projeção da bancada · esquerda → direita</div>${cam}</div>
+    <div class="card"><h2>Senado Federal</h2><div class="sub">as ${s ? s.partidos.reduce((a, p) => a + p[1], 0) : 54} vagas em disputa agora · esquerda → direita</div>${sen}</div></div>`;
+}
+
+function desenhar() {
+  if (!ultimo) return;
+  anterior = atual; atual = {};
+  $("#app").innerHTML = aba === "uf" ? viewUF(ultimo) : aba === "br" ? viewBR(ultimo) : viewCongresso(ultimo);
+}
+
+const ESTADOS = {AC:"Acre",AL:"Alagoas",AM:"Amazonas",AP:"Amapá",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",
+  GO:"Goiás",MA:"Maranhão",MG:"Minas Gerais",MS:"Mato Grosso do Sul",MT:"Mato Grosso",PA:"Pará",PB:"Paraíba",PE:"Pernambuco",
+  PI:"Piauí",PR:"Paraná",RJ:"Rio de Janeiro",RN:"Rio Grande do Norte",RO:"Rondônia",RR:"Roraima",RS:"Rio Grande do Sul",
+  SC:"Santa Catarina",SE:"Sergipe",SP:"São Paulo",TO:"Tocantins"};
+let uf = null;
+try { uf = localStorage.getItem("uf"); } catch (e) {}
+$("#sel-uf").innerHTML = Object.entries(ESTADOS).map(([s, n]) => `<option value="${s}">${s} — ${n}</option>`).join("");
+if (uf) $("#sel-uf").value = uf;
+$("#sel-uf").onchange = () => {
+  uf = $("#sel-uf").value; try { localStorage.setItem("uf", uf); } catch (e) {}
+  aba = "uf"; marcarAba(); $("#status").textContent = "carregando " + uf + "…"; carregar();
+};
+
+async function carregar() {
+  try {
+    const r = await fetch("/api?uf=" + (uf || "") + "&t=" + Date.now());
+    if (!r.ok) throw new Error(r.status);
+    ultimo = await r.json();
+    if (!uf && ultimo.uf) { uf = ultimo.uf.sigla; $("#sel-uf").value = uf; }
+    if (ultimo.uf && $("#sel-uf").value !== ultimo.uf.sigla) $("#sel-uf").value = ultimo.uf.sigla;
+    $("#dot").classList.remove("off");
+    $("#status").textContent = "ao vivo · consulta às " + ultimo.agora + " (Brasília)";
+    desenhar();
+  } catch (e) {
+    $("#dot").classList.add("off");
+    $("#status").textContent = location.protocol === "file:"
+      ? "arquivo aberto direto — rode acompanhar_navegador.bat e use http://localhost:8765"
+      : "servidor local parado — mantenha a janela preta do acompanhar_navegador.bat aberta; tentando de novo…";
+  }
+}
+
+const ABAS = [["t-uf", "uf"], ["t-br", "br"], ["t-cg", "cg"]];
+const marcarAba = () => ABAS.forEach(([id, n]) => $("#" + id).classList.toggle("on", aba === n));
+for (const [id, nome] of ABAS) {
+  $("#" + id).onclick = () => {
+    aba = nome; try { localStorage.setItem("aba", nome); } catch (e) {}
+    marcarAba(); anterior = {}; desenhar();
+  };
+}
+marcarAba();
+carregar(); setInterval(carregar, 10000);
+</script>
+</body>
+</html>
