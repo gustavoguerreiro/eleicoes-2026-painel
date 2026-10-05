@@ -387,10 +387,53 @@ def web_proporcional(j, fora=3):
                 bancadas=sorted(band.items(), key=lambda x: -x[1]))
 
 
+# ---- mapas -------------------------------------------------------------------------------------------------
+def resumo_mapa(j, n=3):
+    """Os n mais votados de um arquivo -u, para pintar/descrever uma região no mapa."""
+    if not j:
+        return None
+    cs = [c for c in candidatos(j) if c["valido"]][:n]
+    return dict(apur=apurado(j), cands=[{k: c[k] for k in ("nome", "sg", "votos", "pct")} for c in cs])
+
+
+_MUN = {}                                                          # {uf: [(cód TSE, cód IBGE, nome)]}
+
+
+def municipios_tse():
+    """Códigos de município do TSE e do IBGE (campo `cdi`), do cm.json da divulgação."""
+    if not _MUN:
+        j = baixar(f"{RAIZ}/{ELE_PRES}/config/mun-e{int(ELE_PRES):06d}-cm.json")
+        for a in (j or {}).get("abr", []):
+            _MUN[a["cd"]] = [(m["cd"], m["cdi"], m["nm"]) for m in a.get("mu", [])]
+    return _MUN
+
+
+def mapa_municipios(uf, cargo):
+    """Resultado de cada município da UF para o cargo (1 presidente, 3 governador, 5 senador)."""
+    import geo
+    ele = ELE_PRES if cargo == 1 else ELE_DEMAIS
+    muns = municipios_tse().get(uf, [])
+    nomes = {}
+    try:
+        nomes = geo.nomes_uf(uf)
+    except Exception:
+        pass
+    urls = [f"{RAIZ}/{ele}/dados/{uf}/{uf}{tse}-c{cargo:04d}-e{int(ele):06d}-u.json" for tse, _, _ in muns]
+    with ThreadPoolExecutor(max_workers=16) as ex:
+        res = list(ex.map(baixar_cache, urls))
+    out = {}
+    for (tse, ibge, nm), j in zip(muns, res):
+        r = resumo_mapa(j)
+        if r:
+            out[ibge] = dict(r, nome=nomes.get(ibge) or nm.title())
+    return dict(uf=uf.upper(), cargo=cargo, total=len(muns), municipios=out)
+
+
 def dados_web(uf, so_uf, so_br):
     pedidos = [(ELE_PRES, "br", 1)]
     if not so_uf:
         pedidos += [(ELE_DEMAIS, u, c) for u in UFS for c in (3, 5, 6)]
+        pedidos += [(ELE_PRES, u, 1) for u in UFS]
     pedidos += [(ELE_DEMAIS, uf, c) for c in (3, 5, 6, 8 if uf == "df" else 7)]
     dados = coletar(list(dict.fromkeys(pedidos)))
     out = dict(agora=datetime.now(BRT).strftime("%H:%M:%S"), pres=web_majoritario(dados.get(("br", 1))))
@@ -427,6 +470,7 @@ def dados_web(uf, so_uf, so_br):
                 bancada[c["sg"]] = bancada.get(c["sg"], 0) + 1
         else:
             faltam.append(u.upper())
+    out["mapa_br"] = {u.upper(): {str(c): resumo_mapa(dados.get((u, c))) for c in (1, 3, 5)} for u in UFS}
     out.update(gov_br=gov_br, sen_br=sen_br,
                camara=dict(partidos=sorted(bancada.items(), key=lambda x: -x[1]), vagas=vagas, faltam=faltam),
                senado=dict(partidos=sorted(band_sen.items(), key=lambda x: -x[1]), tse=sen_tse))
@@ -454,11 +498,33 @@ def servir(porta, uf, so_uf, so_br, intervalo):
                     print(f"Falha neste ciclo: {e}")
             return js
 
+    cache_mapa, lock_mapa = {}, threading.Lock()                  # lock próprio: o mapa de MG não trava o /api
+
+    def gerar_mapa(sigla, cargo):
+        with lock_mapa:
+            t, js = cache_mapa.get((sigla, cargo), (0.0, b"{}"))
+            if time.time() - t > max(intervalo, 30):
+                try:
+                    js = json.dumps(mapa_municipios(sigla, cargo), ensure_ascii=False).encode("utf-8")
+                    cache_mapa[(sigla, cargo)] = (time.time(), js)
+                except Exception as e:
+                    print(f"Falha no mapa {sigla}/{cargo}: {e}")
+            return js
+
     class H(BaseHTTPRequestHandler):
         def do_GET(self):
-            if self.path.startswith("/api"):
-                from urllib.parse import parse_qs, urlparse
-                sel = parse_qs(urlparse(self.path).query).get("uf", [uf])[0].lower()
+            from urllib.parse import parse_qs, urlparse
+            rota, qs = urlparse(self.path).path, parse_qs(urlparse(self.path).query)
+            sel = qs.get("uf", [uf])[0].lower()
+            if rota == "/geo/br":
+                import geo
+                corpo, tipo = geo.geojson_br(), "application/json"
+            elif rota.startswith("/geo/uf/") and rota[8:].lower() in UFS:
+                import geo
+                corpo, tipo = geo.geojson_uf(rota[8:]), "application/json"
+            elif rota == "/api/mapa":
+                corpo, tipo = gerar_mapa(sel if sel in UFS else uf, int(qs.get("cargo", ["3"])[0]) if qs.get("cargo", ["3"])[0] in ("1", "3", "5") else 3), "application/json; charset=utf-8"
+            elif rota.startswith("/api"):
                 corpo, tipo = gerar(sel if sel in UFS else uf), "application/json; charset=utf-8"
             else:
                 with open(pagina, "rb") as f:

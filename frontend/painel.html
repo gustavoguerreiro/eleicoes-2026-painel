@@ -68,6 +68,15 @@ main{max-width:1200px;margin:0 auto;padding:20px;display:grid;gap:16px}
 .resumo{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .vazio{color:var(--mut);padding:14px 0}
 .erro{background:rgba(220,38,38,.12);color:var(--bad);padding:10px 14px;border-radius:10px}
+#tip{position:fixed;z-index:20;pointer-events:none;background:var(--card);color:var(--tx);border:1px solid var(--bd);
+  border-radius:10px;padding:8px 11px;font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.25);display:none;max-width:260px}
+#tip b{display:block;margin-bottom:3px}#tip div{display:flex;justify-content:space-between;gap:14px}
+.seg{display:inline-flex;gap:4px;margin:0 0 10px}
+.seg button{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:4px 11px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer}
+.seg button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.mapa svg{width:100%;height:auto;display:block;max-height:560px}
+.mapa path{stroke:var(--card);stroke-width:.6;stroke-linejoin:round;transition:opacity .15s}
+.mapa path.clic{cursor:pointer}.mapa path:hover{stroke:var(--tx);stroke-width:1.4}
 @media(max-width:600px){main{padding:12px}.grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -80,8 +89,10 @@ main{max-width:1200px;margin:0 auto;padding:20px;display:grid;gap:16px}
     <button id="t-uf" class="on">Estado</button>
     <button id="t-br">Brasil</button>
     <button id="t-cg">Congresso</button>
+    <button id="t-mp">Mapas</button>
   </div>
 </header>
+<div id="tip"></div>
 <main id="app"><div class="vazio">Carregando dados do TSE…</div></main>
 
 <script>
@@ -263,10 +274,113 @@ function viewCongresso(d) {
     <div class="card"><h2>Senado Federal</h2><div class="sub">as ${s ? s.partidos.reduce((a, p) => a + p[1], 0) : 54} vagas em disputa agora · esquerda → direita</div>${sen}</div></div>`;
 }
 
+// ---- Mapas -------------------------------------------------------------------------------------------------
+const UF_COD = {"12":"AC","27":"AL","13":"AM","16":"AP","29":"BA","23":"CE","53":"DF","32":"ES","52":"GO","21":"MA","31":"MG",
+  "50":"MS","51":"MT","15":"PA","25":"PB","26":"PE","22":"PI","41":"PR","33":"RJ","24":"RN","11":"RO","14":"RR","43":"RS",
+  "42":"SC","28":"SE","35":"SP","17":"TO"};
+const CARGOS = {"1": "Presidente", "3": "Governador", "5": "Senador"};
+let mpCargo = {br: "1", uf: "3"}, tips = {};
+const geoCache = {}, mapaCache = {}, mapaVai = {};
+
+function projecao(fc) {                   // equiretangular com correção de latitude (suficiente para o Brasil)
+  if (fc._p) return fc._p;
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  const varre = c => typeof c[0] === "number" ? (x0 = Math.min(x0, c[0]), x1 = Math.max(x1, c[0]), y0 = Math.min(y0, c[1]), y1 = Math.max(y1, c[1])) : c.forEach(varre);
+  fc.features.forEach(f => varre(f.geometry.coordinates));
+  const k = Math.cos((y0 + y1) / 2 * Math.PI / 180), W = 600, e = W / ((x1 - x0) * k);
+  return fc._p = {H: (y1 - y0) * e, pt: (lo, la) => [((lo - x0) * k * e).toFixed(1), ((y1 - la) * e).toFixed(1)]};
+}
+function caminho(f, pr) {
+  if (f._d) return f._d;
+  const g = f.geometry, polis = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+  return f._d = polis.map(po => po.map(an => "M" + an.map(p => pr.pt(p[0], p[1]).join(",")).join("L") + "Z").join("")).join("");
+}
+function topHtml(titulo, r) {
+  const linhas = r.cands.map(c => `<div><span>${esc(c.nome)} <small>${esc(c.sg)}</small></span><b style="display:inline">${pct(c.pct)}</b></div>`).join("");
+  return `<b>${esc(titulo)}</b>${linhas}<small style="color:var(--mut)">${pct(r.apur)} apurado</small>`;
+}
+function svgMapa(id, fc, chave, dados, titulo, clicavel) {
+  const pr = projecao(fc);
+  tips[id] = {};
+  const cont = {};
+  const paths = fc.features.map(f => {
+    const k = chave(f), r = dados[k];
+    let fill = "var(--bar)", op = 1;
+    if (r && r.cands.length) {
+      const l = r.cands[0];
+      fill = cor(l.sg); op = 0.42 + 0.58 * Math.max(0, Math.min(1, (l.pct - 25) / 40));
+      cont[l.sg] = (cont[l.sg] || 0) + 1;
+      tips[id][k] = topHtml(titulo(f, k), r);
+    } else tips[id][k] = `<b>${esc(titulo(f, k))}</b><small style="color:var(--mut)">sem dados</small>`;
+    return `<path data-m="${id}" data-k="${k}" class="${clicavel ? "clic" : ""}" d="${caminho(f, pr)}" fill="${fill}" fill-opacity="${op.toFixed(2)}"></path>`;
+  }).join("");
+  const leg = Object.entries(cont).sort((a, b) => b[1] - a[1]).map(([sg, n]) => `<span class="chip" style="background:${cor(sg)}">${esc(sg)} · ${n}</span>`).join("");
+  return `<svg viewBox="0 0 600 ${pr.H.toFixed(0)}">${paths}</svg><div class="bancadas">${leg}</div>
+    <div class="nota">Cor = partido do mais votado · cor mais forte = maior fatia dos votos válidos.</div>`;
+}
+function seg(grupo, atual) {
+  return `<div class="seg">${Object.entries(CARGOS).map(([c, n]) => `<button data-mp="${grupo}:${c}" class="${atual === c ? "on" : ""}">${n}</button>`).join("")}</div>`;
+}
+
+function viewMapas(d) {
+  const ufSel = uf || (d.uf && d.uf.sigla) || "RN";
+  let br = '<div class="vazio">Carregando mapa…</div>', mu = br;
+  const gbr = geoCache["/geo/br"], gu = geoCache["/geo/uf/" + ufSel];
+  if (gbr && d.mapa_br) {
+    const dados = {};
+    for (const [u, v] of Object.entries(d.mapa_br)) if (v[mpCargo.br]) dados[u] = v[mpCargo.br];
+    br = svgMapa("br", gbr.v, f => UF_COD[f.properties.codarea], dados, (f, k) => (ESTADOS[k] || k) + " — " + CARGOS[mpCargo.br], true) +
+      '<div class="nota">Clique num estado para ver os municípios dele ao lado.</div>';
+  }
+  const m = mapaCache[ufSel + ":" + mpCargo.uf];
+  if (gu && m) {
+    const nm = m.v.municipios, n = Object.keys(nm).length;
+    mu = svgMapa("uf", gu.v, f => f.properties.codarea, nm, (f, k) => (nm[k] ? nm[k].nome : k) + " — " + CARGOS[mpCargo.uf], false) +
+      `<div class="nota">${n} de ${m.v.total} municípios com dados.</div>`;
+  }
+  return `<div class="grid">
+    <div class="card mapa"><h2>Brasil — por estado</h2><div class="sub">quem lidera em cada estado</div>${seg("br", mpCargo.br)}${br}</div>
+    <div class="card mapa"><h2>${esc(ESTADOS[ufSel] || ufSel)} — por município</h2><div class="sub">quem lidera em cada município</div>${seg("uf", mpCargo.uf)}${mu}</div></div>`;
+}
+
+function garantirMapas() {
+  const ufSel = uf || (ultimo && ultimo.uf && ultimo.uf.sigla);
+  const re = () => { if (aba === "mp") desenhar(); };
+  const carrega = (chave, url, destino) => {
+    const x = destino[chave];
+    if (x && (x.fixo || Date.now() - x.t < 45000)) return;
+    if (mapaVai[chave]) return;
+    mapaVai[chave] = 1;
+    fetch(url).then(r => { if (!r.ok) throw 0; return r.json(); })
+      .then(v => { destino[chave] = {v, t: Date.now(), fixo: url.startsWith("/geo/")}; })
+      .catch(() => {}).finally(() => { delete mapaVai[chave]; re(); });
+  };
+  carrega("/geo/br", "/geo/br", geoCache);
+  if (ufSel) {
+    carrega("/geo/uf/" + ufSel, "/geo/uf/" + ufSel, geoCache);
+    carrega(ufSel + ":" + mpCargo.uf, `/api/mapa?uf=${ufSel}&cargo=${mpCargo.uf}`, mapaCache);
+  }
+}
+
+document.addEventListener("mousemove", e => {
+  const t = $("#tip"), p = e.target.closest && e.target.closest("path[data-k]");
+  if (!p) { t.style.display = "none"; return; }
+  t.innerHTML = (tips[p.dataset.m] || {})[p.dataset.k] || "";
+  t.style.display = "block";
+  t.style.left = Math.min(e.clientX + 14, innerWidth - 280) + "px"; t.style.top = (e.clientY + 14) + "px";
+});
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-mp]");
+  if (b) { const [g, c] = b.dataset.mp.split(":"); mpCargo[g] = c; desenhar(); return; }
+  const p = e.target.closest && e.target.closest('path.clic[data-m="br"]');
+  if (p && ESTADOS[p.dataset.k]) { $("#sel-uf").value = p.dataset.k; $("#sel-uf").onchange(); aba = "mp"; marcarAba(); }
+});
+
 function desenhar() {
   if (!ultimo) return;
   anterior = atual; atual = {};
-  $("#app").innerHTML = aba === "uf" ? viewUF(ultimo) : aba === "br" ? viewBR(ultimo) : viewCongresso(ultimo);
+  $("#app").innerHTML = aba === "uf" ? viewUF(ultimo) : aba === "br" ? viewBR(ultimo) : aba === "cg" ? viewCongresso(ultimo) : viewMapas(ultimo);
+  if (aba === "mp") garantirMapas();
 }
 
 const ESTADOS = {AC:"Acre",AL:"Alagoas",AM:"Amazonas",AP:"Amapá",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",
@@ -300,7 +414,7 @@ async function carregar() {
   }
 }
 
-const ABAS = [["t-uf", "uf"], ["t-br", "br"], ["t-cg", "cg"]];
+const ABAS = [["t-uf", "uf"], ["t-br", "br"], ["t-cg", "cg"], ["t-mp", "mp"]];
 const marcarAba = () => ABAS.forEach(([id, n]) => $("#" + id).classList.toggle("on", aba === n));
 for (const [id, nome] of ABAS) {
   $("#" + id).onclick = () => {

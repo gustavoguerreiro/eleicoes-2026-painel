@@ -1,4 +1,5 @@
 """Malhas e nomes do IBGE (API de malhas v3 e localidades v1), com cache em disco em data/geo/."""
+import gzip
 import json
 import os
 import urllib.request
@@ -17,7 +18,12 @@ def _cache(nome, url, binario=False):
         with open(caminho, "wb") as f:
             f.write(dados)
     with open(caminho, "rb") as f:
-        return f.read()
+        dados = f.read()
+    if dados[:2] == b"\x1f\x8b":                       # o IBGE responde em gzip mesmo sem pedirmos
+        dados = gzip.decompress(dados)
+        with open(caminho, "wb") as f:
+            f.write(dados)
+    return dados
 
 
 def geojson_br():
