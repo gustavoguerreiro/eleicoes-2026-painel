@@ -140,6 +140,34 @@ a.tile:hover,a.card:hover{border-color:var(--acc)}
 .leg{display:grid;grid-template-columns:14px 1fr auto auto;gap:4px 10px;align-items:center;font-size:13.5px}
 .leg .sw{width:12px;height:12px;border-radius:3px}
 .leg .n,.leg .p{font-variant-numeric:tabular-nums;text-align:right}.leg .p{color:var(--mut);min-width:52px}
+.chat-topo p{margin:6px 0 0;color:var(--mut);font-size:13px}
+.chat-docs{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chat-docs span{background:var(--soft);border-radius:8px;padding:3px 9px;font-size:12px;color:var(--mut)}
+.sugestoes{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));margin:14px 0 4px}
+.sugestoes button{text-align:left;background:var(--soft);border:1px solid var(--bd);color:var(--tx);border-radius:12px;padding:10px 12px;font:inherit;font-size:13.5px;cursor:pointer}
+.sugestoes button:hover{border-color:var(--acc)}
+#chat-msgs{display:flex;flex-direction:column;gap:12px;overflow-y:auto;max-height:58vh;min-height:140px;padding:6px 2px;margin-top:8px}
+.msg{max-width:92%;border-radius:16px;padding:10px 14px;line-height:1.5;word-wrap:break-word}
+.msg.u{align-self:flex-end;background:var(--acc);color:#fff;border-bottom-right-radius:4px}
+.msg.a{align-self:flex-start;background:var(--soft);border-bottom-left-radius:4px;max-width:100%}
+.msg.a p{margin:0 0 8px}.msg.a p:last-child{margin-bottom:0}
+.msg.a ul{margin:4px 0 8px;padding-left:20px}.msg.a li{margin:3px 0}
+.msg .ferr{color:var(--mut);font-size:13px;display:flex;align-items:center;gap:8px}
+.msg .ferr i{width:8px;height:8px;border-radius:50%;background:var(--acc);animation:pulse 1.2s infinite}
+.msg .erro{color:var(--bad);font-weight:600}
+.ref{border:0;background:var(--acc);color:#fff;border-radius:6px;font:inherit;font-size:11px;font-weight:700;padding:0 6px;margin:0 1px;cursor:pointer;vertical-align:baseline}
+.fontes{margin-top:10px;border-top:1px solid var(--bd);padding-top:8px;font-size:13px}
+.fontes>b{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.fonte{margin-top:6px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:6px 10px}
+.fonte summary{cursor:pointer;font-weight:600}
+.fonte blockquote{margin:8px 0;padding:0 0 0 10px;border-left:3px solid var(--acc);color:var(--tx);font-size:13px;max-height:220px;overflow:auto}
+.fonte a{color:var(--acc);font-weight:600;font-size:12.5px}
+.chat-entrada{display:flex;gap:8px;margin-top:12px;align-items:flex-end}
+.chat-entrada textarea{flex:1;resize:none;min-height:44px;max-height:120px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;font:inherit}
+.chat-entrada button{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:0 18px;height:44px;font:inherit;font-weight:700;cursor:pointer}
+.chat-entrada button:disabled{opacity:.5;cursor:default}
+.chat-rodape{display:flex;justify-content:space-between;gap:10px;color:var(--mut);font-size:12px;margin-top:6px}
+.chat-rodape button{background:none;border:0;color:var(--acc);font:inherit;font-size:12px;cursor:pointer;padding:0}
 footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;color:var(--mut);font-size:12.5px;display:grid;gap:6px}
 .skel{height:120px;border-radius:16px;background:linear-gradient(90deg,var(--bar),var(--soft),var(--bar));background-size:200% 100%;animation:sk 1.4s infinite}
 @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
@@ -220,8 +248,8 @@ const UF_COD = {"12":"AC","27":"AL","13":"AM","16":"AP","29":"BA","23":"CE","53"
   "42":"SC","28":"SE","35":"SP","17":"TO"};
 
 /* ---- estado da aplicação ---- */
-const PAG_T1 = [["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"], ["senado","Senado"], ["deputados","Deputados"]];
-const PAG_T2 = [["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"]];
+const PAG_T1 = [["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"], ["senado","Senado"], ["deputados","Deputados"], ["perguntar","Pergunte"]];
+const PAG_T2 = [["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"], ["perguntar","Pergunte"]];
 let turno = 2, pag = "resumo", uf = null, ultimo = null, anterior = {}, atual = {}, depTipo = "fed";
 const paginasAtuais = () => turno === 1 ? PAG_T1 : PAG_T2;
 try { uf = localStorage.getItem("uf"); } catch (e) {}
@@ -506,6 +534,145 @@ function pgDeputados(d) {
       <div>${cardCamara(d, true)}</div></div>`;
 }
 
+/* ---- chat: RAG sobre os planos + ferramentas com os números do painel ---- */
+const chat = {id: null, msgs: [], ocupado: false, status: null, carregando: false};
+const SUGESTOES = [
+  "Qual a diferença de votos entre Flávio Bolsonaro e Lula?",
+  "O que Lula e Flávio propõem para a saúde?",
+  "O que Cadu de Lula e Allyson propõem para a segurança pública no RN?",
+  "Em quantos estados Lula lidera?",
+  "Em quantos municípios do RN o Allyson lidera?",
+  "Compare as propostas de educação de Lula e Flávio",
+];
+const FONTE_OK = u => /^https:\/\/divulgacandcontas\.tse\.jus\.br\//.test(u || "");
+
+function mdSeguro(txt) {                    // markdown mínimo: parágrafos, listas, **negrito** e [n] de fontes
+  const linhas = esc(txt).split("\n"), out = [];
+  let lista = false, par = [];
+  const inline = t => t.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\[(\d{1,4})\]/g, '<button class="ref" data-ref="$1" title="Ver o trecho do plano">$1</button>');
+  const fechaPar = () => { if (par.length) out.push("<p>" + inline(par.join(" ")) + "</p>"); par = []; };
+  for (const l of linhas) {
+    const m = l.match(/^\s*[-*•]\s+(.*)/);
+    if (m) { fechaPar(); if (!lista) { out.push("<ul>"); lista = true; } out.push("<li>" + inline(m[1]) + "</li>"); }
+    else if (!l.trim()) { fechaPar(); if (lista) { out.push("</ul>"); lista = false; } }
+    else { if (lista) { out.push("</ul>"); lista = false; } par.push(l.trim()); }
+  }
+  fechaPar(); if (lista) out.push("</ul>");
+  return out.join("");
+}
+
+function msgHtml(m, i) {
+  if (m.papel === "u") return `<div class="msg u">${esc(m.texto)}</div>`;
+  const ativo = chat.ocupado && i === chat.msgs.length - 1;
+  const corpo = m.texto ? mdSeguro(m.texto) : "";
+  const ferr = ativo && m.ferr ? `<div class="ferr"><i></i>${esc(m.ferr)}…</div>` : (ativo && !m.texto && !m.erro ? '<div class="ferr"><i></i>Pensando…</div>' : "");
+  const fontes = m.fontes && m.fontes.length ? `<div class="fontes"><b>Fontes</b>${m.fontes.map(f => `
+    <details class="fonte" id="f${i}-${f.ref}"><summary>[${f.ref}] ${esc(nome(f.candidato))} · ${esc(f.cargo)} · p. ${f.pagina}${f.pagina_fim && f.pagina_fim !== f.pagina ? "–" + f.pagina_fim : ""}${f.secao ? " · " + esc(f.secao) : ""}</summary>
+      <blockquote>${esc(f.texto)}</blockquote>${FONTE_OK(f.fonte_url) ? `<a href="${esc(f.fonte_url)}" target="_blank" rel="noopener">Abrir o plano completo no site do TSE ↗</a>` : ""}</details>`).join("")}</div>` : "";
+  return `<div class="msg a" data-i="${i}">${corpo}${ferr}${m.erro ? `<div class="erro">${esc(m.erro)}</div>` : ""}${fontes}</div>`;
+}
+
+function renderMsgs() {
+  const box = $("#chat-msgs");
+  if (!box) return;
+  const perto = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+  const abertos = new Set([...box.querySelectorAll("details[open]")].map(d => d.id));
+  box.innerHTML = chat.msgs.map(msgHtml).join("");
+  abertos.forEach(id => { const d = document.getElementById(id); if (d) d.open = true; });
+  if (perto || chat.ocupado) box.scrollTop = box.scrollHeight;
+  const sug = $("#chat-sug"); if (sug) sug.style.display = chat.msgs.length ? "none" : "";
+}
+function atualizarEntrada() {
+  const b = $("#chat-enviar"), t = $("#chat-texto");
+  if (!b || !t) return;
+  b.disabled = chat.ocupado || !(chat.status && chat.status.ativo);
+  t.disabled = !(chat.status && chat.status.ativo);
+  const c = $("#chat-cont"); if (c) c.textContent = `${t.value.length}/${(chat.status && chat.status.max_mensagem) || 600}`;
+}
+
+function montarChat() {
+  const raiz = $("#app");
+  const st = chat.status;
+  const docs = st && st.documentos ? st.documentos.map(d => `<span>${esc(d.candidato)} · ${esc(d.cargo)} · ${d.paginas} págs.</span>`).join("") : "";
+  const aviso = st && !st.ativo ? `<div class="status s-2turno"><b>Chat indisponível</b><span>${esc(st.motivo || "")}</span></div>` : "";
+  raiz.innerHTML = paginaTitulo("Pergunte", "Tire dúvidas sobre as propostas dos candidatos e sobre os números da apuração.") + `
+    <section class="card" id="chat-root">
+      <div class="chat-topo"><h2>Assistente do painel</h2>
+        <p>Responde com base nos <b>planos de governo registrados no TSE</b> e nos <b>resultados da apuração</b> deste painel, citando a página de origem.
+        É um assistente de IA informativo, não oficial: pode errar, então confira as fontes. Não indica voto nem opina sobre candidatos.</p>
+        <div class="chat-docs">${docs}</div></div>
+      ${aviso}
+      <div class="sugestoes" id="chat-sug">${SUGESTOES.map(q => `<button data-sug="${esc(q)}">${esc(q)}</button>`).join("")}</div>
+      <div id="chat-msgs" aria-live="polite"></div>
+      <div class="chat-entrada"><textarea id="chat-texto" rows="1" maxlength="${(st && st.max_mensagem) || 600}" placeholder="Pergunte sobre propostas ou números…"></textarea>
+        <button id="chat-enviar">Enviar</button></div>
+      <div class="chat-rodape"><span id="chat-cont"></span><button id="chat-novo">Nova conversa</button></div>
+    </section>`;
+  renderMsgs(); atualizarEntrada();
+  if (!st && !chat.carregando) {
+    chat.carregando = true;
+    fetch("/api/chat/status").then(r => r.json()).catch(() => ({ativo: false, motivo: "Servidor indisponível."}))
+      .then(j => { chat.status = j; chat.carregando = false; if ($("#chat-root")) montarChat(); });
+  }
+}
+
+function eventoChat(ev, m) {
+  if (ev.tipo === "conversa") chat.id = ev.id;
+  else if (ev.tipo === "ferramenta") m.ferr = ev.rotulo;
+  else if (ev.tipo === "texto") { m.texto += ev.texto; m.ferr = null; }
+  else if (ev.tipo === "fontes") m.fontes = ev.fontes;
+  else if (ev.tipo === "erro") m.erro = ev.mensagem;
+  renderMsgs();
+}
+
+async function enviarPergunta(texto) {
+  texto = String(texto || "").trim();
+  if (!texto || chat.ocupado || !(chat.status && chat.status.ativo)) return;
+  const m = {papel: "a", texto: "", fontes: [], ferr: null, erro: null};
+  chat.msgs.push({papel: "u", texto}, m);
+  chat.ocupado = true; renderMsgs(); atualizarEntrada();
+  try {
+    const r = await fetch("/api/chat", {method: "POST", headers: {"Content-Type": "application/json"},
+                                          body: JSON.stringify({conversa: chat.id, mensagem: texto})});
+    if (!r.ok) throw new Error(r.status);
+    const leitor = r.body.getReader(), dec = new TextDecoder();
+    let buf = "";
+    for (;;) {
+      const {done, value} = await leitor.read();
+      if (done) break;
+      buf += dec.decode(value, {stream: true});
+      let i;
+      while ((i = buf.indexOf("\n\n")) >= 0) {
+        const bloco = buf.slice(0, i); buf = buf.slice(i + 2);
+        if (bloco.startsWith("data: ")) { try { eventoChat(JSON.parse(bloco.slice(6)), m); } catch (e) {} }
+      }
+    }
+  } catch (e) {
+    m.erro = m.erro || "Não consegui falar com o servidor. Confira se ele está rodando.";
+  }
+  m.ferr = null; chat.ocupado = false; renderMsgs(); atualizarEntrada();
+}
+
+document.addEventListener("click", e => {
+  const t = e.target;
+  if (!t.closest) return;
+  const sug = t.closest("[data-sug]");
+  if (sug) { enviarPergunta(sug.dataset.sug); return; }
+  if (t.closest("#chat-enviar")) { const ta = $("#chat-texto"); const v = ta.value; ta.value = ""; enviarPergunta(v); atualizarEntrada(); return; }
+  if (t.closest("#chat-novo")) { if (!chat.ocupado) { chat.id = null; chat.msgs = []; renderMsgs(); } return; }
+  const ref = t.closest(".ref");
+  if (ref) {
+    const msg = ref.closest(".msg"), d = msg && msg.querySelector(`details[id$="-${ref.dataset.ref}"]`);
+    if (d) { d.open = true; d.scrollIntoView({behavior: "smooth", block: "nearest"}); }
+  }
+});
+document.addEventListener("keydown", e => {
+  if (e.target && e.target.id === "chat-texto" && e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault(); const v = e.target.value; e.target.value = ""; enviarPergunta(v); atualizarEntrada();
+  }
+});
+document.addEventListener("input", e => { if (e.target && e.target.id === "chat-texto") atualizarEntrada(); });
+
 /* ---- 2º turno ---- */
 const diasPara = iso => { const [y, m, d] = iso.split("-").map(Number), h = new Date();
   return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(h.getFullYear(), h.getMonth(), h.getDate())) / 864e5); };
@@ -595,6 +762,7 @@ function desenharMenu() {
 }
 function desenhar() {
   desenharMenu();
+  if (pag === "perguntar") { if (!$("#chat-root")) montarChat(); return; }     // o chat mantém o próprio estado
   if (!ultimo || ultimo.turno !== turno) return;
   anterior = atual; atual = {};
   const f = (turno === 2 ? {resumo: pgResumo2, presidente: pgPresidente2, governador: pgGovernador2}

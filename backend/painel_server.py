@@ -731,12 +731,72 @@ def servir(porta, uf, so_uf, so_br, intervalo):
                     print(f"Falha no mapa {sigla}/{cargo}: {e}")
             return js
 
+    # ---- chat (RAG + ferramentas): ver chat.py -----------------------------------------------------------------
+    def dados_do_painel(sigla, turno):
+        js = json.loads(gerar(sigla.lower(), turno))
+        if not js:
+            raise RuntimeError("dados do TSE indisponíveis no momento")
+        return js
+
+    def mapa_do_painel(sigla, cargo, turno):
+        js = json.loads(gerar_mapa(sigla.lower(), cargo, turno))
+        if not js:
+            raise RuntimeError("dados por região indisponíveis no momento")
+        return js
+
+    chat = None
+    try:
+        from chat import Chat
+        from chat_ferramentas import Ferramentas
+        from rag import busca
+        chat = Chat(Ferramentas(dados_do_painel, mapa_do_painel, busca.carregar()))
+        if not chat.ativo:
+            print(f"AVISO: o chat não vai responder. {chat.motivo_inativo()}")
+    except Exception as e:                                         # sem trechos indexados ou sem dependências
+        print(f"Chat desativado: {type(e).__name__}: {e}  (rode 'python -m rag.ingestao' e 'pip install -r requirements.txt')")
+    origens = {f"http://localhost:{porta}", f"http://127.0.0.1:{porta}"}
+
     class H(BaseHTTPRequestHandler):
+        def do_POST(self):
+            """POST /api/chat -> fluxo de eventos (SSE). Só JSON e só da própria página, para nenhum site de fora
+            conseguir gastar a chave da API do usuário."""
+            from urllib.parse import urlparse
+            if urlparse(self.path).path != "/api/chat" or chat is None:
+                self.send_error(404)
+                return
+            origem = self.headers.get("Origin")
+            if (origem and origem not in origens) or not (self.headers.get("Content-Type") or "").startswith("application/json"):
+                self.send_error(403)
+                return
+            try:
+                n = int(self.headers.get("Content-Length") or 0)
+                if not 0 < n <= 4096:
+                    raise ValueError
+                req = json.loads(self.rfile.read(n).decode("utf-8"))
+            except (ValueError, UnicodeDecodeError):
+                self.send_error(400)
+                return
+            try:
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("X-Accel-Buffering", "no")
+                self.end_headers()
+                for ev in chat.responder(req.get("conversa"), req.get("mensagem", ""), self.client_address[0]):
+                    self.wfile.write(("data: " + json.dumps(ev, ensure_ascii=False) + "\n\n").encode("utf-8"))
+                    self.wfile.flush()
+            except (ConnectionError, OSError):                     # o navegador fechou: o gerador é encerrado
+                pass
+
         def do_GET(self):
             from urllib.parse import parse_qs, urlparse
             rota, qs = urlparse(self.path).path, parse_qs(urlparse(self.path).query)
             sel = qs.get("uf", [uf])[0].lower()
-            if rota == "/geo/br":
+            if rota == "/api/chat/status":
+                corpo = json.dumps(chat.status() if chat else dict(ativo=False, motivo="Chat não configurado."),
+                                   ensure_ascii=False).encode("utf-8")
+                tipo = "application/json; charset=utf-8"
+            elif rota == "/geo/br":
                 import geo
                 corpo, tipo = geo.geojson_br(), "application/json"
             elif rota.startswith("/geo/uf/") and rota[8:].lower() in UFS:

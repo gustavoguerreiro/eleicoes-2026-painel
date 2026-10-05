@@ -1,0 +1,27 @@
+{
+  "descricao": "Perguntas com a resposta esperada no corpus. Mede só a BUSCA (sem chamar a API): o trecho certo aparece entre os k primeiros? `esperado` é uma expressão regular procurada na seção + texto dos trechos do candidato certo. Perguntas sem `filtro` testam a busca sem saber de quem se fala.",
+  "perguntas": [
+    {"pergunta": "Quantos presídios de segurança máxima o Flávio quer construir?", "filtro": "Flávio Bolsonaro", "candidato": "Flávio Bolsonaro", "esperado": "5 novos presídios"},
+    {"pergunta": "O que o Flávio propõe sobre desmatamento ilegal?", "filtro": "Flávio Bolsonaro", "candidato": "Flávio Bolsonaro", "esperado": "zerar o desmatamento ilegal"},
+    {"pergunta": "O Flávio propõe reconhecimento facial?", "filtro": "Flávio Bolsonaro", "candidato": "Flávio Bolsonaro", "esperado": "Muralha Brasileira"},
+    {"pergunta": "O que o Flávio diz sobre a reforma tributária?", "filtro": "Flávio Bolsonaro", "candidato": "Flávio Bolsonaro", "esperado": "reforma tribut"},
+    {"pergunta": "Como o Lula pretende lidar com as dívidas das famílias?", "filtro": "Lula", "candidato": "Lula", "esperado": "Desenrola"},
+    {"pergunta": "O que o Lula propõe para a atenção especializada na saúde?", "filtro": "Lula", "candidato": "Lula", "esperado": "atenção especializada"},
+    {"pergunta": "O Lula fala em justiça tributária e benefícios fiscais?", "filtro": "Lula", "candidato": "Lula", "esperado": "justiça tributária"},
+    {"pergunta": "O que é o Plano Brasil Soberano?", "filtro": "Lula", "candidato": "Lula", "esperado": "Brasil Soberano"},
+    {"pergunta": "O que o Cadu propõe para a educação antirracista?", "filtro": "Cadu de Lula", "candidato": "Cadu de Lula", "esperado": "antirracista"},
+    {"pergunta": "Como o Cadu quer organizar o atendimento da saúde no interior?", "filtro": "Cadu de Lula", "candidato": "Cadu de Lula", "esperado": "regionalizar o atendimento"},
+    {"pergunta": "O que o Cadu diz sobre infraestrutura, portos e aeroportos?", "filtro": "Cadu de Lula", "candidato": "Cadu de Lula", "esperado": "portos, aeroportos"},
+    {"pergunta": "Qual o diagnóstico do Cadu sobre a segurança pública no RN?", "filtro": "Cadu de Lula", "candidato": "Cadu de Lula", "esperado": "segurança pública"},
+    {"pergunta": "O que o Allyson propõe sobre terras raras?", "filtro": "Allyson", "candidato": "Allyson", "esperado": "terras raras"},
+    {"pergunta": "O que é o Pacto Potiguar pela Aprendizagem?", "filtro": "Allyson", "candidato": "Allyson", "esperado": "PACTO POTIGUAR"},
+    {"pergunta": "O Allyson tem proposta para a causa animal?", "filtro": "Allyson", "candidato": "Allyson", "esperado": "CAUSA ANIMAL"},
+    {"pergunta": "O Allyson fala em cultura de paz e prevenção ao uso de drogas?", "filtro": "Allyson", "candidato": "Allyson", "esperado": "cultura de paz"},
+    {"pergunta": "Como o Allyson trata o ensino médio?", "filtro": "Allyson", "candidato": "Allyson", "esperado": "ENSINO MÉDIO"},
+    {"pergunta": "Qual candidato propõe explorar terras raras?", "candidato": "Allyson", "esperado": "terras raras"},
+    {"pergunta": "Quem quer construir presídios de segurança máxima?", "candidato": "Flávio Bolsonaro", "esperado": "presídios de segurança máxima"},
+    {"pergunta": "Quem propõe um programa de renegociação de dívidas das famílias?", "candidato": "Lula", "esperado": "Desenrola"},
+    {"pergunta": "Quem fala em regionalizar consultas, exames e cirurgias?", "candidato": "Allyson", "esperado": "Regionalizar consultas"},
+    {"pergunta": "Quem propõe sistema nacional de reconhecimento facial?", "candidato": "Flávio Bolsonaro", "esperado": "reconhecimento facial"}
+  ]
+}

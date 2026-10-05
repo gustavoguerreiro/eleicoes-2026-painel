@@ -1,0 +1,3 @@
+# Só o chat/RAG precisa de pacotes externos; o painel em si usa apenas a biblioteca padrão.
+anthropic>=0.117
+pymupdf>=1.24
