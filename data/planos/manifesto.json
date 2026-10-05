@@ -1,0 +1,59 @@
+{
+  "fonte": "DivulgaCandContas (TSE) — arquivos do tipo 'Proposta de governo' enviados no registro de candidatura",
+  "eleicao": "Eleição Geral Federal 2026 (1º turno em 04/10/2026)",
+  "consultado_em": "2026-10-05",
+  "planos": [
+    {
+      "candidato": "Luiz Inácio Lula da Silva",
+      "nome_urna": "Lula",
+      "partido": "PT",
+      "cargo": "Presidente",
+      "uf": "BR",
+      "id_candidato_tse": 280002542548,
+      "nome_arquivo_original": "0806JOB838PTlivroplanodegovernocompressed.pdf",
+      "id_arquivo_tse": 280017016005,
+      "url": "https://divulgacandcontas.tse.jus.br/divulga/rest/arquivo/doc/280017016005",
+      "tamanho_mb": 1.13,
+      "arquivo_local": "lula_presidente.pdf"
+    },
+    {
+      "candidato": "Flávio Nantes Bolsonaro",
+      "nome_urna": "Flávio Bolsonaro",
+      "partido": "PL",
+      "cargo": "Presidente",
+      "uf": "BR",
+      "id_candidato_tse": 280002551544,
+      "nome_arquivo_original": "DiretrizesPlanodeGovernoFlavioBolsonaro20272030versaofinal.pdf",
+      "id_arquivo_tse": 280017104726,
+      "url": "https://divulgacandcontas.tse.jus.br/divulga/rest/arquivo/doc/280017104726",
+      "tamanho_mb": 1.85,
+      "arquivo_local": "flavio_bolsonaro_presidente.pdf"
+    },
+    {
+      "candidato": "Carlos Eduardo Xavier",
+      "nome_urna": "Cadu de Lula",
+      "partido": "PT",
+      "cargo": "Governador",
+      "uf": "RN",
+      "id_candidato_tse": 200002534001,
+      "nome_arquivo_original": "Plano de governo Cadu de Lulacompressed.pdf",
+      "id_arquivo_tse": 200016850707,
+      "url": "https://divulgacandcontas.tse.jus.br/divulga/rest/arquivo/doc/200016850707",
+      "tamanho_mb": 0.78,
+      "arquivo_local": "cadu_de_lula_governador_rn.pdf"
+    },
+    {
+      "candidato": "Allyson Leandro Bezerra Silva",
+      "nome_urna": "Allyson",
+      "partido": "UNIÃO",
+      "cargo": "Governador",
+      "uf": "RN",
+      "id_candidato_tse": 200002535255,
+      "nome_arquivo_original": "PROGRAMA DE GOVERNO 20272030 2.pdf",
+      "id_arquivo_tse": 200016865721,
+      "url": "https://divulgacandcontas.tse.jus.br/divulga/rest/arquivo/doc/200016865721",
+      "tamanho_mb": 1.46,
+      "arquivo_local": "allyson_governador_rn.pdf"
+    }
+  ]
+}
