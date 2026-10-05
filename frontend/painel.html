@@ -25,11 +25,12 @@ header.site{position:sticky;top:0;z-index:10;background:var(--card);border-botto
 .top{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .brand{font-weight:800;font-size:18px;letter-spacing:-.01em}
 .brand span{color:var(--acc)}
+.top .live{margin-right:auto}
 .live{display:flex;align-items:center;gap:7px;color:var(--mut);font-size:12.5px}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 1.8s infinite}
 .dot.off{background:var(--bad);animation:none}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(21,128,61,.5)}100%{box-shadow:0 0 0 8px rgba(21,128,61,0)}}
-.ufbox{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut)}
+.ufbox{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut)}
 .ufbox select{border:1px solid var(--bd);background:var(--soft);color:var(--tx);padding:7px 10px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
 nav.menu{max-width:1180px;margin:0 auto;padding:0 12px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
 nav.menu a{padding:10px 14px;font-weight:600;color:var(--mut);border-bottom:2px solid transparent;white-space:nowrap}
@@ -127,6 +128,18 @@ a.tile:hover,a.card:hover{border-color:var(--acc)}
   border-radius:12px;padding:9px 12px;font-size:13px;box-shadow:0 8px 28px rgba(0,0,0,.22);display:none;max-width:270px}
 #tip b{display:block;margin-bottom:3px}#tip div{display:flex;justify-content:space-between;gap:14px}
 
+.turnos{display:inline-flex;gap:2px;background:var(--soft);padding:3px;border-radius:999px}
+.turnos a{padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700;color:var(--mut)}
+.turnos a[aria-current="true"]{background:var(--card);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.aviso{background:rgba(180,83,9,.12);border:1px solid rgba(180,83,9,.35);color:var(--warn);padding:9px 14px;border-radius:12px;font-weight:700;font-size:13.5px}
+.dbar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--bar);margin:14px 0 4px;position:relative}
+.dbar i{display:block;height:100%;transition:width .6s}
+.dbar u{position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--tx);opacity:.55}
+.stack{display:flex;height:22px;border-radius:8px;overflow:hidden;background:var(--bar);margin:12px 0}
+.stack i{display:block;height:100%}
+.leg{display:grid;grid-template-columns:14px 1fr auto auto;gap:4px 10px;align-items:center;font-size:13.5px}
+.leg .sw{width:12px;height:12px;border-radius:3px}
+.leg .n,.leg .p{font-variant-numeric:tabular-nums;text-align:right}.leg .p{color:var(--mut);min-width:52px}
 footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;color:var(--mut);font-size:12.5px;display:grid;gap:6px}
 .skel{height:120px;border-radius:16px;background:linear-gradient(90deg,var(--bar),var(--soft),var(--bar));background-size:200% 100%;animation:sk 1.4s infinite}
 @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
@@ -134,6 +147,7 @@ footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;color:var(--mut);font-
   main{padding:14px 12px 30px}.top{padding:10px 12px}.card{padding:14px 14px}
   .duelo{gap:6px}.lado .p{font-size:24px}.lado .av{width:52px;height:52px}
   .ufbox label{display:none}
+  .turnos a{padding:5px 9px}
   .top{gap:10px}.dot:not(.off)+#status{display:none}      /* cabeçalho em 1 linha: o ponto verde basta */
   .ufbox select{max-width:180px}
 }
@@ -145,6 +159,7 @@ footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;color:var(--mut);font-
   <div class="top">
     <div class="brand">Apuração <span>2026</span></div>
     <div class="live"><span class="dot" id="dot"></span><span id="status">carregando…</span></div>
+    <div class="turnos" id="turnos" role="group" aria-label="Turno"></div>
     <div class="ufbox"><label for="sel-uf">Seu estado</label><select id="sel-uf"></select></div>
   </div>
   <nav class="menu" id="nav" aria-label="Seções"></nav>
@@ -205,8 +220,10 @@ const UF_COD = {"12":"AC","27":"AL","13":"AM","16":"AP","29":"BA","23":"CE","53"
   "42":"SC","28":"SE","35":"SP","17":"TO"};
 
 /* ---- estado da aplicação ---- */
-const PAGINAS = [["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"], ["senado","Senado"], ["deputados","Deputados"]];
-let pag = "resumo", uf = null, ultimo = null, anterior = {}, atual = {}, depTipo = "fed";
+const PAG_T1 = [["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"], ["senado","Senado"], ["deputados","Deputados"]];
+const PAG_T2 = [["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"]];
+let turno = 2, pag = "resumo", uf = null, ultimo = null, anterior = {}, atual = {}, depTipo = "fed";
+const paginasAtuais = () => turno === 1 ? PAG_T1 : PAG_T2;
 try { uf = localStorage.getItem("uf"); } catch (e) {}
 
 function marca(chave, valor) {            // " flash" quando o valor mudou desde a última leitura
@@ -215,15 +232,20 @@ function marca(chave, valor) {            // " flash" quando o valor mudou desde
 }
 
 /* ---- roteamento por hash: #/pagina/UF ---- */
-function lerHash() {
-  const [p, u] = location.hash.replace(/^#\/?/, "").split("/");
-  return {p: PAGINAS.some(x => x[0] === p) ? p : "resumo", u: (u || "").toUpperCase()};
+function lerHash() {                                    // #/pagina/UF[/1]  (sem o "/1" = 2º turno)
+  const [p, u, t] = location.hash.replace(/^#\/?/, "").split("/");
+  return {p: PAG_T1.some(x => x[0] === p) ? p : "resumo", u: (u || "").toUpperCase(), t: t === "1" ? 1 : 2};
 }
-function irPara(p, u) { location.hash = `#/${p}/${u || uf || ""}`; }
+const hashDe = (p, u, t) => `#/${p}/${u || uf || ""}${(t || turno) === 1 ? "/1" : ""}`;
+function irPara(p, u, t) { location.hash = hashDe(p, u, t); }
 function sincronizar() {
-  const r = lerHash();
-  pag = r.p;
-  if (r.u && ESTADOS[r.u] && r.u !== uf) { uf = r.u; try { localStorage.setItem("uf", uf); } catch (e) {} carregar(); }
+  const r = lerHash(), mudou = r.t !== turno;
+  turno = r.t; pag = r.p;
+  if (!paginasAtuais().some(x => x[0] === pag)) pag = "resumo";
+  if (mudou) ultimo = null;
+  const novaUf = r.u && ESTADOS[r.u] && r.u !== uf;
+  if (novaUf) { uf = r.u; try { localStorage.setItem("uf", uf); } catch (e) {} }
+  if (mudou || novaUf) carregar();
   $("#sel-uf").value = uf || "";
 }
 window.addEventListener("hashchange", () => { sincronizar(); anterior = {}; desenhar(); window.scrollTo(0, 0); });
@@ -332,7 +354,7 @@ function topHtml(titulo, r) {
   const linhas = r.cands.map(c => `<div><span>${esc(nome(c.nome))} <small>${esc(c.sg)}</small></span><b style="display:inline">${pct(c.pct)}</b></div>`).join("");
   return `<b>${esc(titulo)}</b>${linhas}<small style="color:var(--mut)">${pct(r.apur)} apurado</small>`;
 }
-function svgMapa(id, fc, chave, dados, titulo, clicavel) {
+function svgMapa(id, fc, chave, dados, titulo, clicavel, modo) {
   const pr = projecao(fc), cont = {};
   tips[id] = {};
   const paths = fc.features.map(f => {
@@ -340,7 +362,9 @@ function svgMapa(id, fc, chave, dados, titulo, clicavel) {
     let fill = "var(--bar)", op = 1;
     if (r && r.cands.length) {
       const l = r.cands[0];
-      fill = cor(l.sg); op = 0.42 + 0.58 * Math.max(0, Math.min(1, (l.pct - 25) / 40));
+      fill = cor(l.sg);
+      op = modo === "duelo" && r.cands[1] ? 0.4 + 0.6 * Math.max(0, Math.min(1, (l.pct - r.cands[1].pct) / 30))
+                                           : 0.42 + 0.58 * Math.max(0, Math.min(1, (l.pct - 25) / 40));
       cont[l.sg] = (cont[l.sg] || 0) + 1;
       tips[id][k] = topHtml(titulo(f, k), r);
     } else tips[id][k] = `<b>${esc(titulo(f, k))}</b><small style="color:var(--mut)">sem dados</small>`;
@@ -348,28 +372,31 @@ function svgMapa(id, fc, chave, dados, titulo, clicavel) {
   }).join("");
   const leg = Object.entries(cont).sort((a, b) => b[1] - a[1]).map(([sg, n]) => chipN(sg, n)).join("");
   return `<svg viewBox="0 0 600 ${pr.H.toFixed(0)}" role="img">${paths}</svg><div class="chips">${leg}</div>
-    <p class="nota">Cor = partido do mais votado · cor mais forte = maior fatia dos votos válidos. Passe o mouse para ver os detalhes.</p>`;
+    <p class="nota">${modo === "duelo" ? "Cor = quem tem mais votos entre os dois finalistas · cor mais forte = maior vantagem."
+      : "Cor = partido do mais votado · cor mais forte = maior fatia dos votos válidos."} Passe o mouse para ver os detalhes.</p>`;
 }
 const CARGOS = {"1": "Presidente", "3": "Governador", "5": "Senador"};
-function mapaBR(d, cargo) {
+function mapaBR(d, cargo, modo, sub) {
   const g = geoCache["/geo/br"];
   let corpo = '<div class="skel"></div>';
   if (g && g.v && d.mapa_br) {
     const dados = {};
     for (const [u, v] of Object.entries(d.mapa_br)) if (v[cargo]) dados[u] = v[cargo];
-    corpo = svgMapa("br", g.v, f => UF_COD[f.properties.codarea], dados, (f, k) => `${ESTADOS[k] || k} — ${CARGOS[cargo]}`, true);
+    corpo = svgMapa("br", g.v, f => UF_COD[f.properties.codarea], dados, (f, k) => `${ESTADOS[k] || k} — ${CARGOS[cargo]}`, true, modo);
   }
-  return `<section class="card mapa"><div class="ch"><h2>Brasil por estado</h2></div><p class="sub" style="margin-bottom:10px">Quem lidera em cada estado. Clique para escolher o estado.</p>${corpo}</section>`;
+  return `<section class="card mapa"><div class="ch"><h2>Brasil por estado</h2></div><p class="sub" style="margin-bottom:10px">${sub || "Quem lidera em cada estado."} Clique para escolher o estado.</p>${corpo}</section>`;
 }
-function mapaUF(cargo) {
-  const u = uf || "RN", g = geoCache["/geo/uf/" + u], m = mapaCache[`${u}:${cargo}`];
+function mapaUF(cargo, modo) {
+  const u = uf || "RN", g = geoCache["/geo/uf/" + u], m = mapaCache[`${u}:${cargo}:${turno}`];
   let corpo = '<div class="skel"></div>';
   if (g && g.v && m && m.v) {
     const nm = m.v.municipios, n = Object.keys(nm).length;
-    corpo = svgMapa("uf", g.v, f => f.properties.codarea, nm, (f, k) => `${nm[k] ? nm[k].nome : k} — ${CARGOS[cargo]}`, false) +
+    corpo = svgMapa("uf", g.v, f => f.properties.codarea, nm, (f, k) => `${nm[k] ? nm[k].nome : k} — ${CARGOS[cargo]}`, false, modo) +
       `<p class="nota">${n} de ${m.v.total} municípios com dados.</p>`;
   }
-  return `<section class="card mapa"><div class="ch"><h2>${esc(ESTADOS[u] || u)} por município</h2></div><p class="sub" style="margin-bottom:10px">Quem lidera em cada município.</p>${corpo}</section>`;
+  const sub = modo !== "duelo" ? "Quem lidera em cada município."
+    : (m && m.v && m.v.modo === "2t" ? "Resultado do 2º turno em cada município." : "Os dois finalistas no 1º turno, município a município.");
+  return `<section class="card mapa"><div class="ch"><h2>${esc(ESTADOS[u] || u)} por município</h2></div><p class="sub" style="margin-bottom:10px">${sub}</p>${corpo}</section>`;
 }
 function garantirMapas(cargo) {
   const u = uf || (ultimo && ultimo.uf && ultimo.uf.sigla);
@@ -384,7 +411,7 @@ function garantirMapas(cargo) {
       .finally(() => { delete mapaVai[chave]; desenhar(); });
   };
   carrega("/geo/br", "/geo/br", geoCache);
-  if (u) { carrega("/geo/uf/" + u, "/geo/uf/" + u, geoCache); carrega(`${u}:${cargo}`, `/api/mapa?uf=${u}&cargo=${cargo}`, mapaCache); }
+  if (u) { carrega("/geo/uf/" + u, "/geo/uf/" + u, geoCache); carrega(`${u}:${cargo}:${turno}`, `/api/mapa?uf=${u}&cargo=${cargo}&turno=${turno}`, mapaCache); }
 }
 
 /* ---- páginas ---- */
@@ -479,16 +506,101 @@ function pgDeputados(d) {
       <div>${cardCamara(d, true)}</div></div>`;
 }
 
+/* ---- 2º turno ---- */
+const diasPara = iso => { const [y, m, d] = iso.split("-").map(Number), h = new Date();
+  return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(h.getFullYear(), h.getMonth(), h.getDate())) / 864e5); };
+const dataBr = iso => iso.split("-").reverse().slice(0, 2).join("/");
+const avisoSim = d => d.meta && d.meta.simulado ? '<div class="aviso">SIMULAÇÃO · dados fabricados para teste; não são resultados reais.</div>' : "";
+
+function cardDuelo(titulo, d, link) {
+  if (!d || d.cands.length < 2) return cardVazio(titulo);
+  const [a, b] = d.cands, ao = d.ao_vivo;
+  const lado = c => `<div class="lado${marca("d" + titulo + c.nome, c.votos)}"><span class="av" style="background:${cor(c.sg)}">${esc(iniciais(c.nome))}</span>
+    <div class="n">${c.eleito ? "★ " : ""}${esc(nome(c.nome))}</div>${chip(c.sg)}
+    <div class="p">${ao ? pct(c.pct) : pct1(c.pct)}</div>
+    <small>${ao ? milhar(c.votos) + " votos · 1º turno: " + pct1(c.pct1t) : "no 1º turno · " + milhar(c.votos) + " votos"}</small></div>`;
+  const resto = Math.max(0, 100 - a.pct - b.pct);
+  return `<section class="card"><div class="ch"><h2>${esc(titulo)}</h2><span class="apur-t">${ao ? pct(d.apur) + " apurado" : "2º turno em " + dataBr(ultimo.meta.data_2t)}</span></div>
+    ${ao ? apurBar(d.apur) : '<div style="height:10px"></div>'}
+    ${statusHtml(d.situacao)}
+    <div class="duelo">${lado(a)}<div class="vs"><span>x</span></div>${lado(b)}</div>
+    <div class="dbar" title="participação de cada candidato">
+      <i style="width:${a.pct}%;background:${cor(a.sg)}"></i><i style="width:${resto}%;background:var(--bar)"></i><i style="width:${b.pct}%;background:${cor(b.sg)}"></i>${ao ? "<u></u>" : ""}</div>
+    <p class="nota">${ao ? "A linha no meio marca 50% dos votos válidos: quem passar dela vence." : "Barras do 1º turno; o cinza no meio são os votos dos candidatos que ficaram de fora."}</p>
+    ${link ? `<div class="rodape-card"><span></span><a class="link" href="#/${link}/${uf || ""}">Ver detalhes →</a></div>` : ""}</section>`;
+}
+
+function cardBase(titulo, d) {
+  if (!d || !d.base || d.cands.length < 2) return cardVazio(titulo);
+  const b = d.base;
+  const fin = d.cands.map(c => c.votos1t);                                                  // votos de cada finalista no 1º turno
+  const seg = [
+    [nome(d.cands[0].nome), fin[0], cor(d.cands[0].sg)], [nome(d.cands[1].nome), fin[1], cor(d.cands[1].sg)],
+    ["Candidatos eliminados", b.outros_votos, "#8b93a1"], ["Votos brancos", b.brancos, "#c6ccd8"],
+    ["Votos nulos", b.nulos, "#a9b0bf"], ["Abstenção", b.abstencao, "var(--bar)"]];
+  const tot = b.aptos || seg.reduce((a, s2) => a + s2[1], 0);
+  const barra = seg.map(([n, v, c]) => `<i style="width:${v / tot * 100}%;background:${c}" title="${esc(n)}"></i>`).join("");
+  const leg = seg.map(([n, v, c]) => `<span class="sw" style="background:${c};border:1px solid var(--bd)"></span><span>${esc(n)}</span><span class="n">${milhar(v)}</span><span class="p">${pct1(v / tot * 100)}</span>`).join("");
+  const elim = b.eliminados.slice(0, 5).map(c => `<span>${esc(nome(c.nome))} ${chip(c.sg)} <small style="color:var(--mut)">${pct1(c.pct)}</small></span>`).join(" &nbsp; ");
+  return `<section class="card"><div class="ch"><h2>O que está em disputa · ${esc(titulo)}</h2></div>
+    <p class="sub">Como o eleitorado se dividiu no 1º turno (percentuais sobre todos os eleitores aptos).</p>
+    <div class="stack">${barra}</div><div class="leg">${leg}</div>
+    <p class="nota" style="margin-top:12px"><b>${pct1(b.outros_pct)}</b> dos votos válidos foram para candidatos que não chegaram ao 2º turno. Esses votos, os brancos, os nulos e a abstenção são o que ainda pode mudar o placar.</p>
+    ${b.eliminados.length ? `<p class="nota" style="line-height:1.9">Mais votados entre os eliminados: ${elim}</p>` : ""}</section>`;
+}
+
+function cardUfSemT2(d) {
+  const u = d.uf || {};
+  return `<section class="card"><div class="ch"><h2>${esc(ESTADOS[u.sigla] || u.sigla)}</h2></div>
+    <p class="vazio" style="text-align:left">O governo deste estado foi decidido no 1º turno, então não há 2º turno para governador aqui.</p>
+    <div class="rodape-card"><a class="link" href="#/governador/${u.sigla}/1">Ver o resultado do 1º turno →</a></div></section>`;
+}
+
+function subtituloT2(d) {
+  const ao = d.pres && d.pres.ao_vivo, dias = diasPara(d.meta.data_2t);
+  if (ao) return `Apuração em andamento · ${pct(d.pres.apur)} das seções`;
+  if (dias > 1) return `O 2º turno é em ${dataBr(d.meta.data_2t)} · faltam ${dias} dias`;
+  if (dias === 1) return `O 2º turno é amanhã, ${dataBr(d.meta.data_2t)}`;
+  return `O 2º turno é hoje, ${dataBr(d.meta.data_2t)} · aguardando os primeiros resultados`;
+}
+
+function pgResumo2(d) {
+  const u = d.uf || {};
+  const gov = u.em_2turno ? cardDuelo("Governador · " + (ESTADOS[u.sigla] || u.sigla), u.gov, "governador") : cardUfSemT2(d);
+  return avisoSim(d) + paginaTitulo("2º turno", subtituloT2(d)) +
+    `<div class="grid">${cardDuelo("Presidente da República", d.pres, "presidente")}${gov}</div>
+    <div class="grid">${cardBase("Presidente", d.pres)}${u.em_2turno ? cardBase("Governador · " + u.sigla, u.gov) : ""}</div>
+    <p class="nota">Quer ver como foi o 1º turno? <a class="link" href="${hashDe("resumo", uf, 1)}">Resultado final do 1º turno →</a></p>`;
+}
+function pgPresidente2(d) {
+  garantirMapas("1");
+  const ao = d.pres && d.pres.ao_vivo;
+  return avisoSim(d) + paginaTitulo("Presidente da República", subtituloT2(d)) +
+    `<div class="grid">${cardDuelo("Brasil", d.pres)}${cardBase("Brasil", d.pres)}</div>
+    <div class="grid">${mapaBR(d, "1", "duelo", ao ? "Resultado do 2º turno por estado." : "Os dois finalistas no 1º turno, estado a estado.")}${mapaUF("1", "duelo")}</div>`;
+}
+function pgGovernador2(d) {
+  const u = d.uf || {};
+  if (!u.em_2turno) return avisoSim(d) + paginaTitulo("Governador", subtituloT2(d)) + `<div class="grid">${cardUfSemT2(d)}</div>`;
+  garantirMapas("3");
+  return avisoSim(d) + paginaTitulo("Governador · " + (ESTADOS[u.sigla] || u.sigla), subtituloT2(d)) +
+    `<div class="grid">${cardDuelo("Governador", u.gov)}${cardBase("Governador", u.gov)}</div>
+    <div class="grid">${mapaUF("3", "duelo")}</div>`;
+}
+
 /* ---- desenho ---- */
 function desenharMenu() {
-  $("#nav").innerHTML = PAGINAS.map(([id, n]) => `<a href="#/${id}/${uf || ""}" ${pag === id ? 'aria-current="page"' : ""}>${n}</a>`).join("");
+  $("#nav").innerHTML = paginasAtuais().map(([id, n]) => `<a href="${hashDe(id)}" ${pag === id ? 'aria-current="page"' : ""}>${n}</a>`).join("");
+  $("#turnos").innerHTML = [[2, "2º turno"], [1, "1º turno"]].map(([t, n]) => `<a href="${hashDe(pag, uf, t)}" ${turno === t ? 'aria-current="true"' : ""}>${n}</a>`).join("");
 }
 function desenhar() {
   desenharMenu();
-  if (!ultimo) return;
+  if (!ultimo || ultimo.turno !== turno) return;
   anterior = atual; atual = {};
-  const f = {resumo: pgResumo, presidente: pgPresidente, governador: pgGovernador, senado: pgSenado, deputados: pgDeputados}[pag] || pgResumo;
-  $("#app").innerHTML = f(ultimo);
+  const f = (turno === 2 ? {resumo: pgResumo2, presidente: pgPresidente2, governador: pgGovernador2}
+                         : {resumo: pgResumo, presidente: pgPresidente, governador: pgGovernador, senado: pgSenado, deputados: pgDeputados})[pag] || pgResumo;
+  // os links internos das páginas do 1º turno não carregam o turno: acrescenta aqui
+  $("#app").innerHTML = f(ultimo).replace(/href="#\/(\w+)\/([A-Z]*)"/g, (m, p, u) => `href="${hashDe(p, u)}"`);
 }
 
 /* ---- interação ---- */
@@ -516,9 +628,11 @@ $("#sel-uf").onchange = () => irPara(pag, $("#sel-uf").value);
 
 async function carregar() {
   try {
-    const r = await fetch("/api?uf=" + (uf || "") + "&t=" + Date.now());
+    const r = await fetch(`/api?uf=${uf || ""}&turno=${turno}&t=${Date.now()}`);
     if (!r.ok) throw new Error(r.status);
-    ultimo = await r.json();
+    const j = await r.json();
+    if (j.turno !== turno || (uf && j.uf && j.uf.sigla !== uf)) return;        // resposta de uma escolha anterior
+    ultimo = j;
     if (!uf && ultimo.uf) { uf = ultimo.uf.sigla; try { localStorage.setItem("uf", uf); } catch (e) {} }
     $("#sel-uf").value = uf;
     $("#dot").classList.remove("off");

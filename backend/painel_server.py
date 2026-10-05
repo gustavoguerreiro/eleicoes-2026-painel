@@ -24,7 +24,9 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 
-RAIZ = "https://resultados.tse.jus.br/oficial/ele2026"
+BASE = "https://resultados.tse.jus.br/oficial"
+RAIZ = BASE + "/ele2026"
+DATA_2T = "2026-10-25"
 ELE_PRES, ELE_DEMAIS = "6257", "6259"          # presidente | governador, senador e deputados
 UFS = ["ac", "al", "am", "ap", "ba", "ce", "df", "es", "go", "ma", "mg", "ms", "mt", "pa", "pb", "pe", "pi", "pr",
        "rj", "rn", "ro", "rr", "rs", "sc", "se", "sp", "to"]
@@ -38,6 +40,14 @@ V, R, A, C, D, N, Z = "\033[32m", "\033[31m", "\033[33m", "\033[36m", "\033[2m",
 
 # ---- coleta -----------------------------------------------------------------------------------------------
 def baixar(url):
+    if SIM["ativo"]:                                   # --simular-2t: o 2º turno é fabricado a partir do 1º
+        fab = simulado(url)
+        if fab is not False:
+            return fab
+    return _baixar_http(url)
+
+
+def _baixar_http(url):
     for tentativa in range(3):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 eleicoes-2026-painel"})
@@ -99,7 +109,7 @@ def candidatos(j):
         for ag in cg.get("agr", []):
             for pa in ag.get("par", []):
                 for c in pa.get("cand", []):
-                    out.append(dict(nome=c.get("nmu") or c["nm"], sg=pa.get("sg", ""), votos=num(c["vap"]),
+                    out.append(dict(nome=c.get("nmu") or c["nm"], n=str(c.get("n", "")), sg=pa.get("sg", ""), votos=num(c["vap"]),
                                     pct=num(c.get("pvap")), eleito=c.get("e") == "s" and "turno" not in c.get("st", "").lower(),
                                     t2=c.get("e") == "s" and "turno" in c.get("st", "").lower(), valido=c.get("dvt", "").startswith("V"),
                                     agr=ag.get("com", ag.get("nm", ""))))
@@ -408,25 +418,49 @@ def municipios_tse():
     return _MUN
 
 
-def mapa_municipios(uf, cargo):
-    """Resultado de cada município da UF para o cargo (1 presidente, 3 governador, 5 senador)."""
+def mapa_municipios(uf, cargo, turno=1):
+    """Resultado de cada município da UF para o cargo (1 presidente, 3 governador, 5 senador).
+    turno=2: o 2º turno ao vivo, se já houver arquivos; antes disso, o desempenho dos dois finalistas no 1º turno."""
     import geo
-    ele = ELE_PRES if cargo == 1 else ELE_DEMAIS
+    cod = codigos_turno()
+    ele1 = cod["pres1"] if cargo == 1 else cod["dem1"]
+    ele2 = cod["pres2"] if cargo == 1 else cod["dem2"]
     muns = municipios_tse().get(uf, [])
     nomes = {}
     try:
         nomes = geo.nomes_uf(uf)
     except Exception:
         pass
-    urls = [f"{RAIZ}/{ele}/dados/{uf}/{uf}{tse}-c{cargo:04d}-e{int(ele):06d}-u.json" for tse, _, _ in muns]
-    with ThreadPoolExecutor(max_workers=16) as ex:
-        res = list(ex.map(baixar_cache, urls))
+
+    def urls(ele):
+        return [f"{RAIZ}/{ele}/dados/{uf}/{uf}{tse}-c{cargo:04d}-e{int(ele):06d}-u.json" for tse, _, _ in muns]
+
+    def baixa(us):
+        with ThreadPoolExecutor(max_workers=16) as ex:
+            return list(ex.map(baixar_cache, us))
+
+    r1 = baixa(urls(ele1))
+    modo, r2 = "1t", [None] * len(muns)
+    finalistas = set()
+    if turno == 2:
+        uf1 = baixar_cache(url_u(ele1, uf, cargo))
+        finalistas = {c["n"] for c in finalistas_1t(uf1)} if uf1 else set()
+        if t2_disponivel():
+            r2 = baixa(urls(ele2))
+            modo = "2t"
+        else:
+            modo = "duelo_1t"
     out = {}
-    for (tse, ibge, nm), j in zip(muns, res):
-        r = resumo_mapa(j)
+    for (tse, ibge, nm), j1, j2 in zip(muns, r1, r2):
+        if turno == 2 and modo == "2t" and j2:
+            r = resumo_mapa(j2, 2)
+        elif turno == 2:
+            r = resumo_duelo(j1, finalistas)
+        else:
+            r = resumo_mapa(j1)
         if r:
             out[ibge] = dict(r, nome=nomes.get(ibge) or nm.title())
-    return dict(uf=uf.upper(), cargo=cargo, total=len(muns), municipios=out)
+    return dict(uf=uf.upper(), cargo=cargo, turno=turno, modo=modo, total=len(muns), municipios=out)
 
 
 def dados_web(uf, so_uf, so_br):
@@ -436,7 +470,7 @@ def dados_web(uf, so_uf, so_br):
         pedidos += [(ELE_PRES, u, 1) for u in UFS]
     pedidos += [(ELE_DEMAIS, uf, c) for c in (3, 5, 6, 8 if uf == "df" else 7)]
     dados = coletar(list(dict.fromkeys(pedidos)))
-    out = dict(agora=datetime.now(BRT).strftime("%H:%M:%S"), pres=web_majoritario(dados.get(("br", 1))))
+    out = dict(turno=1, meta=meta(), agora=datetime.now(BRT).strftime("%H:%M:%S"), pres=web_majoritario(dados.get(("br", 1))))
     out["uf"] = dict(sigla=uf.upper(), gov=web_majoritario(dados.get((uf, 3))), sen=web_senado(dados.get((uf, 5))),
                      fed=web_proporcional(dados.get((uf, 6))),
                      est=web_proporcional(dados.get((uf, 8 if uf == "df" else 7))))
@@ -477,6 +511,191 @@ def dados_web(uf, so_uf, so_br):
     return out
 
 
+# ---- 2º turno ----------------------------------------------------------------------------------------------
+SIM = dict(ativo=False, t0=0.0, duracao=600.0)
+_COD = dict(t=0.0, v=None)
+
+
+def codigos_turno():
+    """Códigos de eleição do 1º e do 2º turno (campo `cdt2` do ele-c.json). Se falhar, usa os já anunciados."""
+    if _COD["v"] and time.time() - _COD["t"] < 600:
+        return _COD["v"]
+    v = dict(pres1=ELE_PRES, pres2="6258", dem1=ELE_DEMAIS, dem2="6260")
+    try:
+        j = _baixar_http(f"{BASE}/comum/config/ele-c.json") or {}
+        for pl in j.get("pl", []):
+            if "2026" not in str(pl.get("c", "")):
+                continue
+            for e in pl.get("e", []):
+                if str(e.get("t")) != "1":
+                    continue
+                for a in e.get("abr", []):
+                    for cp in a.get("cp", []):
+                        if a.get("cd") == "br" and cp.get("cd") == "1":
+                            v.update(pres1=e["cd"], pres2=e.get("cdt2") or v["pres2"])
+                        if a.get("cd") == "br" and cp.get("cd") == "3":
+                            v.update(dem1=e["cd"], dem2=e.get("cdt2") or v["dem2"])
+    except Exception:
+        pass
+    _COD.update(t=time.time(), v=v)
+    return v
+
+
+def t2_disponivel():
+    """O TSE já publicou os arquivos do 2º turno? (antes de 25/10 eles dão 404)"""
+    c = codigos_turno()
+    return baixar_cache(url_u(c["pres2"], "br", 1)) is not None
+
+
+def meta():
+    return dict(t2_disponivel=t2_disponivel(), simulado=SIM["ativo"], data_2t=DATA_2T)
+
+
+def simulado(url):
+    """Modo --simular-2t: devolve um arquivo de 2º turno fabricado a partir do equivalente do 1º (False = não é 2º turno)."""
+    c = codigos_turno()
+    for k1, k2 in (("pres1", "pres2"), ("dem1", "dem2")):
+        e1, e2 = c[k1], c[k2]
+        if f"/{e2}/" in url and f"e{int(e2):06d}" in url:
+            u1 = url.replace(f"/{e2}/", f"/{e1}/").replace(f"e{int(e2):06d}", f"e{int(e1):06d}")
+            j1 = _baixar_http(u1)
+            return sintetizar_2t(j1, url) if j1 else None
+    return False
+
+
+def sintetizar_2t(j1, url):
+    """Só para testar: os dois finalistas ficam com os votos do 1º turno + uma divisão pseudo-aleatória (estável por
+    arquivo) dos votos dos demais, e a apuração avança com o tempo até 100% em SIM['duracao'] segundos."""
+    import copy
+    import hashlib
+    import random
+    rnd = random.Random(int(hashlib.md5(url.encode()).hexdigest(), 16) % 2 ** 32)
+    cs = [c for c in candidatos(j1) if c["valido"]]
+    fin = ([c for c in cs if c["t2"]] or cs[:2])[:2]
+    if len(fin) < 2:
+        return None
+    prog = min(1.0, (time.time() - SIM["t0"]) / SIM["duracao"])
+    local = min(1.0, max(0.0, prog * 1.25 - 0.25 * rnd.random()))
+    outros = sum(c["votos"] for c in cs if c["n"] not in {f["n"] for f in fin})
+    lean = 0.5 + (rnd.random() - 0.5) * 0.3
+    novos = {fin[0]["n"]: round((fin[0]["votos"] + lean * outros) * local),
+             fin[1]["n"]: round((fin[1]["votos"] + (1 - lean) * outros) * local)}
+    total = sum(novos.values())
+    fmt = lambda x: f"{x:.2f}".replace(".", ",")
+    j = copy.deepcopy(j1)
+    for cg in j.get("carg", []):
+        agrs = []
+        for ag in cg.get("agr", []):
+            pars = []
+            for pa in ag.get("par", []):
+                pa["cand"] = [c for c in pa.get("cand", []) if str(c.get("n")) in novos]
+                for c in pa["cand"]:
+                    v = novos[str(c["n"])]
+                    p = v / total * 100 if total else 0.0
+                    c.update(vap=str(v), pvap=fmt(p), pvapn=f"{p:.9f}".replace(".", ","))
+                    venceu = local >= 1 and v == max(novos.values())
+                    c.update(e="s" if venceu else "n", st=("Eleito" if venceu else "Não eleito") if local >= 1 else "")
+                if pa["cand"]:
+                    pars.append(pa)
+            if pars:
+                ag["par"] = pars
+                agrs.append(ag)
+        cg["agr"] = agrs
+    ts = int(num(j["s"]["ts"]))
+    j["s"].update(st=str(round(ts * local)), pst=fmt(local * 100), pstn=f"{local * 100:.9f}".replace(".", ","))
+    j["v"].update(vv=str(total), vvc=str(total))
+    j["t"] = "2"
+    agora = datetime.now(BRT)
+    j["dg"], j["hg"], j["ht"] = agora.strftime("%d/%m/%Y"), agora.strftime("%H:%M:%S"), agora.strftime("%H:%M:%S")
+    return j
+
+
+def finalistas_1t(j1):
+    """Os dois candidatos que foram ao 2º turno (marcados pelo TSE) ou, se ainda não marcou, os dois mais votados."""
+    cs = [c for c in candidatos(j1) if c["valido"]]
+    return ([c for c in cs if c["t2"]] or cs[:2])[:2]
+
+
+def resumo_duelo(j1, nums):
+    """Antes do 2º turno: só os dois finalistas, com os votos que tiveram no 1º turno naquela região."""
+    if not j1:
+        return None
+    cs = [c for c in candidatos(j1) if c["valido"] and c["n"] in nums]
+    if len(cs) < 2:
+        return None
+    return dict(apur=apurado(j1), cands=[{k: c[k] for k in ("nome", "sg", "votos", "pct")} for c in cs])
+
+
+def base_1t(j1, nums):
+    """O que o 1º turno deixou 'em disputa' para o 2º: eleitores dos eliminados, brancos, nulos e abstenção."""
+    cs = [c for c in candidatos(j1) if c["valido"]]
+    elim = [c for c in cs if c["n"] not in nums]
+    vv = num(j1["v"]["vv"])
+    e, v = j1.get("e", {}), j1.get("v", {})
+    outros = sum(c["votos"] for c in elim)
+    return dict(apur=apurado(j1), validos=vv, outros_votos=outros, outros_pct=outros / vv * 100 if vv else 0,
+                brancos=num(v.get("vb")), nulos=num(v.get("tvn")), abstencao=num(e.get("a")), aptos=num(e.get("te")),
+                comparecimento_pct=num(e.get("pc")),
+                eliminados=[{k: c[k] for k in ("nome", "sg", "votos", "pct")} for c in elim[:8]])
+
+
+def situacao_2t(j, cs):
+    """No 2º turno vence quem tiver mais votos válidos (maioria absoluta, já que são só dois)."""
+    if len(cs) < 2 or apurado(j) <= 0:
+        return dict(tipo="aberto", rotulo="AGUARDANDO APURAÇÃO", texto="Os primeiros resultados ainda não chegaram.")
+    a, b = cs[0], cs[1]
+    dif, r = a["votos"] - b["votos"], restantes(j)
+    pp = a["pct"] - b["pct"]
+    if a["eleito"]:
+        return dict(tipo="eleito", rotulo="ELEITO", texto=f"{a['nome']} (confirmado pelo TSE)")
+    if dif > r:
+        return dict(tipo="1turno", rotulo="VITÓRIA DEFINIDA (projeção)",
+                    texto=f"{a['nome']} lidera por {milhar(dif)} votos e o que falta apurar não alcança essa diferença")
+    cor = "2turno" if dif < 0.25 * r else "aberto"
+    return dict(tipo=cor, rotulo="DISPUTA ABERTA",
+                texto=f"{a['nome']} lidera por {milhar(dif)} votos ({pct(pp)} p.p.); faltam cerca de {milhar(r)} votos válidos")
+
+
+def web_2t(j2, j1):
+    """Cartão do duelo. Ao vivo (j2) mostra o 2º turno; antes dele, os finalistas com o desempenho do 1º turno (j1)."""
+    if not j1:
+        return None
+    fin = finalistas_1t(j1)
+    nums = {c["n"] for c in fin}
+    ref = {c["n"]: c["pct"] for c in fin}
+    refv = {c["n"]: c["votos"] for c in fin}
+    base = base_1t(j1, nums)
+    campos = ("nome", "n", "sg", "votos", "pct", "eleito")
+    if j2:
+        cs = [c for c in candidatos(j2) if c["valido"]][:2]
+        return dict(ao_vivo=True, apur=apurado(j2), ht=j2.get("ht", ""), situacao=situacao_2t(j2, cs), base=base,
+                    cands=[dict({k: c[k] for k in campos}, pct1t=ref.get(c["n"], 0), votos1t=refv.get(c["n"], 0)) for c in cs])
+    return dict(ao_vivo=False, apur=0, ht=j1.get("ht", ""), base=base,
+                situacao=dict(tipo="aberto", rotulo="AGUARDANDO O 2º TURNO", texto=f"A votação é em {DATA_2T[8:]}/{DATA_2T[5:7]}."),
+                cands=[dict({k: c[k] for k in campos}, pct1t=c["pct"], votos1t=c["votos"]) for c in fin])
+
+
+def dados_2t(uf):
+    c = codigos_turno()
+    ok = t2_disponivel()
+    d1 = coletar([(c["pres1"], "br", 1)] + [(c["pres1"], u, 1) for u in UFS] + [(c["dem1"], uf, 3)])
+    d2 = coletar([(c["pres2"], "br", 1)] + [(c["pres2"], u, 1) for u in UFS] + [(c["dem2"], uf, 3)]) if ok else {}
+    out = dict(turno=2, meta=meta(), agora=datetime.now(BRT).strftime("%H:%M:%S"),
+               pres=web_2t(d2.get(("br", 1)), d1.get(("br", 1))))
+    fin_gov = finalistas_1t(d1[(uf, 3)]) if d1.get((uf, 3)) else []
+    out["uf"] = dict(sigla=uf.upper(), em_2turno=bool(d1.get((uf, 3)) and any(x["t2"] for x in fin_gov)),
+                     gov=web_2t(d2.get((uf, 3)), d1.get((uf, 3))))
+    mapa = {}
+    nums = {x["n"] for x in finalistas_1t(d1[("br", 1)])} if d1.get(("br", 1)) else set()
+    for u in UFS:
+        j2, j1 = d2.get((u, 1)), d1.get((u, 1))
+        r = resumo_mapa(j2, 2) if j2 else resumo_duelo(j1, nums)
+        if r:
+            mapa[u.upper()] = {"1": r}
+    out["mapa_br"] = mapa
+    return out
+
+
 def servir(porta, uf, so_uf, so_br, intervalo):
     import threading
     import webbrowser
@@ -487,26 +706,27 @@ def servir(porta, uf, so_uf, so_br, intervalo):
     cache = {}                                                     # uf -> (instante, json)
     lock = threading.Lock()
 
-    def gerar(sigla=uf):
+    def gerar(sigla=uf, turno=1):
         with lock:
-            t, js = cache.get(sigla, (0.0, b"{}"))
+            t, js = cache.get((sigla, turno), (0.0, b"{}"))
             if time.time() - t > intervalo:                        # várias abas não multiplicam as consultas ao TSE
                 try:
-                    js = json.dumps(dados_web(sigla, so_uf, so_br), ensure_ascii=False).encode("utf-8")
-                    cache[sigla] = (time.time(), js)
+                    dados = dados_2t(sigla) if turno == 2 else dados_web(sigla, so_uf, so_br)
+                    js = json.dumps(dados, ensure_ascii=False).encode("utf-8")
+                    cache[(sigla, turno)] = (time.time(), js)
                 except Exception as e:
                     print(f"Falha neste ciclo: {e}")
             return js
 
     cache_mapa, lock_mapa = {}, threading.Lock()                  # lock próprio: o mapa de MG não trava o /api
 
-    def gerar_mapa(sigla, cargo):
+    def gerar_mapa(sigla, cargo, turno=1):
         with lock_mapa:
-            t, js = cache_mapa.get((sigla, cargo), (0.0, b"{}"))
+            t, js = cache_mapa.get((sigla, cargo, turno), (0.0, b"{}"))
             if time.time() - t > max(intervalo, 30):
                 try:
-                    js = json.dumps(mapa_municipios(sigla, cargo), ensure_ascii=False).encode("utf-8")
-                    cache_mapa[(sigla, cargo)] = (time.time(), js)
+                    js = json.dumps(mapa_municipios(sigla, cargo, turno), ensure_ascii=False).encode("utf-8")
+                    cache_mapa[(sigla, cargo, turno)] = (time.time(), js)
                 except Exception as e:
                     print(f"Falha no mapa {sigla}/{cargo}: {e}")
             return js
@@ -523,9 +743,13 @@ def servir(porta, uf, so_uf, so_br, intervalo):
                 import geo
                 corpo, tipo = geo.geojson_uf(rota[8:]), "application/json"
             elif rota == "/api/mapa":
-                corpo, tipo = gerar_mapa(sel if sel in UFS else uf, int(qs.get("cargo", ["3"])[0]) if qs.get("cargo", ["3"])[0] in ("1", "3", "5") else 3), "application/json; charset=utf-8"
+                cg = qs.get("cargo", ["3"])[0]
+                corpo = gerar_mapa(sel if sel in UFS else uf, int(cg) if cg in ("1", "3", "5") else 3,
+                                   2 if qs.get("turno", ["1"])[0] == "2" else 1)
+                tipo = "application/json; charset=utf-8"
             elif rota.startswith("/api"):
-                corpo, tipo = gerar(sel if sel in UFS else uf), "application/json; charset=utf-8"
+                corpo = gerar(sel if sel in UFS else uf, 2 if qs.get("turno", ["1"])[0] == "2" else 1)
+                tipo = "application/json; charset=utf-8"
             else:
                 with open(pagina, "rb") as f:
                     corpo, tipo = f.read(), "text/html; charset=utf-8"
@@ -564,11 +788,17 @@ def main():
     ap.add_argument("--uma-vez", action="store_true")
     ap.add_argument("--web", action="store_true", help="abre o painel no navegador (localhost)")
     ap.add_argument("--porta", type=int, default=8765)
+    ap.add_argument("--simular-2t", action="store_true",
+                    help="TESTE: fabrica arquivos de 2º turno a partir do 1º, com apuração que avança até 100%%")
+    ap.add_argument("--sim-duracao", type=int, default=600, help="segundos até a apuração simulada chegar a 100%%")
     ap.add_argument("--intervalo", type=int, default=None, help="segundos entre consultas (padrão: 60 no terminal, 15 no navegador)")
     a = ap.parse_args()
     uf = a.uf.lower()
     if uf not in UFS:
         sys.exit(f"UF inválida: {a.uf}")
+    if a.simular_2t:
+        SIM.update(ativo=True, t0=time.time(), duracao=float(a.sim_duracao))
+        print(f"*** SIMULAÇÃO DE 2º TURNO ATIVA (dados fabricados; 100% em {a.sim_duracao}s) ***")
     if a.web:
         servir(a.porta, uf, a.so_uf, a.so_br, a.intervalo or 15)
         return
