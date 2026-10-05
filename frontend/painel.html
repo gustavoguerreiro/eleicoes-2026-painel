@@ -6,222 +6,266 @@
 <title>Apuração 2026</title>
 <style>
 :root{
-  --bg:#f4f5f7; --card:#fff; --tx:#1b1f27; --mut:#6b7280; --bd:#e5e7eb; --bar:#e8eaee;
-  --acc:#2563eb; --ok:#16a34a; --warn:#d97706; --bad:#dc2626; --flash:#fef08a;
+  --bg:#f5f6f8; --card:#fff; --tx:#171b23; --mut:#667085; --bd:#e4e7ec; --bar:#e9ecf1; --soft:#f0f2f6;
+  --acc:#2457d6; --ok:#15803d; --warn:#b45309; --bad:#b42318; --flash:#fff3b0; --sh:0 1px 2px rgba(16,24,40,.05);
 }
 @media (prefers-color-scheme:dark){:root{
-  --bg:#0d1017; --card:#161b25; --tx:#e7eaf0; --mut:#8c95a6; --bd:#252c3a; --bar:#232a38;
-  --acc:#60a5fa; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171; --flash:#5b4b00;
+  --bg:#0c0f15; --card:#151a23; --tx:#e9ecf2; --mut:#8e98a9; --bd:#252c3a; --bar:#232a38; --soft:#1b212c;
+  --acc:#6b9bff; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171; --flash:#4a3e00; --sh:none;
 }}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--bd);padding:12px 20px;
-  display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
-h1{font-size:18px;margin:0;font-weight:700}
-.live{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:13px}
-.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);animation:pulse 1.6s infinite}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
+
+/* ---- cabeçalho ---- */
+header.site{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--bd)}
+.top{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:18px;letter-spacing:-.01em}
+.brand span{color:var(--acc)}
+.live{display:flex;align-items:center;gap:7px;color:var(--mut);font-size:12.5px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 1.8s infinite}
 .dot.off{background:var(--bad);animation:none}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.55)}100%{box-shadow:0 0 0 9px rgba(22,163,74,0)}}
-.tabs{margin-left:auto;display:flex;gap:6px}
-.tabs button{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:7px 14px;border-radius:999px;
-  font:inherit;cursor:pointer}
-.tabs select{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:7px 10px;border-radius:999px;font:inherit;cursor:pointer}
-.tabs button.on{background:var(--acc);border-color:var(--acc);color:#fff}
-main{max-width:1200px;margin:0 auto;padding:20px;display:grid;gap:16px}
-.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(360px,1fr))}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px 18px}
-.card h2{font-size:15px;margin:0 0 2px;font-weight:700}
-.sub{color:var(--mut);font-size:12.5px;margin-bottom:12px}
-.apur{height:5px;background:var(--bar);border-radius:3px;margin:6px 0 12px;overflow:hidden}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(21,128,61,.5)}100%{box-shadow:0 0 0 8px rgba(21,128,61,0)}}
+.ufbox{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut)}
+.ufbox select{border:1px solid var(--bd);background:var(--soft);color:var(--tx);padding:7px 10px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+nav.menu{max-width:1180px;margin:0 auto;padding:0 12px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+nav.menu a{padding:10px 14px;font-weight:600;color:var(--mut);border-bottom:2px solid transparent;white-space:nowrap}
+nav.menu a:hover{color:var(--tx)}
+nav.menu a[aria-current="page"]{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* ---- layout ---- */
+main{max-width:1180px;margin:0 auto;padding:22px 20px 40px;display:grid;gap:18px}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));align-items:start}
+.cols3{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
+.pagina-titulo h1{margin:0;font-size:24px;letter-spacing:-.02em}
+.pagina-titulo p{margin:4px 0 0;color:var(--mut)}
+.secao{margin:6px 0 -6px;font-size:13px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+
+/* ---- cartões ---- */
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px 20px;box-shadow:var(--sh)}
+.ch{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.card h2{font-size:16px;margin:0;font-weight:700}
+.sub{color:var(--mut);font-size:13px;margin:2px 0 0}
+.apur-t{color:var(--mut);font-size:12.5px;white-space:nowrap}
+.apur{height:5px;background:var(--bar);border-radius:3px;margin:10px 0 14px;overflow:hidden}
 .apur i{display:block;height:100%;background:var(--acc);transition:width .6s}
-.row{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:7px 8px;border-radius:8px;margin:0 -8px}
-.row.flash{animation:fl 2.4s ease-out}
+.nota{color:var(--mut);font-size:12.5px;margin:10px 0 0}
+.vazio{color:var(--mut);padding:18px 0;text-align:center}
+.link{color:var(--acc);font-weight:600;font-size:13.5px}
+.rodape-card{margin-top:14px;padding-top:12px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* ---- status ---- */
+.status{display:flex;flex-direction:column;gap:2px;padding:10px 14px;border-radius:12px;margin:0 0 12px;border:1px solid transparent}
+.status b{font-size:13px;letter-spacing:.02em}.status span{font-size:13.5px}
+.s-eleito,.s-1turno{background:rgba(21,128,61,.10);border-color:rgba(21,128,61,.25)}.s-eleito b,.s-1turno b{color:var(--ok)}
+.s-2turno{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.28)}.s-2turno b{color:var(--warn)}
+.s-aberto{background:rgba(36,87,214,.09);border-color:rgba(36,87,214,.25)}.s-aberto b{color:var(--acc)}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.b-eleito,.b-1turno{background:rgba(21,128,61,.14);color:var(--ok)}
+.b-2turno{background:rgba(180,83,9,.15);color:var(--warn)}
+.b-aberto{background:rgba(36,87,214,.13);color:var(--acc)}
+
+/* ---- candidatos ---- */
+.cand{display:grid;grid-template-columns:40px 1fr auto;gap:3px 12px;align-items:center;padding:8px 8px;margin:0 -8px;border-radius:10px}
+.cand.flash,.item.flash,.linha.flash{animation:fl 2.4s ease-out}
 @keyframes fl{0%{background:var(--flash)}100%{background:transparent}}
-.nome{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nome small{font-weight:400;color:var(--mut);margin-left:6px}
-.num{text-align:right;font-variant-numeric:tabular-nums}
-.num b{font-size:15px}.num span{color:var(--mut);font-size:12px;margin-left:6px}
-.barra{grid-column:1/-1;position:relative;height:8px;background:var(--bar);border-radius:4px}
-.barra i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;transition:width .6s}
-.barra u{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--mut);opacity:.7}
-.row.top .nome{font-size:16px}
-.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;margin:2px 6px 8px 0}
-.b-eleito,.b-1turno{background:rgba(22,163,74,.15);color:var(--ok)}
-.b-2turno{background:rgba(217,119,6,.18);color:var(--warn)}
-.b-aberto{background:rgba(37,99,235,.14);color:var(--acc)}
-.nota{color:var(--mut);font-size:12.5px;margin-top:8px}
-.chip{display:inline-block;padding:1px 8px;border-radius:6px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
-.lista{display:grid;gap:0}
-.item{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;padding:6px 8px;margin:0 -8px;border-radius:8px}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+.cn{min-width:0;display:flex;flex-direction:column;gap:2px}
+.cn b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cand.top .cn b{font-size:16px}
+.cv{text-align:right;font-variant-numeric:tabular-nums;display:flex;flex-direction:column}
+.cv b{font-size:16px}.cv small{color:var(--mut);font-size:12px}
+.bar{grid-column:2/-1;position:relative;height:7px;background:var(--bar);border-radius:4px}
+.bar i{position:absolute;inset:0 auto 0 0;border-radius:4px;transition:width .6s}
+.bar u{position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--mut);opacity:.6}
+.chip{display:inline-block;padding:1px 8px;border-radius:6px;font-size:11.5px;font-weight:700;color:#fff;white-space:nowrap;width:fit-content}
+
+/* ---- duelo (2º turno) ---- */
+.duelo{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;padding:6px 0}
+.lado{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
+.lado .av{width:64px;height:64px;font-size:22px}
+.lado .n{font-weight:700;font-size:17px;line-height:1.2}
+.lado .p{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.lado small{color:var(--mut)}
+.vs{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--mut);font-weight:700}
+.duelo-mini{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;font-size:13.5px}
+.duelo-mini .l{display:flex;flex-direction:column;gap:2px}.duelo-mini .l:last-child{text-align:right;align-items:flex-end}
+.duelo-mini b{font-variant-numeric:tabular-nums}
+.duelo-mini .uf{font-weight:800;color:var(--mut)}
+.tile{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;display:block}
+.tile .n{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tile .l{color:var(--mut);font-size:13px}
+a.tile:hover,a.card:hover{border-color:var(--acc)}
+
+/* ---- listas ---- */
+.item{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:6px 8px;margin:0 -8px;border-radius:8px}
 .item .pos{color:var(--mut);font-size:12px;text-align:right}
+.item .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.item .v{color:var(--mut);font-size:13px;font-variant-numeric:tabular-nums}
 .item.fora{opacity:.55}
-.item .v{font-variant-numeric:tabular-nums;color:var(--mut);font-size:13px}
-.sep{border-top:1px dashed var(--bd);margin:6px 0;color:var(--mut);font-size:11.5px;padding-top:4px}
-.bancadas{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.camara{display:flex;height:26px;border-radius:7px;overflow:hidden;margin:6px 0 10px}
-.camara i{display:block;height:100%}
-.mini{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--bd)}
-.mini:last-child{border-bottom:0}
-.mini .uf{font-weight:800;color:var(--mut)}
-.mini .info{min-width:0}.mini .info div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mini .info small{color:var(--mut)}
-.resumo{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.vazio{color:var(--mut);padding:14px 0}
-.erro{background:rgba(220,38,38,.12);color:var(--bad);padding:10px 14px;border-radius:10px}
-#tip{position:fixed;z-index:20;pointer-events:none;background:var(--card);color:var(--tx);border:1px solid var(--bd);
-  border-radius:10px;padding:8px 11px;font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.25);display:none;max-width:260px}
-#tip b{display:block;margin-bottom:3px}#tip div{display:flex;justify-content:space-between;gap:14px}
-.seg{display:inline-flex;gap:4px;margin:0 0 10px}
-.seg button{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:4px 11px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer}
-.seg button.on{background:var(--acc);border-color:var(--acc);color:#fff}
-.mapa svg{width:100%;height:auto;display:block;max-height:560px}
-.mapa path{stroke:var(--card);stroke-width:.6;stroke-linejoin:round;transition:opacity .15s}
+.sep{border-top:1px dashed var(--bd);margin:8px 0 4px;color:var(--mut);font-size:12px;padding-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.linha{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:9px 6px;border-bottom:1px solid var(--bd);cursor:pointer;border-radius:8px}
+.linha:last-child{border-bottom:0}.linha:hover{background:var(--soft)}
+.linha .uf{font-weight:800;color:var(--mut)}
+.linha .m{min-width:0}.linha .m div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.linha .m small{color:var(--mut)}
+.linha .r{text-align:right;display:flex;flex-direction:column;gap:3px;align-items:flex-end;font-variant-numeric:tabular-nums}
+.duas{columns:2 260px;column-gap:28px}.duas .item{break-inside:avoid}
+
+/* ---- hemiciclo e mapas ---- */
+.mapa svg{width:100%;height:auto;display:block;max-height:540px}
+.mapa path{stroke:var(--card);stroke-width:.6;stroke-linejoin:round}
 .mapa path.clic{cursor:pointer}.mapa path:hover{stroke:var(--tx);stroke-width:1.4}
-@media(max-width:600px){main{padding:12px}.grid{grid-template-columns:1fr}}
+.seg{display:inline-flex;gap:4px;margin:0 0 12px;background:var(--soft);padding:3px;border-radius:999px}
+.seg button{border:0;background:transparent;color:var(--mut);padding:6px 14px;border-radius:999px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+.seg button.on{background:var(--card);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+#tip{position:fixed;z-index:30;pointer-events:none;background:var(--card);color:var(--tx);border:1px solid var(--bd);
+  border-radius:12px;padding:9px 12px;font-size:13px;box-shadow:0 8px 28px rgba(0,0,0,.22);display:none;max-width:270px}
+#tip b{display:block;margin-bottom:3px}#tip div{display:flex;justify-content:space-between;gap:14px}
+
+footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;color:var(--mut);font-size:12.5px;display:grid;gap:6px}
+.skel{height:120px;border-radius:16px;background:linear-gradient(90deg,var(--bar),var(--soft),var(--bar));background-size:200% 100%;animation:sk 1.4s infinite}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media(max-width:620px){
+  main{padding:14px 12px 30px}.top{padding:10px 12px}.card{padding:14px 14px}
+  .duelo{gap:6px}.lado .p{font-size:24px}.lado .av{width:52px;height:52px}
+  .ufbox label{display:none}
+  .top{gap:10px}.dot:not(.off)+#status{display:none}      /* cabeçalho em 1 linha: o ponto verde basta */
+  .ufbox select{max-width:180px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<header>
-  <h1>Apuração 2026</h1>
-  <div class="live"><span class="dot" id="dot"></span><span id="status">carregando…</span></div>
-  <div class="tabs">
-    <select id="sel-uf" title="Escolha o estado"></select>
-    <button id="t-uf" class="on">Estado</button>
-    <button id="t-br">Brasil</button>
-    <button id="t-cg">Congresso</button>
-    <button id="t-mp">Mapas</button>
+<header class="site">
+  <div class="top">
+    <div class="brand">Apuração <span>2026</span></div>
+    <div class="live"><span class="dot" id="dot"></span><span id="status">carregando…</span></div>
+    <div class="ufbox"><label for="sel-uf">Seu estado</label><select id="sel-uf"></select></div>
   </div>
+  <nav class="menu" id="nav" aria-label="Seções"></nav>
 </header>
 <div id="tip"></div>
-<main id="app"><div class="vazio">Carregando dados do TSE…</div></main>
+<main id="app"><div class="skel"></div><div class="skel"></div></main>
+<footer>
+  <div><b>Como ler:</b> ★ eleito (confirmado pelo TSE) · ② vai ao 2º turno (confirmado pelo TSE) · ▶ se elegeria com os votos de agora.</div>
+  <div>Fonte: divulgação oficial de resultados do TSE. Projeções de deputados são estimativas próprias (quociente eleitoral, cláusulas de 80%/20% e sobras); vale o resultado que o TSE marcar como eleito.</div>
+</footer>
 
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const milhar = n => Math.round(n).toLocaleString("pt-BR");
 const pct = n => n.toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2}) + "%";
-// Cores pela identidade visual de cada partido (esquerda → direita em ESPECTRO, usado também no hemiciclo)
+const pct1 = n => n.toLocaleString("pt-BR", {minimumFractionDigits:1, maximumFractionDigits:1}) + "%";
+const SEGUNDO_TURNO = "25/10";
+
+/* ---- nomes ---- */
+const MINUS = new Set(["de","da","do","dos","das","e","di","du"]);
+const SIGLAS = new Set(["TSE","UF","STF","TRE","DF","PT","PL","PP"]);
+const nome = s => String(s || "").toLowerCase().split(/\s+/).map((w, i) => {
+  if (i > 0 && MINUS.has(w)) return w;
+  if (/^[^aeiouáéíóúâêôãõ.]{2,4}$/.test(w)) return w.toUpperCase();          // siglas: MLB, JHC, PT
+  return w.charAt(0).toUpperCase() + w.slice(1);
+}).join(" ");
+const bonito = t => String(t || "").replace(/[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-ZÁÉÍÓÚÂÊÔÃÕÇ.]+(?: [A-ZÁÉÍÓÚÂÊÔÃÕÇ.]+)*/g, m => SIGLAS.has(m) ? m : nome(m));
+const iniciais = n => String(n).split(/\s+/).filter(w => !MINUS.has(w.toLowerCase()) && !/^(dr|dra)\.?$/i.test(w)).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+
+/* ---- cores dos partidos (identidade visual; ordem = espectro esquerda → direita) ---- */
 const PARTIDOS = {
   PSTU:"#7f1d1d", PCO:"#991b1b", PCB:"#b91c1c", UP:"#be123c",
   PSOL:"#c2185b", PT:"#dc2626", PCDOB:"#9f1239", "PC DO B":"#9f1239", PV:"#84cc16", REDE:"#10b981",
   PSB:"#f97316", PDT:"#0ea5e9", CIDADANIA:"#ec4899", PSDB:"#0369a1",
   MDB:"#eab308", PSD:"#0d9488", PODE:"#06b6d4", AVANTE:"#7c3aed", SOLIDARIEDADE:"#f59e0b", PRD:"#6b7280",
   MOBILIZA:"#a16207", DC:"#64748b", PMB:"#92400e", AGIR:"#4d7c0f",
-  "UNIÃO":"#3b82f6", PP:"#1e3a8a", REPUBLICANOS:"#6366f1", MISSÃO:"#374151", PRTB:"#15803d",
+  "UNIÃO":"#3b82f6", PP:"#1e3a8a", REPUBLICANOS:"#6366f1", "MISSÃO":"#374151", PRTB:"#15803d",
   PL:"#16a34a", NOVO:"#c2410c"
 };
 const ESPECTRO = Object.keys(PARTIDOS);
 const norm = sg => String(sg).split("/")[0].trim().toUpperCase();
 const cor = sg => {
   const k = norm(sg);
-  if (PARTIDOS[k]) return PARTIDOS[k].replace("-", "");
+  if (PARTIDOS[k]) return PARTIDOS[k];
   let h = 0; for (const c of k) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h} 35% 45%)`;
 };
-const ordemEspectro = (a, b) => {
-  const ia = ESPECTRO.indexOf(norm(a)), ib = ESPECTRO.indexOf(norm(b));
-  return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
-};
+const ordemEspectro = (a, b) => { const x = ESPECTRO.indexOf(norm(a)), y = ESPECTRO.indexOf(norm(b)); return (x < 0 ? 99 : x) - (y < 0 ? 99 : y); };
 const chip = sg => `<span class="chip" style="background:${cor(sg)}">${esc(sg)}</span>`;
-const apurBar = a => `<div class="apur"><i style="width:${a}%"></i></div>`;
+const chipN = (sg, n) => `<span class="chip" style="background:${cor(sg)}">${esc(sg)} · ${n}</span>`;
 
-let aba = "uf", ultimo = null, anterior = {}, atual = {};
-try { aba = localStorage.getItem("aba") || "uf"; } catch (e) {}
+const ESTADOS = {AC:"Acre",AL:"Alagoas",AM:"Amazonas",AP:"Amapá",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",
+  GO:"Goiás",MA:"Maranhão",MG:"Minas Gerais",MS:"Mato Grosso do Sul",MT:"Mato Grosso",PA:"Pará",PB:"Paraíba",PE:"Pernambuco",
+  PI:"Piauí",PR:"Paraná",RJ:"Rio de Janeiro",RN:"Rio Grande do Norte",RO:"Rondônia",RR:"Roraima",RS:"Rio Grande do Sul",
+  SC:"Santa Catarina",SE:"Sergipe",SP:"São Paulo",TO:"Tocantins"};
+const UF_COD = {"12":"AC","27":"AL","13":"AM","16":"AP","29":"BA","23":"CE","53":"DF","32":"ES","52":"GO","21":"MA","31":"MG",
+  "50":"MS","51":"MT","15":"PA","25":"PB","26":"PE","22":"PI","41":"PR","33":"RJ","24":"RN","11":"RO","14":"RR","43":"RS",
+  "42":"SC","28":"SE","35":"SP","17":"TO"};
 
-function marca(chave, valor) {            // devolve " flash" quando o valor mudou desde a última leitura
+/* ---- estado da aplicação ---- */
+const PAGINAS = [["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"], ["senado","Senado"], ["deputados","Deputados"]];
+let pag = "resumo", uf = null, ultimo = null, anterior = {}, atual = {}, depTipo = "fed";
+try { uf = localStorage.getItem("uf"); } catch (e) {}
+
+function marca(chave, valor) {            // " flash" quando o valor mudou desde a última leitura
   atual[chave] = valor;
   return chave in anterior && anterior[chave] !== valor ? " flash" : "";
 }
 
-function badge(s) { return s ? `<span class="badge b-${s.tipo}">${esc(s.rotulo)}</span>` : ""; }
+/* ---- roteamento por hash: #/pagina/UF ---- */
+function lerHash() {
+  const [p, u] = location.hash.replace(/^#\/?/, "").split("/");
+  return {p: PAGINAS.some(x => x[0] === p) ? p : "resumo", u: (u || "").toUpperCase()};
+}
+function irPara(p, u) { location.hash = `#/${p}/${u || uf || ""}`; }
+function sincronizar() {
+  const r = lerHash();
+  pag = r.p;
+  if (r.u && ESTADOS[r.u] && r.u !== uf) { uf = r.u; try { localStorage.setItem("uf", uf); } catch (e) {} carregar(); }
+  $("#sel-uf").value = uf || "";
+}
+window.addEventListener("hashchange", () => { sincronizar(); anterior = {}; desenhar(); window.scrollTo(0, 0); });
 
-function cardMajoritario(titulo, d, linha50) {
-  if (!d) return `<div class="card"><h2>${esc(titulo)}</h2><div class="vazio">Sem dados ainda.</div></div>`;
-  const rows = d.cands.map((c, i) => `
-    <div class="row${i === 0 ? " top" : ""}${marca(titulo + c.nome, c.votos)}">
-      <div class="nome">${c.eleito ? "★ " : c.t2 ? "② " : ""}${esc(c.nome)}<small>${esc(c.sg)}</small></div>
-      <div class="num"><b>${pct(c.pct)}</b><span>${milhar(c.votos)}</span></div>
-      <div class="barra"><i style="width:${Math.min(c.pct, 100)}%;background:${cor(c.sg)}"></i>${linha50 ? '<u style="left:50%"></u>' : ""}</div>
-    </div>`).join("");
-  return `<div class="card"><h2>${esc(titulo)}</h2>
-    <div class="sub">${pct(d.apur)} das seções apuradas · TSE ${esc(d.ht)}</div>${apurBar(d.apur)}
-    ${badge(d.situacao)}<div class="nota" style="margin:0 0 6px">${esc(d.situacao ? d.situacao.texto : "")}</div>${rows}
-    ${linha50 ? '<div class="nota">Linha vertical = 50% dos votos válidos (maioria absoluta).</div>' : ""}</div>`;
+/* ---- componentes ---- */
+const apurBar = a => `<div class="apur" role="progressbar" aria-valuenow="${a}" aria-valuemin="0" aria-valuemax="100"><i style="width:${a}%"></i></div>`;
+const cardVazio = t => `<section class="card"><div class="ch"><h2>${esc(t)}</h2></div><div class="vazio">Sem dados ainda.</div></section>`;
+const statusHtml = s => s ? `<div class="status s-${s.tipo}"><b>${esc(s.rotulo)}</b><span>${esc(bonito(s.texto))}</span></div>` : "";
+
+function candRow(c, o = {}) {
+  const sel = c.eleito ? "★ " : c.t2 ? "② " : (o.marca || "");
+  return `<div class="cand${o.top ? " top" : ""}${marca((o.k || "") + c.nome, c.votos)}">
+    <span class="av" style="background:${cor(c.sg)}" aria-hidden="true">${esc(iniciais(c.nome))}</span>
+    <div class="cn"><b>${sel}${esc(nome(c.nome))}</b>${chip(c.sg)}</div>
+    <div class="cv"><b>${pct(c.pct)}</b><small>${milhar(c.votos)} votos</small></div>
+    <div class="bar"><i style="width:${Math.min(c.pct * (o.escala || 1), 100)}%;background:${cor(c.sg)}"></i>${o.l50 ? "<u></u>" : ""}</div></div>`;
+}
+function cardMaj(titulo, d, o = {}) {
+  if (!d) return cardVazio(titulo);
+  return `<section class="card"><div class="ch"><h2>${esc(titulo)}</h2><span class="apur-t">${pct(d.apur)} apurado</span></div>${apurBar(d.apur)}
+    ${statusHtml(d.situacao)}${d.cands.map((c, i) => candRow(c, {top: i === 0, k: titulo, l50: o.l50})).join("")}
+    ${o.l50 ? '<p class="nota">A linha vertical marca 50% dos votos válidos (maioria absoluta).</p>' : ""}${o.rodape || ""}</section>`;
+}
+function cardSenado(titulo, d, o = {}) {
+  if (!d) return cardVazio(titulo);
+  return `<section class="card"><div class="ch"><h2>${esc(titulo)}</h2><span class="apur-t">${d.nv} vagas · ${pct(d.apur)} apurado</span></div>${apurBar(d.apur)}
+    ${statusHtml(d.situacao)}${d.cands.map((c, i) => candRow(c, {top: i < d.nv, k: titulo, marca: i < d.nv ? "▶ " : "", escala: 2.2})).join("")}${o.rodape || ""}</section>`;
+}
+function cardProp(titulo, d, o = {}) {
+  if (!d) return cardVazio(titulo);
+  const itens = d.eleitos.map((c, i) => `<div class="item${marca(titulo + c.nome, c.votos)}"><span class="pos">${i + 1}</span>
+    <div class="nm">${c.tse ? "★ " : ""}${esc(nome(c.nome))} ${chip(c.sg)}</div><span class="v">${milhar(c.votos)}</span></div>`).join("");
+  const fora = d.fora.map(c => `<div class="item fora"><span class="pos">–</span><div class="nm">${esc(nome(c.nome))} ${chip(c.sg)}</div><span class="v">${milhar(c.votos)}</span></div>`).join("");
+  const band = d.bancadas.map(([n, q]) => chipN(n, q)).join("");
+  return `<section class="card"><div class="ch"><h2>${esc(titulo)}</h2><span class="apur-t">${d.nv} vagas · ${pct(d.apur)} apurado</span></div>${apurBar(d.apur)}
+    <div class="chips" style="margin:0 0 12px">${band}</div>
+    <div class="${o.duas ? "duas" : ""}">${itens}</div>${fora ? '<div class="sep">primeiros fora, se encerrasse agora</div>' + fora : ""}
+    <p class="nota">Quociente eleitoral: ${milhar(d.qe)} votos · projeção com os votos apurados até agora.</p></section>`;
 }
 
-function cardSenado(titulo, d) {
-  if (!d) return `<div class="card"><h2>${esc(titulo)}</h2><div class="vazio">Sem dados ainda.</div></div>`;
-  const rows = d.cands.map((c, i) => `
-    <div class="row${i < d.nv ? " top" : ""}${marca(titulo + c.nome, c.votos)}">
-      <div class="nome">${i < d.nv ? (c.eleito ? "★ " : "▶ ") : ""}${esc(c.nome)}<small>${esc(c.sg)}</small></div>
-      <div class="num"><b>${pct(c.pct)}</b><span>${milhar(c.votos)}</span></div>
-      <div class="barra"><i style="width:${Math.min(c.pct * 2, 100)}%;background:${cor(c.sg)}"></i></div>
-    </div>`).join("");
-  return `<div class="card"><h2>${esc(titulo)}</h2>
-    <div class="sub">${d.nv} vagas · ${pct(d.apur)} apurado · TSE ${esc(d.ht)}</div>${apurBar(d.apur)}
-    ${badge(d.situacao)}<div class="nota" style="margin:0 0 6px">${esc(d.situacao.texto)}</div>${rows}</div>`;
-}
-
-function cardProporcional(titulo, d) {
-  if (!d) return `<div class="card"><h2>${esc(titulo)}</h2><div class="vazio">Sem dados ainda.</div></div>`;
-  const itens = d.eleitos.map((c, i) => `
-    <div class="item${marca(titulo + c.nome, c.votos)}">
-      <span class="pos">${i + 1}</span>
-      <div class="nome">${c.tse ? "★ " : ""}${esc(c.nome)} ${chip(c.sg)}</div>
-      <span class="v">${milhar(c.votos)}</span></div>`).join("");
-  const fora = d.fora.map(c => `
-    <div class="item fora"><span class="pos">–</span>
-      <div class="nome">${esc(c.nome)} ${chip(c.sg)}</div><span class="v">${milhar(c.votos)}</span></div>`).join("");
-  const band = d.bancadas.map(([n, q]) => `<span class="chip" style="background:${cor(n)}">${esc(n)} · ${q}</span>`).join("");
-  return `<div class="card"><h2>${esc(titulo)}</h2>
-    <div class="sub">${d.nv} vagas · quociente ${milhar(d.qe)} · ${pct(d.apur)} apurado · projeção</div>${apurBar(d.apur)}
-    <div class="lista">${itens}${fora ? '<div class="sep">primeiros fora, se encerrasse agora</div>' + fora : ""}</div>
-    <div class="bancadas">${band}</div>
-    <div class="nota">★ eleito pelo TSE · demais = se elegeriam com os votos de agora. Projeção própria (QE, 80%/20% e sobras); o oficial é o do TSE.</div></div>`;
-}
-
-function viewUF(d) {
-  const u = d.uf;
-  if (!u) return '<div class="vazio">Painel iniciado sem estado.</div>';
-  return `<div class="grid">
-    ${cardMajoritario("Governador " + u.sigla, u.gov, true)}
-    ${cardSenado("Senador " + u.sigla, u.sen)}
-    ${cardProporcional("Deputado federal " + u.sigla, u.fed)}
-    ${cardProporcional((u.sigla === "DF" ? "Deputado distrital " : "Deputado estadual ") + u.sigla, u.est)}
-  </div>`;
-}
-
-function viewBR(d) {
-  const pres = d.pres ? cardMajoritario("Presidente", d.pres, true) : "";
-  const gov = d.gov_br || [], sen = d.sen_br || [];
-  const cont = t => gov.filter(g => g.tipo === t).length;
-  const govHtml = gov.map(g => `
-    <div class="mini${marca("g" + g.uf, g.votos)}"><span class="uf">${g.uf}</span>
-      <div class="info"><div><b>${esc(g.nome)}</b> ${chip(g.sg)}</div>
-        <small>${g.seg ? "x " + esc(g.seg) + " · " : ""}${pct(g.apur)} apurado</small></div>
-      <div class="num"><b>${pct(g.pct)}</b><br><span class="badge b-${g.tipo}" style="margin:0">${esc(g.rotulo)}</span></div></div>`).join("");
-  const senHtml = sen.map(s => `
-    <div class="mini${marca("s" + s.uf, s.sig)}"><span class="uf">${s.uf}</span>
-      <div class="info">${s.eleitos.map(e => `<div>${esc(e.nome)} ${chip(e.sg)} <small>${pct(e.pct)}</small></div>`).join("")}</div>
-      <div class="num"><small class="nota">${pct(s.apur)}</small><br>${s.tse ? '<span class="badge b-eleito" style="margin:0">eleitos</span>' : ""}</div></div>`).join("");
-  const cam = d.camara;
-  let camHtml = '<div class="vazio">Sem dados.</div>';
-  if (cam && cam.partidos.length) {
-    const tot = cam.partidos.reduce((a, p) => a + p[1], 0);
-    camHtml = `<div class="camara">${cam.partidos.map(([n, q]) => `<i title="${esc(n)} ${q}" style="width:${q / tot * 100}%;background:${cor(n)}"></i>`).join("")}</div>
-      <div class="bancadas" style="margin-top:0">${cam.partidos.map(([n, q]) => `<span class="chip" style="background:${cor(n)}">${esc(n)} · ${q}</span>`).join("")}</div>
-      <div class="nota">${cam.vagas} vagas projetadas${cam.faltam.length ? " · sem dados: " + cam.faltam.join(", ") : ""}.</div>`;
-  }
-  return `<div class="grid">${pres}
-    <div class="card"><h2>Câmara dos Deputados</h2><div class="sub">projeção da bancada por partido (soma dos 27 estados)</div>${camHtml}</div></div>
-    <div class="grid">
-    <div class="card"><h2>Governadores</h2>
-      <div class="resumo"><span class="badge b-eleito">eleitos/1º turno: ${cont("eleito") + cont("1turno")}</span>
-      <span class="badge b-2turno">2º turno: ${cont("2turno")}</span></div>${govHtml}</div>
-    <div class="card"><h2>Senadores</h2><div class="sub">os 2 mais votados em cada estado agora</div>${senHtml}</div></div>`;
-}
-
-// Hemiciclo: cadeiras em anéis concêntricos, ordenadas da esquerda para a direita pelo espectro dos partidos.
-function hemiciclo(partidos, total, rotuloCentro, fora = 0) {
+/* ---- hemiciclo ---- */
+function hemiciclo(partidos, total, rotulo, fora = 0) {
   const lista = partidos.slice().sort((a, b) => ordemEspectro(a[0], b[0]));
   const cores = [];
   for (const [n, q] of lista) for (let i = 0; i < q; i++) cores.push([n, cor(n)]);
@@ -238,56 +282,45 @@ function hemiciclo(partidos, total, rotuloCentro, fora = 0) {
   pts.sort((p, q) => q.a - p.a || p.r - q.r);
   const rd = Math.min(...raios.map((r, i) => 0.46 * Math.min(dr, Math.PI * r / Math.max(qtd[i] - 1, 1))));
   let bolas = pts.map((p, i) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rd.toFixed(1)}" fill="${cores[i][1]}"><title>${esc(cores[i][0])}</title></circle>`).join("");
-  for (let k = 0; k < fora; k++) {            // cadeiras fora de disputa: anel externo cinza
+  for (let k = 0; k < fora; k++) {
     const a = Math.PI - Math.PI * k / (fora - 1);
     bolas += `<circle cx="${(200 + 190 * Math.cos(a)).toFixed(1)}" cy="${(200 - 190 * Math.sin(a)).toFixed(1)}" r="${(rd * 0.9).toFixed(1)}" fill="var(--bar)"><title>mandato até 2031 (eleito em 2022)</title></circle>`;
   }
-  return `<svg viewBox="0 0 400 215" style="width:100%;max-width:560px;display:block;margin:0 auto">${bolas}
+  return `<svg viewBox="0 0 400 215" style="width:100%;max-width:560px;display:block;margin:0 auto" role="img" aria-label="${esc(rotulo)}">${bolas}
     <text x="200" y="182" text-anchor="middle" font-size="34" font-weight="800" fill="currentColor">${total + fora}</text>
-    <text x="200" y="202" text-anchor="middle" font-size="11" fill="var(--mut)">${esc(rotuloCentro)}</text></svg>`;
+    <text x="200" y="202" text-anchor="middle" font-size="11" fill="var(--mut)">${esc(rotulo)}</text></svg>`;
+}
+const legenda = (partidos, extra) => `<div class="chips">${partidos.map(([n, q]) => chipN(n, q)).join("")}${extra || ""}</div>`;
+
+function cardCamara(d, completo) {
+  const c = d.camara;
+  if (!c || !c.partidos.length) return cardVazio("Câmara dos Deputados");
+  const tot = c.partidos.reduce((a, p) => a + p[1], 0);
+  return `<section class="card"><div class="ch"><h2>Câmara dos Deputados</h2><span class="apur-t">${tot} de 513 cadeiras</span></div>
+    <p class="sub" style="margin-bottom:8px">Projeção da bancada · esquerda → direita</p>${hemiciclo(c.partidos, tot, "deputados federais")}
+    ${legenda(completo ? c.partidos : c.partidos.slice(0, 8))}
+    <p class="nota">Maioria: 257. Maior bancada: ${esc(c.partidos[0][0])} (${c.partidos[0][1]}).${c.faltam.length ? " Sem dados: " + c.faltam.join(", ") + "." : ""}</p></section>`;
+}
+function cardSenadoBR(d, completo) {
+  const s = d.senado;
+  if (!s || !s.partidos.length) return cardVazio("Senado Federal");
+  const tot = s.partidos.reduce((a, p) => a + p[1], 0), resto = 81 - tot;
+  const cinza = resto > 0 ? `<span class="chip" style="background:var(--bar);color:var(--mut)">mandato até 2031 · ${resto}</span>` : "";
+  return `<section class="card"><div class="ch"><h2>Senado Federal</h2><span class="apur-t">${tot} vagas em disputa</span></div>
+    <p class="sub" style="margin-bottom:8px">2 por estado · esquerda → direita</p>${hemiciclo(s.partidos, tot, "senadores", resto)}
+    ${legenda(completo ? s.partidos : s.partidos.slice(0, 8), cinza)}
+    <p class="nota">As ${resto} cadeiras em cinza foram eleitas em 2022 e não estão em disputa; o partido delas ainda não é carregado. ${s.tse} de ${tot} vagas já confirmadas pelo TSE.</p></section>`;
 }
 
-function legenda(partidos, extra) {
-  return `<div class="bancadas">${partidos.map(([n, q]) => `<span class="chip" style="background:${cor(n)}">${esc(n)} · ${q}</span>`).join("")}${extra || ""}</div>`;
-}
-
-function viewCongresso(d) {
-  const c = d.camara, s = d.senado;
-  let cam = '<div class="vazio">Sem dados.</div>', sen = cam;
-  if (c && c.partidos.length) {
-    const tot = c.partidos.reduce((a, p) => a + p[1], 0);
-    const maior = c.partidos[0];
-    cam = hemiciclo(c.partidos, tot, "deputados federais") + legenda(c.partidos) +
-      `<div class="nota">Maioria: 257 cadeiras. Maior bancada projetada: ${esc(maior[0])} com ${maior[1]}.
-      Soma dos 27 estados${c.faltam.length ? " (sem dados: " + c.faltam.join(", ") + ")" : ""}; projeção própria até o TSE marcar os eleitos.</div>`;
-  }
-  if (s && s.partidos.length) {
-    const tot = s.partidos.reduce((a, p) => a + p[1], 0);
-    const resto = 81 - tot;
-    const cinza = resto > 0 ? `<span class="chip" style="background:var(--bar);color:var(--mut)">mandato até 2031 · ${resto}</span>` : "";
-    sen = hemiciclo(s.partidos, tot, "senadores", resto) + legenda(s.partidos, cinza) +
-      `<div class="nota">Em 2026 são ${tot} das 81 cadeiras (2 por estado). As ${resto} restantes (cinza) foram eleitas em 2022 e
-      não estão em disputa — o painel ainda não carrega o partido delas. Maioria: 41. ${s.tse} das ${tot} vagas já confirmadas pelo TSE.</div>`;
-  }
-  return `<div class="grid">
-    <div class="card"><h2>Câmara dos Deputados</h2><div class="sub">projeção da bancada · esquerda → direita</div>${cam}</div>
-    <div class="card"><h2>Senado Federal</h2><div class="sub">as ${s ? s.partidos.reduce((a, p) => a + p[1], 0) : 54} vagas em disputa agora · esquerda → direita</div>${sen}</div></div>`;
-}
-
-// ---- Mapas -------------------------------------------------------------------------------------------------
-const UF_COD = {"12":"AC","27":"AL","13":"AM","16":"AP","29":"BA","23":"CE","53":"DF","32":"ES","52":"GO","21":"MA","31":"MG",
-  "50":"MS","51":"MT","15":"PA","25":"PB","26":"PE","22":"PI","41":"PR","33":"RJ","24":"RN","11":"RO","14":"RR","43":"RS",
-  "42":"SC","28":"SE","35":"SP","17":"TO"};
-const CARGOS = {"1": "Presidente", "3": "Governador", "5": "Senador"};
-let mpCargo = {br: "1", uf: "3"}, tips = {};
+/* ---- mapas (SVG próprio, sem biblioteca) ---- */
+let tips = {};
 const geoCache = {}, mapaCache = {}, mapaVai = {};
-
-function projecao(fc) {                   // equiretangular com correção de latitude (suficiente para o Brasil)
+function projecao(fc) {
   if (fc._p) return fc._p;
   let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
   const varre = c => typeof c[0] === "number" ? (x0 = Math.min(x0, c[0]), x1 = Math.max(x1, c[0]), y0 = Math.min(y0, c[1]), y1 = Math.max(y1, c[1])) : c.forEach(varre);
   fc.features.forEach(f => varre(f.geometry.coordinates));
-  const k = Math.cos((y0 + y1) / 2 * Math.PI / 180), W = 600, e = W / ((x1 - x0) * k);
+  const k = Math.cos((y0 + y1) / 2 * Math.PI / 180), e = 600 / ((x1 - x0) * k);
   return fc._p = {H: (y1 - y0) * e, pt: (lo, la) => [((lo - x0) * k * e).toFixed(1), ((y1 - la) * e).toFixed(1)]};
 }
 function caminho(f, pr) {
@@ -296,13 +329,12 @@ function caminho(f, pr) {
   return f._d = polis.map(po => po.map(an => "M" + an.map(p => pr.pt(p[0], p[1]).join(",")).join("L") + "Z").join("")).join("");
 }
 function topHtml(titulo, r) {
-  const linhas = r.cands.map(c => `<div><span>${esc(c.nome)} <small>${esc(c.sg)}</small></span><b style="display:inline">${pct(c.pct)}</b></div>`).join("");
+  const linhas = r.cands.map(c => `<div><span>${esc(nome(c.nome))} <small>${esc(c.sg)}</small></span><b style="display:inline">${pct(c.pct)}</b></div>`).join("");
   return `<b>${esc(titulo)}</b>${linhas}<small style="color:var(--mut)">${pct(r.apur)} apurado</small>`;
 }
 function svgMapa(id, fc, chave, dados, titulo, clicavel) {
-  const pr = projecao(fc);
+  const pr = projecao(fc), cont = {};
   tips[id] = {};
-  const cont = {};
   const paths = fc.features.map(f => {
     const k = chave(f), r = dados[k];
     let fill = "var(--bar)", op = 1;
@@ -314,38 +346,33 @@ function svgMapa(id, fc, chave, dados, titulo, clicavel) {
     } else tips[id][k] = `<b>${esc(titulo(f, k))}</b><small style="color:var(--mut)">sem dados</small>`;
     return `<path data-m="${id}" data-k="${k}" class="${clicavel ? "clic" : ""}" d="${caminho(f, pr)}" fill="${fill}" fill-opacity="${op.toFixed(2)}"></path>`;
   }).join("");
-  const leg = Object.entries(cont).sort((a, b) => b[1] - a[1]).map(([sg, n]) => `<span class="chip" style="background:${cor(sg)}">${esc(sg)} · ${n}</span>`).join("");
-  return `<svg viewBox="0 0 600 ${pr.H.toFixed(0)}">${paths}</svg><div class="bancadas">${leg}</div>
-    <div class="nota">Cor = partido do mais votado · cor mais forte = maior fatia dos votos válidos.</div>`;
+  const leg = Object.entries(cont).sort((a, b) => b[1] - a[1]).map(([sg, n]) => chipN(sg, n)).join("");
+  return `<svg viewBox="0 0 600 ${pr.H.toFixed(0)}" role="img">${paths}</svg><div class="chips">${leg}</div>
+    <p class="nota">Cor = partido do mais votado · cor mais forte = maior fatia dos votos válidos. Passe o mouse para ver os detalhes.</p>`;
 }
-function seg(grupo, atual) {
-  return `<div class="seg">${Object.entries(CARGOS).map(([c, n]) => `<button data-mp="${grupo}:${c}" class="${atual === c ? "on" : ""}">${n}</button>`).join("")}</div>`;
-}
-
-function viewMapas(d) {
-  const ufSel = uf || (d.uf && d.uf.sigla) || "RN";
-  let br = '<div class="vazio">Carregando mapa…</div>', mu = br;
-  const gbr = geoCache["/geo/br"], gu = geoCache["/geo/uf/" + ufSel];
-  if (gbr && d.mapa_br) {
+const CARGOS = {"1": "Presidente", "3": "Governador", "5": "Senador"};
+function mapaBR(d, cargo) {
+  const g = geoCache["/geo/br"];
+  let corpo = '<div class="skel"></div>';
+  if (g && g.v && d.mapa_br) {
     const dados = {};
-    for (const [u, v] of Object.entries(d.mapa_br)) if (v[mpCargo.br]) dados[u] = v[mpCargo.br];
-    br = svgMapa("br", gbr.v, f => UF_COD[f.properties.codarea], dados, (f, k) => (ESTADOS[k] || k) + " — " + CARGOS[mpCargo.br], true) +
-      '<div class="nota">Clique num estado para ver os municípios dele ao lado.</div>';
+    for (const [u, v] of Object.entries(d.mapa_br)) if (v[cargo]) dados[u] = v[cargo];
+    corpo = svgMapa("br", g.v, f => UF_COD[f.properties.codarea], dados, (f, k) => `${ESTADOS[k] || k} — ${CARGOS[cargo]}`, true);
   }
-  const m = mapaCache[ufSel + ":" + mpCargo.uf];
-  if (gu && m) {
-    const nm = m.v.municipios, n = Object.keys(nm).length;
-    mu = svgMapa("uf", gu.v, f => f.properties.codarea, nm, (f, k) => (nm[k] ? nm[k].nome : k) + " — " + CARGOS[mpCargo.uf], false) +
-      `<div class="nota">${n} de ${m.v.total} municípios com dados.</div>`;
-  }
-  return `<div class="grid">
-    <div class="card mapa"><h2>Brasil — por estado</h2><div class="sub">quem lidera em cada estado</div>${seg("br", mpCargo.br)}${br}</div>
-    <div class="card mapa"><h2>${esc(ESTADOS[ufSel] || ufSel)} — por município</h2><div class="sub">quem lidera em cada município</div>${seg("uf", mpCargo.uf)}${mu}</div></div>`;
+  return `<section class="card mapa"><div class="ch"><h2>Brasil por estado</h2></div><p class="sub" style="margin-bottom:10px">Quem lidera em cada estado. Clique para escolher o estado.</p>${corpo}</section>`;
 }
-
-function garantirMapas() {
-  const ufSel = uf || (ultimo && ultimo.uf && ultimo.uf.sigla);
-  const re = () => { if (aba === "mp") desenhar(); };
+function mapaUF(cargo) {
+  const u = uf || "RN", g = geoCache["/geo/uf/" + u], m = mapaCache[`${u}:${cargo}`];
+  let corpo = '<div class="skel"></div>';
+  if (g && g.v && m && m.v) {
+    const nm = m.v.municipios, n = Object.keys(nm).length;
+    corpo = svgMapa("uf", g.v, f => f.properties.codarea, nm, (f, k) => `${nm[k] ? nm[k].nome : k} — ${CARGOS[cargo]}`, false) +
+      `<p class="nota">${n} de ${m.v.total} municípios com dados.</p>`;
+  }
+  return `<section class="card mapa"><div class="ch"><h2>${esc(ESTADOS[u] || u)} por município</h2></div><p class="sub" style="margin-bottom:10px">Quem lidera em cada município.</p>${corpo}</section>`;
+}
+function garantirMapas(cargo) {
+  const u = uf || (ultimo && ultimo.uf && ultimo.uf.sigla);
   const carrega = (chave, url, destino) => {
     const x = destino[chave];
     if (x && (x.fixo || Date.now() - x.t < 45000)) return;
@@ -353,77 +380,159 @@ function garantirMapas() {
     mapaVai[chave] = 1;
     fetch(url).then(r => { if (!r.ok) throw 0; return r.json(); })
       .then(v => { destino[chave] = {v, t: Date.now(), fixo: url.startsWith("/geo/")}; })
-      .catch(() => {}).finally(() => { delete mapaVai[chave]; re(); });
+      .catch(() => { destino[chave] = {v: x ? x.v : null, t: Date.now()}; })     // falha: não insiste por 45 s
+      .finally(() => { delete mapaVai[chave]; desenhar(); });
   };
   carrega("/geo/br", "/geo/br", geoCache);
-  if (ufSel) {
-    carrega("/geo/uf/" + ufSel, "/geo/uf/" + ufSel, geoCache);
-    carrega(ufSel + ":" + mpCargo.uf, `/api/mapa?uf=${ufSel}&cargo=${mpCargo.uf}`, mapaCache);
-  }
+  if (u) { carrega("/geo/uf/" + u, "/geo/uf/" + u, geoCache); carrega(`${u}:${cargo}`, `/api/mapa?uf=${u}&cargo=${cargo}`, mapaCache); }
 }
 
+/* ---- páginas ---- */
+const paginaTitulo = (t, sub) => `<div class="pagina-titulo"><h1>${esc(t)}</h1><p>${sub}</p></div>`;
+
+function duelo(a, b, rotulo) {
+  const lado = c => `<div class="lado"><span class="av" style="background:${cor(c.sg)}">${esc(iniciais(c.nome))}</span>
+    <div class="n">${esc(nome(c.nome))}</div>${chip(c.sg)}<div class="p">${pct1(c.pct)}</div><small>${milhar(c.votos)} votos</small></div>`;
+  return `<div class="duelo">${lado(a)}<div class="vs"><span class="badge b-2turno">${esc(rotulo)}</span><span>x</span></div>${lado(b)}</div>`;
+}
+function dueloMini(g) {
+  const m = ultimo.mapa_br[g.uf], c = (m && m["3"] ? m["3"].cands : []);
+  if (c.length < 2) return "";
+  return `<a class="card" href="#/governador/${g.uf}" style="padding:12px 14px"><div class="duelo-mini">
+    <div class="l"><span>${esc(nome(c[0].nome))}</span><small>${chip(c[0].sg)} <b>${pct1(c[0].pct)}</b></small></div>
+    <span class="uf">${g.uf}</span>
+    <div class="l"><span>${esc(nome(c[1].nome))}</span><small><b>${pct1(c[1].pct)}</b> ${chip(c[1].sg)}</small></div></div></a>`;
+}
+
+function pgResumo(d) {
+  const p = d.pres, gb = d.gov_br || [], u = d.uf || {};
+  const duelos = gb.filter(g => g.tipo === "2turno"), eleitos = gb.filter(g => g.tipo !== "2turno");
+  let heroi = cardVazio("Presidente");
+  if (p && p.cands.length > 1) {
+    const s = p.situacao || {};
+    heroi = `<section class="card"><div class="ch"><h2>Presidente da República</h2><span class="apur-t">${pct(p.apur)} apurado</span></div>${apurBar(p.apur)}
+      ${s.tipo === "2turno" ? duelo(p.cands[0], p.cands[1], "2º TURNO · " + SEGUNDO_TURNO) : statusHtml(s) + candRow(p.cands[0], {top: true, k: "res"})}
+      <div class="rodape-card"><span class="sub">${esc(bonito(s.rotulo || ""))}</span><a class="link" href="#/presidente/${uf || ""}">Ver detalhes →</a></div></section>`;
+  }
+  const seuEstado = u.gov ? `<section class="card"><div class="ch"><h2>${esc(ESTADOS[u.sigla] || u.sigla)}</h2><span class="apur-t">seu estado</span></div>
+      <div style="margin-top:10px"><p class="secao" style="margin:0 0 6px">Governador</p>${statusHtml(u.gov.situacao)}
+        ${u.gov.cands.slice(0, 3).map((c, i) => candRow(c, {top: i === 0, k: "rg"})).join("")}</div>
+      ${u.sen ? `<p class="secao" style="margin:14px 0 4px">Senado</p><p style="margin:0">${u.sen.cands.slice(0, u.sen.nv).map(c => esc(nome(c.nome)) + " " + chip(c.sg)).join(" &nbsp;·&nbsp; ")}</p>
+        <p class="nota" style="margin-top:4px">${esc(bonito(u.sen.situacao.rotulo))}</p>` : ""}
+      <div class="rodape-card"><a class="link" href="#/governador/${u.sigla}">Governador →</a><a class="link" href="#/senado/${u.sigla}">Senado →</a><a class="link" href="#/deputados/${u.sigla}">Deputados →</a></div></section>` : "";
+  const tiles = `<div class="cols3">
+    <a class="tile" href="#/governador/${uf || ""}"><div class="n">${eleitos.length}</div><div class="l">governadores eleitos no 1º turno</div></a>
+    <a class="tile" href="#/governador/${uf || ""}"><div class="n" style="color:var(--warn)">${duelos.length}</div><div class="l">estados com 2º turno para governador</div></a>
+    <a class="tile" href="#/senado/${uf || ""}"><div class="n">${d.senado ? d.senado.partidos.reduce((a, x) => a + x[1], 0) : "–"}</div><div class="l">vagas no Senado definidas nesta eleição</div></a>
+    <a class="tile" href="#/deputados/${uf || ""}"><div class="n">${d.camara ? d.camara.vagas : "–"}</div><div class="l">cadeiras da Câmara projetadas</div></a></div>`;
+  const dg = duelos.length ? `<h2 class="secao">Governos em 2º turno · ${SEGUNDO_TURNO}</h2><div class="cols3" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))">${duelos.map(dueloMini).join("")}</div>` : "";
+  return paginaTitulo("Como está a eleição", `Resultados da divulgação oficial do TSE${p ? " · " + pct(p.apur) + " das seções apuradas" : ""}`) +
+    `<div class="grid">${heroi}${seuEstado}</div>${tiles}${dg}
+    <div class="grid">${cardCamara(d, false)}${cardSenadoBR(d, false)}</div>`;
+}
+
+function pgPresidente(d) {
+  garantirMapas("1");
+  return paginaTitulo("Presidente da República", "Total nacional e, ao lado, estado por estado.") +
+    `<div class="grid">${cardMaj("Brasil", d.pres, {l50: true})}${mapaBR(d, "1")}</div>${mapaUF("1")}`;
+}
+
+function pgGovernador(d) {
+  garantirMapas("3");
+  const u = d.uf || {}, gb = d.gov_br || [];
+  const ordem = [...gb].sort((a, b) => (a.tipo === "2turno" ? 0 : 1) - (b.tipo === "2turno" ? 0 : 1) || a.uf.localeCompare(b.uf));
+  const lista = ordem.map(g => {
+    const m = d.mapa_br[g.uf], c = (m && m["3"] ? m["3"].cands : []);
+    const rival = c[1] ? `${nome(c[1].nome)} ${pct1(c[1].pct)}` : "";
+    return `<div class="linha${marca("g" + g.uf, g.votos)}" data-uf="${g.uf}" tabindex="0"><span class="uf">${g.uf}</span>
+      <div class="m"><div><b>${esc(nome(g.nome))}</b> ${chip(g.sg)}</div><small>${rival ? "x " + esc(rival) + " · " : ""}${pct(g.apur)} apurado</small></div>
+      <div class="r"><b>${pct1(g.pct)}</b><span class="badge b-${g.tipo}">${esc(g.rotulo)}</span></div></div>`;
+  }).join("");
+  return paginaTitulo("Governador", "Seu estado em destaque e o panorama dos 27 estados.") +
+    `<div class="grid">${cardMaj("Governador · " + (ESTADOS[u.sigla] || ""), u.gov, {l50: true})}${mapaUF("3")}</div>
+    <h2 class="secao">Brasil</h2>
+    <div class="grid">${mapaBR(d, "3")}<section class="card"><div class="ch"><h2>Todos os estados</h2><span class="apur-t">${gb.filter(g => g.tipo === "2turno").length} em 2º turno</span></div>
+      <p class="sub" style="margin-bottom:6px">2º turno primeiro. Clique para escolher o estado.</p>${lista}</section></div>`;
+}
+
+function pgSenado(d) {
+  garantirMapas("5");
+  const u = d.uf || {}, sb = d.sen_br || [];
+  const grade = sb.map(s => `<div class="linha${marca("s" + s.uf, s.eleitos.map(e => e.nome).join())}" data-uf="${s.uf}" tabindex="0"><span class="uf">${s.uf}</span>
+    <div class="m">${s.eleitos.map(e => `<div>${esc(nome(e.nome))} ${chip(e.sg)} <small>${pct1(e.pct)}</small></div>`).join("")}</div>
+    <div class="r">${s.tse ? '<span class="badge b-eleito">eleitos</span>' : '<span class="badge b-aberto">em apuração</span>'}</div></div>`).join("");
+  return paginaTitulo("Senado", "Duas vagas por estado nesta eleição: os dois mais votados se elegem.") +
+    `<div class="grid">${cardSenado("Senador · " + (ESTADOS[u.sigla] || ""), u.sen)}${mapaUF("5")}</div>
+    <h2 class="secao">Brasil</h2>
+    <div class="grid">${cardSenadoBR(d, true)}<section class="card"><div class="ch"><h2>Os eleitos por estado</h2></div>
+      <p class="sub" style="margin-bottom:6px">Clique para escolher o estado.</p>${grade}</section></div>`;
+}
+
+function pgDeputados(d) {
+  const u = d.uf || {}, dist = u.sigla === "DF";
+  const t = depTipo === "est" ? [(dist ? "Deputado distrital" : "Deputado estadual") + " · " + u.sigla, u.est] : ["Deputado federal · " + u.sigla, u.fed];
+  return paginaTitulo("Deputados", "Quem se elegeria hoje, pelas regras do quociente eleitoral.") +
+    `<div class="grid"><div>
+      <div class="seg"><button data-dep="fed" class="${depTipo === "fed" ? "on" : ""}">Federal</button>
+        <button data-dep="est" class="${depTipo === "est" ? "on" : ""}">${dist ? "Distrital" : "Estadual"}</button></div>
+      ${cardProp(t[0], t[1], {duas: true})}</div>
+      <div>${cardCamara(d, true)}</div></div>`;
+}
+
+/* ---- desenho ---- */
+function desenharMenu() {
+  $("#nav").innerHTML = PAGINAS.map(([id, n]) => `<a href="#/${id}/${uf || ""}" ${pag === id ? 'aria-current="page"' : ""}>${n}</a>`).join("");
+}
+function desenhar() {
+  desenharMenu();
+  if (!ultimo) return;
+  anterior = atual; atual = {};
+  const f = {resumo: pgResumo, presidente: pgPresidente, governador: pgGovernador, senado: pgSenado, deputados: pgDeputados}[pag] || pgResumo;
+  $("#app").innerHTML = f(ultimo);
+}
+
+/* ---- interação ---- */
 document.addEventListener("mousemove", e => {
   const t = $("#tip"), p = e.target.closest && e.target.closest("path[data-k]");
   if (!p) { t.style.display = "none"; return; }
   t.innerHTML = (tips[p.dataset.m] || {})[p.dataset.k] || "";
   t.style.display = "block";
-  t.style.left = Math.min(e.clientX + 14, innerWidth - 280) + "px"; t.style.top = (e.clientY + 14) + "px";
+  t.style.left = Math.min(e.clientX + 14, innerWidth - 290) + "px"; t.style.top = Math.min(e.clientY + 14, innerHeight - 140) + "px";
 });
 document.addEventListener("click", e => {
-  const b = e.target.closest && e.target.closest("[data-mp]");
-  if (b) { const [g, c] = b.dataset.mp.split(":"); mpCargo[g] = c; desenhar(); return; }
+  const dep = e.target.closest && e.target.closest("[data-dep]");
+  if (dep) { depTipo = dep.dataset.dep; desenhar(); return; }
+  const lin = e.target.closest && e.target.closest(".linha[data-uf]");
+  if (lin) { irPara(pag, lin.dataset.uf); return; }
   const p = e.target.closest && e.target.closest('path.clic[data-m="br"]');
-  if (p && ESTADOS[p.dataset.k]) { $("#sel-uf").value = p.dataset.k; $("#sel-uf").onchange(); aba = "mp"; marcarAba(); }
+  if (p && ESTADOS[p.dataset.k]) irPara(pag, p.dataset.k);
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.matches && e.target.matches(".linha[data-uf]")) irPara(pag, e.target.dataset.uf);
 });
 
-function desenhar() {
-  if (!ultimo) return;
-  anterior = atual; atual = {};
-  $("#app").innerHTML = aba === "uf" ? viewUF(ultimo) : aba === "br" ? viewBR(ultimo) : aba === "cg" ? viewCongresso(ultimo) : viewMapas(ultimo);
-  if (aba === "mp") garantirMapas();
-}
-
-const ESTADOS = {AC:"Acre",AL:"Alagoas",AM:"Amazonas",AP:"Amapá",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",
-  GO:"Goiás",MA:"Maranhão",MG:"Minas Gerais",MS:"Mato Grosso do Sul",MT:"Mato Grosso",PA:"Pará",PB:"Paraíba",PE:"Pernambuco",
-  PI:"Piauí",PR:"Paraná",RJ:"Rio de Janeiro",RN:"Rio Grande do Norte",RO:"Rondônia",RR:"Roraima",RS:"Rio Grande do Sul",
-  SC:"Santa Catarina",SE:"Sergipe",SP:"São Paulo",TO:"Tocantins"};
-let uf = null;
-try { uf = localStorage.getItem("uf"); } catch (e) {}
 $("#sel-uf").innerHTML = Object.entries(ESTADOS).map(([s, n]) => `<option value="${s}">${s} — ${n}</option>`).join("");
-if (uf) $("#sel-uf").value = uf;
-$("#sel-uf").onchange = () => {
-  uf = $("#sel-uf").value; try { localStorage.setItem("uf", uf); } catch (e) {}
-  aba = "uf"; marcarAba(); $("#status").textContent = "carregando " + uf + "…"; carregar();
-};
+$("#sel-uf").onchange = () => irPara(pag, $("#sel-uf").value);
 
 async function carregar() {
   try {
     const r = await fetch("/api?uf=" + (uf || "") + "&t=" + Date.now());
     if (!r.ok) throw new Error(r.status);
     ultimo = await r.json();
-    if (!uf && ultimo.uf) { uf = ultimo.uf.sigla; $("#sel-uf").value = uf; }
-    if (ultimo.uf && $("#sel-uf").value !== ultimo.uf.sigla) $("#sel-uf").value = ultimo.uf.sigla;
+    if (!uf && ultimo.uf) { uf = ultimo.uf.sigla; try { localStorage.setItem("uf", uf); } catch (e) {} }
+    $("#sel-uf").value = uf;
     $("#dot").classList.remove("off");
-    $("#status").textContent = "ao vivo · consulta às " + ultimo.agora + " (Brasília)";
+    $("#status").textContent = "ao vivo · " + ultimo.agora;
     desenhar();
   } catch (e) {
     $("#dot").classList.add("off");
     $("#status").textContent = location.protocol === "file:"
-      ? "arquivo aberto direto — rode acompanhar_navegador.bat e use http://localhost:8765"
-      : "servidor local parado — mantenha a janela preta do acompanhar_navegador.bat aberta; tentando de novo…";
+      ? "abra pelo iniciar.bat (http://localhost:8765)"
+      : "servidor local parado — mantenha a janela do iniciar.bat aberta";
   }
 }
 
-const ABAS = [["t-uf", "uf"], ["t-br", "br"], ["t-cg", "cg"], ["t-mp", "mp"]];
-const marcarAba = () => ABAS.forEach(([id, n]) => $("#" + id).classList.toggle("on", aba === n));
-for (const [id, nome] of ABAS) {
-  $("#" + id).onclick = () => {
-    aba = nome; try { localStorage.setItem("aba", nome); } catch (e) {}
-    marcarAba(); anterior = {}; desenhar();
-  };
-}
-marcarAba();
-carregar(); setInterval(carregar, 10000);
+sincronizar(); desenharMenu(); carregar(); setInterval(carregar, 10000);
 </script>
 </body>
 </html>
