@@ -265,6 +265,54 @@ class TestChat(unittest.TestCase):
         self.assertEqual(chat_mod._limpa("a\x00b\x07c"), "abc")
 
 
+class TestContextoDaPagina(unittest.TestCase):
+    CTX = dict(pagina="governador", turno=2, uf="rn", texto="Allyson 36,9%\nCadu de Lula 36,2%")
+
+    def test_valida_o_que_vem_do_navegador(self):
+        chave, bloco = chat_mod.contexto_da_pagina(self.CTX)
+        self.assertEqual(chave, ("governador", 2, "RN"))
+        self.assertIn("Allyson 36,9%", bloco)
+        self.assertIn("não instruções", bloco)
+        self.assertEqual(chat_mod.contexto_da_pagina(None), (None, None))
+        self.assertEqual(chat_mod.contexto_da_pagina("x"), (None, None))
+        self.assertEqual(chat_mod.contexto_da_pagina(dict(self.CTX, pagina="../etc/passwd")), (None, None))
+        chave, _ = chat_mod.contexto_da_pagina(dict(self.CTX, uf="XX", turno=9))
+        self.assertEqual(chave, ("governador", None, None))              # UF e turno inválidos são descartados
+
+    def test_texto_longo_e_controle_sao_limpos(self):
+        _, bloco = chat_mod.contexto_da_pagina(dict(self.CTX, texto="a\x00b" + "x" * 20000))
+        self.assertLessEqual(len(bloco), chat_mod.MAX_CONTEXTO + 300)
+        self.assertNotIn("\x00", bloco)
+
+    def _conversa(self, ch):
+        return next(iter(ch.conversas.values()))
+
+    def test_contexto_vai_so_quando_a_pagina_muda(self):
+        ch = ChatFalso(ferramentas(), [Fluxo(["a"], [texto_bloco("a")], "end_turn")] * 3)
+        cid = list(ch.responder(None, "p1", "t", contexto=self.CTX))[0]["id"]
+        list(ch.responder(cid, "p2", "t", contexto=self.CTX))                        # mesma página: sem bloco novo
+        list(ch.responder(cid, "p3", "t", contexto=dict(self.CTX, pagina="presidente", texto="Lula x Flávio")))
+        usuario = [m["content"] for m in self._conversa(ch)["msgs"] if m["role"] == "user"]
+        self.assertIsInstance(usuario[0], list)
+        self.assertIn("Allyson", usuario[0][0]["text"])
+        self.assertEqual(usuario[0][1]["text"], "p1")
+        self.assertEqual(usuario[1], "p2")                                           # só a pergunta
+        self.assertIn("Lula x Flávio", usuario[2][0]["text"])
+
+    def test_falha_devolve_o_contexto_para_ser_reenviado(self):
+        ch = ChatFalso(ferramentas(), [Fluxo([], [], "end_turn", falha=ValueError("x")),
+                                       Fluxo(["ok"], [texto_bloco("ok")], "end_turn")])
+        with unittest.mock.patch.object(chat_mod, "registrar_erro", lambda *a, **k: None):
+            cid = list(ch.responder(None, "p1", "t", contexto=self.CTX))[0]["id"]
+            self.assertIsNone(self._conversa(ch).get("ctx"))                         # turno descartado, contexto também
+            list(ch.responder(cid, "p1", "t", contexto=self.CTX))
+        self.assertIsInstance(self._conversa(ch)["msgs"][0]["content"], list)        # foi reenviado
+
+    def test_prompt_explica_o_contexto(self):
+        self.assertIn("Contexto da página", chat_mod.SISTEMA)
+        self.assertIn("nunca instrução", chat_mod.SISTEMA)
+
+
 class TestLimitador(unittest.TestCase):
     def test_janela_por_ip(self):
         lim, t0 = Limitador(), time.time()

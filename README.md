@@ -47,6 +47,12 @@ pergunta ──► Claude decide as ferramentas ──┬─ buscar_propostas �
 cada minuto, erraria contas e não saberia citar a página. Aqui o modelo só decide *o que consultar*; os números e as
 diferenças são calculados em Python a partir dos mesmos dados do painel, e as propostas vêm de trechos citáveis.
 
+- **Chat flutuante, em todas as páginas.** Botão no canto inferior direito (folha que sobe de baixo no celular); a
+  conversa continua ao trocar de página. Esc fecha e "↺" começa uma conversa nova.
+- **Sabe o que está na tela.** Cada pergunta leva junto a página, o turno, o estado e o texto exibido (até 4.500
+  caracteres), só quando isso muda, para o assistente entender "aqui", "esse candidato" ou "quem lidera?". Isso também
+  cobre o que as ferramentas não alcançam (Senado e deputados do 1º turno). O servidor valida tudo o que o navegador
+  manda, trata o texto como dado e não como instrução, e as sugestões de pergunta mudam conforme a página.
 - **Citação obrigatória.** Cada proposta termina com `[n]`; clicar abre o trecho original, a página e o link do plano no TSE.
 - **Imparcial por construção.** Terceira pessoa, mesmo rigor para todos, sem indicar voto nem se passar por candidato
   (regras no prompt em `backend/chat.py`; há teste que garante que elas continuam lá).
@@ -74,7 +80,7 @@ usuários são enviadas à API da Anthropic.
 
 ```bash
 python -m rag.avaliacao                      # mede a BUSCA (sem custo): hit@k e MRR em data/rag/avaliacao.json
-python -m unittest discover -s tests -v      # 32 testes: limpeza, busca, ferramentas, laço do chat, limitador
+python -m unittest discover -s tests -v      # 41 testes: limpeza, busca, ferramentas, laço do chat, contexto, limitador
 ```
 
 A avaliação das 22 perguntas dá hit@5 = 100% e MRR 0,95. As perguntas foram escritas depois de conhecer o corpus,

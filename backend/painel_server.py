@@ -770,7 +770,7 @@ def servir(porta, uf, so_uf, so_br, intervalo):
                 return
             try:
                 n = int(self.headers.get("Content-Length") or 0)
-                if not 0 < n <= 4096:
+                if not 0 < n <= 16384:                             # pergunta + texto da página (até ~4500 caracteres)
                     raise ValueError
                 req = json.loads(self.rfile.read(n).decode("utf-8"))
             except (ValueError, UnicodeDecodeError):
@@ -782,7 +782,8 @@ def servir(porta, uf, so_uf, so_br, intervalo):
                 self.send_header("Cache-Control", "no-store")
                 self.send_header("X-Accel-Buffering", "no")
                 self.end_headers()
-                for ev in chat.responder(req.get("conversa"), req.get("mensagem", ""), self.client_address[0]):
+                for ev in chat.responder(req.get("conversa"), req.get("mensagem", ""), self.client_address[0],
+                                         contexto=req.get("contexto")):
                     self.wfile.write(("data: " + json.dumps(ev, ensure_ascii=False) + "\n\n").encode("utf-8"))
                     self.wfile.flush()
             except (ConnectionError, OSError):                     # o navegador fechou: o gerador é encerrado
