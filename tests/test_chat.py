@@ -168,6 +168,22 @@ class TestChat(unittest.TestCase):
         self.assertEqual(resultado["type"], "tool_result")
         self.assertEqual(json.loads(resultado["content"])["trechos"][0]["ref"], 1)
 
+    def test_texto_antes_e_depois_da_ferramenta_nao_cola_na_mesma_linha(self):
+        ch = ChatFalso(ferramentas(), [
+            Fluxo(["Vou buscar."], [texto_bloco("Vou buscar."), uso_ferramenta("resumo_geral", {})], "tool_use"),
+            Fluxo(["**Lula (PT)**"], [texto_bloco("**Lula (PT)**")], "end_turn"),
+        ])
+        texto = "".join(e.get("texto", "") for e in self.rodar(ch))
+        self.assertEqual(texto, "Vou buscar.\n\n**Lula (PT)**")
+
+    def test_citacao_agrupada_tambem_lista_as_fontes(self):
+        ch = ChatFalso(ferramentas(), [
+            Fluxo([], [uso_ferramenta("buscar_propostas", dict(consulta="SUS filas"))], "tool_use"),
+            Fluxo(["Filas [1; 9] e mais."], [texto_bloco("Filas [1; 9] e mais.")], "end_turn"),
+        ])
+        fontes = next(e for e in self.rodar(ch) if e["tipo"] == "fontes")["fontes"]
+        self.assertEqual([f["ref"] for f in fontes], [1])                # [1; 9]: só o 1 existe, o 9 é ignorado
+
     def test_ferramenta_com_erro_volta_ao_modelo(self):
         ch = ChatFalso(ferramentas(), [
             Fluxo([], [uso_ferramenta("resultados", dict(turno=2, cargo="presidente", uf="XX"))], "tool_use"),

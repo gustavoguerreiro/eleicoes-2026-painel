@@ -73,14 +73,18 @@ python -m rag.ingestao                       # PDFs em data/planos/ -> data/rag/
 python painel_server.py --web
 ```
 
-Modelo padrão: `claude-opus-5-5`. Para gastar menos: `CLAUDE_MODEL=claude-sonnet-5-5` no `.env`. As perguntas dos
-usuários são enviadas à API da Anthropic.
+**Modelo e custo.** O padrão é o Haiku 4.5 (`CLAUDE_MODEL` no `.env` troca). Medido em 7 perguntas numa mesma conversa
+(o histórico cresce, que é o caso caro), com o cache do histórico ligado: Haiku 4.5 ≈ US$ 0,005 por pergunta,
+Sonnet 5.5 ≈ US$ 0,009, Opus 5.5 ≈ US$ 0,022. Todos passaram nas mesmas verificações (número certo vindo da ferramenta,
+citações, recusa de pedido de voto, de biografia e de falar como candidato). Se a paridade entre candidatos ou a
+fidelidade das comparações importarem mais que o custo, use `CLAUDE_MODEL=claude-sonnet-5-5`.
+As perguntas dos usuários são enviadas à API da Anthropic.
 
 ### Qualidade
 
 ```bash
 python -m rag.avaliacao                      # mede a BUSCA (sem custo): hit@k e MRR em data/rag/avaliacao.json
-python -m unittest discover -s tests -v      # 41 testes: limpeza, busca, ferramentas, laço do chat, contexto, limitador
+python -m unittest discover -s tests -v      # 43 testes: limpeza, busca, ferramentas, laço do chat, contexto, limitador
 ```
 
 A avaliação das 22 perguntas dá hit@5 = 100% e MRR 0,95. As perguntas foram escritas depois de conhecer o corpus,
@@ -93,7 +97,10 @@ então o número é otimista: serve como alarme de regressão, não como nota fi
 - `backend/chat.py`, `backend/chat_ferramentas.py` — o chat: prompt, laço com ferramentas, limitador e as ferramentas.
 - `backend/rag/` — `texto.py` (limpeza), `ingestao.py` (PDF → trechos), `busca.py` (BM25), `avaliacao.py`.
 - `backend/geo.py` — malhas e nomes do IBGE, com cache em `data/geo/`.
-- `frontend/painel.html` — página única que consome a API e se atualiza sozinha.
+- `frontend/painel.html` — página única que consome a API e se atualiza sozinha. Visual do 2º turno e do chat segue o
+  redesenho (tokens de cor e tipografia no início do `<style>`, tema claro/escuro com botão, ordem alfabética fixa dos
+  candidatos, cartograma de estados e grade de municípios, selos de partido com contraste AA). As telas do 1º turno
+  usam os mesmos tokens, mas o layout delas ainda é o anterior.
 - `data/planos/` — planos de governo dos candidatos (TSE) e `manifesto.json` com a origem de cada um.
 - `data/rag/` — trechos indexados e o conjunto de avaliação.
 - `tests/` — testes automatizados.

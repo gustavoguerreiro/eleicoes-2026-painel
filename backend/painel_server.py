@@ -651,9 +651,9 @@ def situacao_2t(j, cs):
     if dif > r:
         return dict(tipo="1turno", rotulo="VITÓRIA DEFINIDA (projeção)",
                     texto=f"{a['nome']} lidera por {milhar(dif)} votos e o que falta apurar não alcança essa diferença")
-    cor = "2turno" if dif < 0.25 * r else "aberto"
-    return dict(tipo=cor, rotulo="DISPUTA ABERTA",
-                texto=f"{a['nome']} lidera por {milhar(dif)} votos ({pct(pp)} p.p.); faltam cerca de {milhar(r)} votos válidos")
+    falta = (f"{r / 1e6:.1f}".replace(".", ",") + " milhões de votos válidos") if r >= 1e6 else f"{milhar(r)} votos válidos"
+    return dict(tipo="aberto", rotulo="DISPUTA ABERTA",
+                texto=f"{a['nome']} tem {milhar(dif)} votos a mais. Faltam cerca de {falta}.")
 
 
 def web_2t(j2, j1):
@@ -671,7 +671,7 @@ def web_2t(j2, j1):
         return dict(ao_vivo=True, apur=apurado(j2), ht=j2.get("ht", ""), situacao=situacao_2t(j2, cs), base=base,
                     cands=[dict({k: c[k] for k in campos}, pct1t=ref.get(c["n"], 0), votos1t=refv.get(c["n"], 0)) for c in cs])
     return dict(ao_vivo=False, apur=0, ht=j1.get("ht", ""), base=base,
-                situacao=dict(tipo="aberto", rotulo="AGUARDANDO O 2º TURNO", texto=f"A votação é em {DATA_2T[8:]}/{DATA_2T[5:7]}."),
+                situacao=dict(tipo="aberto", rotulo="AGUARDANDO O 2º TURNO", texto=f"A votação é em {DATA_2T[8:]}/{DATA_2T[5:7]}. Abaixo, como cada um foi no 1º turno."),
                 cands=[dict({k: c[k] for k in campos}, pct1t=c["pct"], votos1t=c["votos"]) for c in fin])
 
 

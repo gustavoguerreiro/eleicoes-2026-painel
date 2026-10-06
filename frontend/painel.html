@@ -4,197 +4,439 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Apuração 2026</title>
-<style>
-:root{
-  --bg:#f5f6f8; --card:#fff; --tx:#171b23; --mut:#667085; --bd:#e4e7ec; --bar:#e9ecf1; --soft:#f0f2f6;
-  --acc:#2457d6; --ok:#15803d; --warn:#b45309; --bad:#b42318; --flash:#fff3b0; --sh:0 1px 2px rgba(16,24,40,.05);
+<script>try{var t=localStorage.getItem("tema");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>/* Apuração 2026 — tokens (cole no <style> do painel.html) */
+:root {
+  /* Tipografia — só pilha do sistema */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fs-cap: 13px;      /* mínimo para qualquer texto (antes 11px) */
+  --fs-sm: 14px;
+  --fs-body: 15px;
+  --fs-lg: 17px;
+  --fs-h3: 18px;       /* título de cartão */
+  --fs-h2: 22px;
+  --fs-h1: 28px;       /* título de página */
+  --fs-num: clamp(30px, 9cqi, 46px); /* % do duelo, escala com o cartão */
+  --fw-reg: 400; --fw-med: 600; --fw-bold: 700; --fw-black: 800;
+  --lh-tight: 1.15; --lh-body: 1.5;
+  --num: tabular-nums; /* font-variant-numeric em todo número */
+
+  /* Forma e espaço */
+  --r-card: 14px; --r-box: 10px; --r-chip: 6px; --r-pill: 999px;
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
+  --max: 1180px; --bp-mobile: 620px;
+
+  /* Partidos — cor "pura" (mapas, barras, hemiciclos) */
+  --p-pt: #dc2626; --p-pl: #16a34a; --p-uniao: #3b82f6; --p-pp: #1e3a8a;
+  --p-republicanos: #6366f1; --p-psd: #0d9488; --p-mdb: #eab308; --p-pode: #06b6d4;
+  --p-psb: #f97316; --p-psol: #c2185b; --p-psdb: #0369a1; --p-pdt: #0ea5e9;
+  --p-novo: #c2410c; --p-avante: #7c3aed; --p-pv: #84cc16; --p-rede: #10b981;
+  --p-pcdob: #9f1239; --p-cidadania: #ec4899; --p-solidariedade: #f59e0b;
+  --p-prd: #6b7280; --p-missao: #374151; --p-up: #be123c; --p-pstu: #9f1239;
+
+  /* Partidos — fundo do selo/avatar com texto branco (todos ≥ 4,5:1) */
+  --p-pt-chip: #b91c1c;            /* 6,5 */
+  --p-pl-chip: #15803d;            /* 5,0  (era 3,30) */
+  --p-uniao-chip: #1d4ed8;         /* 6,7  (era 3,68) */
+  --p-pp-chip: #1e3a8a;
+  --p-republicanos-chip: #4f46e5;  /* 6,3  (era 4,47) */
+  --p-psd-chip: #0f766e;           /* 5,5  (era 3,74) */
+  --p-mdb-chip: #854d0e;           /* 7,0  (era 1,92) */
+  --p-pode-chip: #0e7490;          /* 5,4  (era 2,43) */
+  --p-psb-chip: #c2410c;           /* 5,2  (era 2,80) */
+  --p-psol-chip: #c2185b;
+  --p-psdb-chip: #0369a1;
+  --p-pdt-chip: #0369a1;           /* 5,9  (era 2,77) */
+  --p-novo-chip: #c2410c;
+  --p-avante-chip: #7c3aed;
+  --p-pv-chip: #3f6212;            /* 7,4  (era 1,98) */
+  --p-rede-chip: #047857;          /* 5,5  (era 2,54) */
+  --p-pcdob-chip: #9f1239;
+  --p-cidadania-chip: #be185d;     /* 6,0  (era 3,53) */
+  --p-solidariedade-chip: #92400e; /* 7,0  (era 2,15) */
+  --p-prd-chip: #4b5563;
+  --p-missao-chip: #374151;
+  --p-up-chip: #be123c;
+  --p-pstu-chip: #9f1239;
 }
-@media (prefers-color-scheme:dark){:root{
-  --bg:#0c0f15; --card:#151a23; --tx:#e9ecf2; --mut:#8e98a9; --bd:#252c3a; --bar:#232a38; --soft:#1b212c;
-  --acc:#6b9bff; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171; --flash:#4a3e00; --sh:none;
-}}
+
+:root, [data-theme="light"] {
+  --bg: #f4f5f7; --surface: #ffffff; --surface-2: #eef0f4;
+  --ink: #14171f; --ink-2: #465063; --ink-3: #5b6477; /* ink-3 = 5,9:1 no branco */
+  --line: #dfe3ea; --track: #e4e7ed;
+  --acc: #1f4fc4; --acc-ink: #ffffff; --acc-soft: #e7edfb;   /* 6,9:1 */
+  --ok: #14703a; --ok-soft: #e4f3e9;
+  --warn: #9a4a07; --warn-soft: #fbefe1;
+  --info: #1f4fc4; --info-soft: #e7edfb;
+  --bad: #b42318; --bad-soft: #fdeceb;
+  --flash: #fff1a8;
+  --n-elim: #7d8596; --n-branco: #c3c8d1; --n-nulo: #a1a8b5;
+  --shadow: 0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.06);
+}
+
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0b0e14; --surface: #141922; --surface-2: #1b212c;
+  --ink: #edf0f5; --ink-2: #b4bccb; --ink-3: #98a2b3;
+  --line: #262e3c; --track: #252d3b;
+  --acc: #7aa5ff; --acc-ink: #0b1220; --acc-soft: #1a2540;   /* texto escuro no azul: 8,1:1 (era 2,7) */
+  --ok: #4ade80; --ok-soft: #12261a;
+  --warn: #fbbf24; --warn-soft: #2a2010;
+  --info: #7aa5ff; --info-soft: #18213a;
+  --bad: #f87171; --bad-soft: #2c1618;
+  --flash: #4a3e00;
+  --n-elim: #6b7383; --n-branco: #a9b0bd; --n-nulo: #868e9c;
+  --shadow: none;
+} }
+[data-theme="dark"] {
+  --bg: #0b0e14; --surface: #141922; --surface-2: #1b212c;
+  --ink: #edf0f5; --ink-2: #b4bccb; --ink-3: #98a2b3;
+  --line: #262e3c; --track: #252d3b;
+  --acc: #7aa5ff; --acc-ink: #0b1220; --acc-soft: #1a2540;
+  --ok: #4ade80; --ok-soft: #12261a;
+  --warn: #fbbf24; --warn-soft: #2a2010;
+  --info: #7aa5ff; --info-soft: #18213a;
+  --bad: #f87171; --bad-soft: #2c1618;
+  --flash: #4a3e00;
+  --n-elim: #6b7383; --n-branco: #a9b0bd; --n-nulo: #868e9c;
+  --shadow: none;
+}
+
+/* aliases dos nomes antigos: as telas do 1º turno ainda usam estes nomes */
+:root{--card:var(--surface);--soft:var(--surface-2);--tx:var(--ink);--mut:var(--ink-3);--bd:var(--line);--bar:var(--track);--sh:var(--shadow)}
+
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  -webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--ink);font:var(--fs-body)/var(--lh-body) var(--font-sans);-webkit-font-smoothing:antialiased;font-variant-numeric:var(--num)}
 a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
 
 /* ---- cabeçalho ---- */
-header.site{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--bd)}
-.top{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.brand{font-weight:800;font-size:18px;letter-spacing:-.01em}
-.brand span{color:var(--acc)}
-.top .live{margin-right:auto}
-.live{display:flex;align-items:center;gap:7px;color:var(--mut);font-size:12.5px}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 1.8s infinite}
-.dot.off{background:var(--bad);animation:none}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(21,128,61,.5)}100%{box-shadow:0 0 0 8px rgba(21,128,61,0)}}
-.ufbox{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut)}
-.ufbox select{border:1px solid var(--bd);background:var(--soft);color:var(--tx);padding:7px 10px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
-nav.menu{max-width:1180px;margin:0 auto;padding:0 12px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
-nav.menu a{padding:10px 14px;font-weight:600;color:var(--mut);border-bottom:2px solid transparent;white-space:nowrap}
-nav.menu a:hover{color:var(--tx)}
-nav.menu a[aria-current="page"]{color:var(--acc);border-bottom-color:var(--acc)}
+header.site{position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
+.top{max-width:var(--max);margin:0 auto;padding:14px 24px 0;display:flex;align-items:center;gap:20px}
+.marca{display:flex;align-items:center;gap:10px}
+.logo{width:22px;height:22px;border-radius:6px;overflow:hidden;display:flex;gap:2px;background:var(--surface)}
+.logo i{flex:1;background:var(--ink)}.logo i+i{background:var(--ink-3)}
+.marca{flex:none}
+.marca .nome{font-size:18px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}.marca .nome b{color:var(--acc)}
+.live{display:flex;align-items:center;gap:8px;font-size:var(--fs-cap);color:var(--ink-3)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft);flex:none}
+.dot.off{background:var(--bad);box-shadow:0 0 0 3px var(--bad-soft)}
+.esp{flex:1}
+.turnos{display:flex;padding:3px;border-radius:var(--r-pill);background:var(--surface-2);font-size:var(--fs-sm);font-weight:600}
+.turnos a{padding:6px 14px;border-radius:var(--r-pill);color:var(--ink-3);border:1px solid transparent}
+.turnos a[aria-current="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);border-color:var(--line)}
+.t-c,.uf-c{display:none}
+.ufpill{position:relative;display:flex;align-items:center;gap:10px;padding:7px 12px 7px 14px;border:1px solid var(--line);border-radius:var(--r-pill);font-size:var(--fs-sm);cursor:pointer;background:var(--surface)}
+.ufpill .ufl,.ufpill .car{color:var(--ink-3)}
+.ufpill select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
+.tema{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:transparent;display:grid;place-items:center;cursor:pointer;padding:0}
+.tema i{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink);background:linear-gradient(90deg,var(--ink) 50%,transparent 50%)}
+nav.menu{max-width:var(--max);margin:8px auto 0;padding:0 24px;display:flex;gap:4px}
+nav.menu a{padding:10px 14px;font-size:var(--fs-body);font-weight:600;color:var(--ink-3);border-bottom:2px solid transparent;white-space:nowrap}
+nav.menu a:hover{color:var(--ink)}
+nav.menu a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--acc)}
 
 /* ---- layout ---- */
-main{max-width:1180px;margin:0 auto;padding:22px 20px 40px;display:grid;gap:18px}
+main{max-width:var(--max);margin:0 auto;padding:24px;display:flex;flex-direction:column;gap:20px}
 .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));align-items:start}
 .cols3{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
-.pagina-titulo h1{margin:0;font-size:24px;letter-spacing:-.02em}
-.pagina-titulo p{margin:4px 0 0;color:var(--mut)}
-.secao{margin:6px 0 -6px;font-size:13px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.pagina-titulo h1{margin:0;font-size:var(--fs-h1);line-height:var(--lh-tight);font-weight:800;letter-spacing:-.015em}
+.pagina-titulo p{margin:6px 0 0;color:var(--ink-2)}
+.secao{margin:6px 0 -6px;font-size:var(--fs-cap);font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
 
 /* ---- cartões ---- */
-.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px 20px;box-shadow:var(--sh)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:18px 20px;box-shadow:var(--shadow)}
 .ch{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-.card h2{font-size:16px;margin:0;font-weight:700}
-.sub{color:var(--mut);font-size:13px;margin:2px 0 0}
-.apur-t{color:var(--mut);font-size:12.5px;white-space:nowrap}
-.apur{height:5px;background:var(--bar);border-radius:3px;margin:10px 0 14px;overflow:hidden}
+.card h2{font-size:var(--fs-h3);margin:0;font-weight:700}
+.sub{color:var(--ink-2);font-size:var(--fs-sm);margin:2px 0 0}
+.apur-t{color:var(--ink-2);font-size:var(--fs-sm);white-space:nowrap}
+.apur{height:6px;background:var(--track);border-radius:3px;margin:10px 0 14px;overflow:hidden}
 .apur i{display:block;height:100%;background:var(--acc);transition:width .6s}
-.nota{color:var(--mut);font-size:12.5px;margin:10px 0 0}
-.vazio{color:var(--mut);padding:18px 0;text-align:center}
-.link{color:var(--acc);font-weight:600;font-size:13.5px}
-.rodape-card{margin-top:14px;padding-top:12px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.nota{color:var(--ink-3);font-size:var(--fs-cap);margin:10px 0 0}
+.vazio{color:var(--ink-3);padding:18px 0;text-align:center}
+.link{color:var(--acc);font-weight:700;font-size:var(--fs-sm)}
+.rodape-card{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 
-/* ---- status ---- */
-.status{display:flex;flex-direction:column;gap:2px;padding:10px 14px;border-radius:12px;margin:0 0 12px;border:1px solid transparent}
-.status b{font-size:13px;letter-spacing:.02em}.status span{font-size:13.5px}
-.s-eleito,.s-1turno{background:rgba(21,128,61,.10);border-color:rgba(21,128,61,.25)}.s-eleito b,.s-1turno b{color:var(--ok)}
-.s-2turno{background:rgba(180,83,9,.10);border-color:rgba(180,83,9,.28)}.s-2turno b{color:var(--warn)}
-.s-aberto{background:rgba(36,87,214,.09);border-color:rgba(36,87,214,.25)}.s-aberto b{color:var(--acc)}
-.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap}
-.b-eleito,.b-1turno{background:rgba(21,128,61,.14);color:var(--ok)}
-.b-2turno{background:rgba(180,83,9,.15);color:var(--warn)}
-.b-aberto{background:rgba(36,87,214,.13);color:var(--acc)}
+/* ---- status e selos (1º turno) ---- */
+.status{display:flex;flex-direction:column;gap:2px;padding:10px 14px;border-radius:var(--r-box);margin:0 0 12px}
+.status b{font-size:var(--fs-cap);letter-spacing:.05em;font-weight:800}.status span{font-size:var(--fs-sm)}
+.s-eleito,.s-1turno{background:var(--ok-soft)}.s-eleito b,.s-1turno b{color:var(--ok)}
+.s-2turno{background:var(--warn-soft)}.s-2turno b{color:var(--warn)}
+.s-aberto{background:var(--info-soft)}.s-aberto b{color:var(--info)}
+.badge{display:inline-block;padding:2px 9px;border-radius:var(--r-pill);font-size:var(--fs-cap);font-weight:700;white-space:nowrap}
+.b-eleito,.b-1turno{background:var(--ok-soft);color:var(--ok)}
+.b-2turno{background:var(--warn-soft);color:var(--warn)}
+.b-aberto{background:var(--info-soft);color:var(--info)}
 
-/* ---- candidatos ---- */
-.cand{display:grid;grid-template-columns:40px 1fr auto;gap:3px 12px;align-items:center;padding:8px 8px;margin:0 -8px;border-radius:10px}
-.cand.flash,.item.flash,.linha.flash{animation:fl 2.4s ease-out}
+/* ---- candidatos (1º turno) ---- */
+.cand{display:grid;grid-template-columns:40px 1fr auto;gap:3px 12px;align-items:center;padding:8px 8px;margin:0 -8px;border-radius:var(--r-box)}
+.cand.flash,.item.flash,.linha.flash,.lado2.flash{animation:fl 2.4s ease-out}
 @keyframes fl{0%{background:var(--flash)}100%{background:transparent}}
-.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:var(--fs-cap)}
 .cn{min-width:0;display:flex;flex-direction:column;gap:2px}
 .cn b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cand.top .cn b{font-size:16px}
-.cv{text-align:right;font-variant-numeric:tabular-nums;display:flex;flex-direction:column}
-.cv b{font-size:16px}.cv small{color:var(--mut);font-size:12px}
-.bar{grid-column:2/-1;position:relative;height:7px;background:var(--bar);border-radius:4px}
+.cand.top .cn b{font-size:var(--fs-lg)}
+.cv{text-align:right;display:flex;flex-direction:column}
+.cv b{font-size:var(--fs-lg)}.cv small{color:var(--ink-3);font-size:var(--fs-cap)}
+.bar{grid-column:2/-1;position:relative;height:7px;background:var(--track);border-radius:4px}
 .bar i{position:absolute;inset:0 auto 0 0;border-radius:4px;transition:width .6s}
-.bar u{position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--mut);opacity:.6}
-.chip{display:inline-block;padding:1px 8px;border-radius:6px;font-size:11.5px;font-weight:700;color:#fff;white-space:nowrap;width:fit-content}
+.bar u{position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--ink-3);opacity:.6}
+.chip{display:inline-block;padding:2px 8px;border-radius:var(--r-chip);font-size:var(--fs-cap);font-weight:800;color:#fff;white-space:nowrap;width:fit-content;letter-spacing:.02em}
 
-/* ---- duelo (2º turno) ---- */
+/* ---- duelo do resumo do 1º turno ---- */
 .duelo{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;padding:6px 0}
 .lado{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
 .lado .av{width:64px;height:64px;font-size:22px}
-.lado .n{font-weight:700;font-size:17px;line-height:1.2}
-.lado .p{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.lado small{color:var(--mut)}
-.vs{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--mut);font-weight:700}
-.duelo-mini{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;font-size:13.5px}
+.lado .n{font-weight:700;font-size:var(--fs-lg);line-height:1.2}
+.lado .p{font-size:30px;font-weight:800;letter-spacing:-.02em}
+.lado small{color:var(--ink-3)}
+.vs{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink-3);font-weight:700}
+.duelo-mini{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;font-size:var(--fs-sm)}
 .duelo-mini .l{display:flex;flex-direction:column;gap:2px}.duelo-mini .l:last-child{text-align:right;align-items:flex-end}
-.duelo-mini b{font-variant-numeric:tabular-nums}
-.duelo-mini .uf{font-weight:800;color:var(--mut)}
-.tile{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;display:block}
-.tile .n{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.tile .l{color:var(--mut);font-size:13px}
+.duelo-mini .uf{font-weight:800;color:var(--ink-3)}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:14px 16px;display:block}
+.tile .n{font-size:30px;font-weight:800;letter-spacing:-.02em}
+.tile .l{color:var(--ink-3);font-size:var(--fs-cap)}
 a.tile:hover,a.card:hover{border-color:var(--acc)}
 
 /* ---- listas ---- */
 .item{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:6px 8px;margin:0 -8px;border-radius:8px}
-.item .pos{color:var(--mut);font-size:12px;text-align:right}
+.item .pos{color:var(--ink-3);font-size:var(--fs-cap);text-align:right}
 .item .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;gap:8px;align-items:center}
-.item .v{color:var(--mut);font-size:13px;font-variant-numeric:tabular-nums}
-.item.fora{opacity:.55}
-.sep{border-top:1px dashed var(--bd);margin:8px 0 4px;color:var(--mut);font-size:12px;padding-top:6px}
+.item .v{color:var(--ink-3);font-size:var(--fs-cap)}
+.item.fora{opacity:.6}
+.sep{border-top:1px dashed var(--line);margin:8px 0 4px;color:var(--ink-3);font-size:var(--fs-cap);padding-top:6px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-.linha{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:9px 6px;border-bottom:1px solid var(--bd);cursor:pointer;border-radius:8px}
-.linha:last-child{border-bottom:0}.linha:hover{background:var(--soft)}
-.linha .uf{font-weight:800;color:var(--mut)}
+.linha{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:9px 6px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:8px}
+.linha:last-child{border-bottom:0}.linha:hover{background:var(--surface-2)}
+.linha .uf{font-weight:800;color:var(--ink-3)}
 .linha .m{min-width:0}.linha .m div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.linha .m small{color:var(--mut)}
-.linha .r{text-align:right;display:flex;flex-direction:column;gap:3px;align-items:flex-end;font-variant-numeric:tabular-nums}
+.linha .m small{color:var(--ink-3);font-size:var(--fs-cap)}
+.linha .r{text-align:right;display:flex;flex-direction:column;gap:3px;align-items:flex-end}
 .duas{columns:2 260px;column-gap:28px}.duas .item{break-inside:avoid}
 
-/* ---- hemiciclo e mapas ---- */
+/* ---- mapas SVG, tooltip e controles ---- */
 .mapa svg{width:100%;height:auto;display:block;max-height:540px}
-.mapa path{stroke:var(--card);stroke-width:.6;stroke-linejoin:round}
-.mapa path.clic{cursor:pointer}.mapa path:hover{stroke:var(--tx);stroke-width:1.4}
-.seg{display:inline-flex;gap:4px;margin:0 0 12px;background:var(--soft);padding:3px;border-radius:999px}
-.seg button{border:0;background:transparent;color:var(--mut);padding:6px 14px;border-radius:999px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
-.seg button.on{background:var(--card);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-#tip{position:fixed;z-index:30;pointer-events:none;background:var(--card);color:var(--tx);border:1px solid var(--bd);
-  border-radius:12px;padding:9px 12px;font-size:13px;box-shadow:0 8px 28px rgba(0,0,0,.22);display:none;max-width:270px}
+.mapa path{stroke:var(--surface);stroke-width:.6;stroke-linejoin:round}
+.mapa path.clic{cursor:pointer}.mapa path:hover{stroke:var(--ink);stroke-width:1.4}
+.seg{display:inline-flex;gap:4px;margin:0 0 12px;background:var(--surface-2);padding:3px;border-radius:var(--r-pill)}
+.seg button,.seg2 button{border:0;background:transparent;color:var(--ink-3);padding:6px 14px;border-radius:var(--r-pill);font-size:var(--fs-sm);font-weight:700;cursor:pointer}
+.seg button.on,.seg2 button.on{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.seg2{display:inline-flex;padding:3px;border-radius:var(--r-pill);background:var(--surface-2)}
+#tip{position:fixed;z-index:30;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);
+  border-radius:12px;padding:9px 12px;font-size:var(--fs-cap);box-shadow:0 8px 28px rgba(0,0,0,.22);display:none;max-width:270px}
 #tip b{display:block;margin-bottom:3px}#tip div{display:flex;justify-content:space-between;gap:14px}
 
-.turnos{display:inline-flex;gap:2px;background:var(--soft);padding:3px;border-radius:999px}
-.turnos a{padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700;color:var(--mut)}
-.turnos a[aria-current="true"]{background:var(--card);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.14)}
-.aviso{background:rgba(180,83,9,.12);border:1px solid rgba(180,83,9,.35);color:var(--warn);padding:9px 14px;border-radius:12px;font-weight:700;font-size:13.5px}
-.dbar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--bar);margin:14px 0 4px;position:relative}
+.aviso{background:var(--warn-soft);border:1px solid var(--line);color:var(--warn);padding:9px 14px;border-radius:var(--r-box);font-weight:700;font-size:var(--fs-sm)}
+.dbar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--track);margin:14px 0 4px;position:relative}
 .dbar i{display:block;height:100%;transition:width .6s}
-.dbar u{position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--tx);opacity:.55}
-.stack{display:flex;height:22px;border-radius:8px;overflow:hidden;background:var(--bar);margin:12px 0}
-.stack i{display:block;height:100%}
-.leg{display:grid;grid-template-columns:14px 1fr auto auto;gap:4px 10px;align-items:center;font-size:13.5px}
-.leg .sw{width:12px;height:12px;border-radius:3px}
-.leg .n,.leg .p{font-variant-numeric:tabular-nums;text-align:right}.leg .p{color:var(--mut);min-width:52px}
-/* ---- chat flutuante ---- */
-#cw{position:fixed;right:20px;bottom:20px;z-index:40;font-size:14px}
-#cw-fab{display:flex;align-items:center;gap:8px;background:var(--acc);color:#fff;border:0;border-radius:999px;padding:13px 18px;font:inherit;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(36,87,214,.35)}
-#cw-fab:hover{filter:brightness(1.08)}
-#cw-fab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#cw[data-aberto="1"] #cw-fab{display:none}
-#cw-painel{display:none;flex-direction:column;width:390px;height:min(620px,calc(100vh - 40px));background:var(--card);border:1px solid var(--bd);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.30);overflow:hidden}
-#cw[data-aberto="1"] #cw-painel{display:flex}
-.cw-topo{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;background:var(--acc);color:#fff}
-.cw-topo b{display:block;font-size:15px}
-.cw-topo small{display:block;opacity:.85;font-size:11.5px;margin-top:1px;max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cw-topo button{background:rgba(255,255,255,.18);border:0;color:#fff;border-radius:8px;width:30px;height:30px;font-size:16px;cursor:pointer;margin-left:4px}
-.cw-topo button:hover{background:rgba(255,255,255,.3)}
-#cw-aviso{padding:0 12px}
-#cw-aviso .status{margin:10px 0 0}
-#chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:12px}
-.cw-vazio p{margin:0 0 10px;color:var(--mut);font-size:13.5px}
-.sugestoes{display:flex;flex-direction:column;gap:7px}
-.sugestoes button{text-align:left;background:var(--soft);border:1px solid var(--bd);color:var(--tx);border-radius:12px;padding:9px 12px;font:inherit;font-size:13px;cursor:pointer}
-.sugestoes button:hover{border-color:var(--acc)}
-.msg{max-width:92%;border-radius:16px;padding:9px 13px;line-height:1.5;word-wrap:break-word;font-size:13.5px}
-.msg.u{align-self:flex-end;background:var(--acc);color:#fff;border-bottom-right-radius:4px}
-.msg.a{align-self:flex-start;background:var(--soft);border-bottom-left-radius:4px;max-width:100%}
-.msg.a p{margin:0 0 7px}.msg.a p:last-child{margin-bottom:0}
-.msg.a ul,.msg.a ol{margin:4px 0 7px;padding-left:20px}.msg.a li{margin:3px 0}
-.msg .ferr{color:var(--mut);font-size:12.5px;display:flex;align-items:center;gap:8px}
-.msg .ferr i{width:8px;height:8px;border-radius:50%;background:var(--acc);animation:pulse 1.2s infinite}
-.msg .erro{color:var(--bad);font-weight:600}
-.ref{border:0;background:var(--acc);color:#fff;border-radius:6px;font:inherit;font-size:11px;font-weight:700;padding:0 6px;margin:0 1px;cursor:pointer;vertical-align:baseline}
-.fontes{margin-top:9px;border-top:1px solid var(--bd);padding-top:7px;font-size:12.5px}
-.fontes>b{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
-.fonte{margin-top:6px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:5px 9px}
-.fonte summary{cursor:pointer;font-weight:600}
-.fonte blockquote{margin:7px 0;padding:0 0 0 9px;border-left:3px solid var(--acc);color:var(--tx);font-size:12.5px;max-height:180px;overflow:auto}
-.fonte a{color:var(--acc);font-weight:600;font-size:12px}
-.cw-entrada{display:flex;gap:8px;padding:10px 12px 4px;border-top:1px solid var(--bd);align-items:flex-end}
-.cw-entrada textarea{flex:1;resize:none;min-height:40px;max-height:96px;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:9px 11px;font:inherit}
-.cw-entrada button{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:0 15px;height:40px;font:inherit;font-weight:700;cursor:pointer}
-.cw-entrada button:disabled{opacity:.5;cursor:default}
-.cw-rodape{margin:0;padding:2px 14px 9px;color:var(--mut);font-size:11px}
-@media(max-width:620px){
-  #cw{right:12px;bottom:12px}#cw-fab span{display:none}#cw-fab{padding:14px}
-  #cw[data-aberto="1"]{right:0;bottom:0;left:0}
-  #cw-painel{width:100%;height:min(82vh,640px);border-radius:18px 18px 0 0}
-}
-footer{max-width:1180px;margin:0 auto;padding:0 20px 90px;color:var(--mut);font-size:12.5px;display:grid;gap:6px}
-.skel{height:120px;border-radius:16px;background:linear-gradient(90deg,var(--bar),var(--soft),var(--bar));background-size:200% 100%;animation:sk 1.4s infinite}
+.dbar u{position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--ink);opacity:.55}
+
+/* ---- 2º turno: bloco de título, duelo, "em disputa" ---- */
+.tit{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+.tit>div:first-child{min-width:0}
+.tit h1{margin:0;font-size:var(--fs-h1);line-height:var(--lh-tight);font-weight:800;letter-spacing:-.015em;text-wrap:pretty}
+.tit .sub2{color:var(--ink-2);font-size:var(--fs-body);margin-top:6px;text-wrap:pretty}
+.kick{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.kick .kl{display:block;font-size:var(--fs-cap);color:var(--ink-3);font-weight:600;line-height:1.1}
+.kick strong{display:block;font-size:22px;line-height:1.1}
+.kick .vl{width:1px;align-self:stretch;background:var(--line)}
+.kick .kn{font-size:var(--fs-sm);color:var(--ink-2);max-width:180px}
+.sim{display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:var(--r-box);background:var(--warn-soft);color:var(--warn);font-size:var(--fs-sm);border:1px solid var(--line)}
+.sim span{color:var(--ink-2)}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:20px;align-items:start}
+.dcard{container-type:inline-size;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.dtop{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.dtop>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dtop .cg{font-size:var(--fs-cap);font-weight:700;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
+.dtop h2{margin:0;font-size:var(--fs-h3);font-weight:700}
+.dtop .meta{font-size:var(--fs-sm);color:var(--ink-2);white-space:nowrap}
+.apur6{height:6px;border-radius:3px;background:var(--track);overflow:hidden}
+.apur6 i{display:block;height:100%;background:var(--acc);transition:width .6s}
+.st{display:flex;flex-direction:column;gap:2px;padding:10px 14px;border-radius:var(--r-box)}
+.st b{font-size:var(--fs-cap);font-weight:800;letter-spacing:.05em}
+.st span{font-size:var(--fs-sm);color:var(--ink);text-wrap:pretty}
+.st.info{background:var(--info-soft)}.st.info b{color:var(--info)}
+.st.warn{background:var(--warn-soft)}.st.warn b{color:var(--warn)}
+.st.ok{background:var(--ok-soft)}.st.ok b{color:var(--ok)}
+.lados{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.lado2{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;min-width:0;border-radius:var(--r-box)}
+.av2{width:56px;height:56px;border-radius:50%;color:#fff;display:grid;place-items:center;font-weight:800;font-size:19px}
+.lado2 .nm{font-size:clamp(16px,4.2cqi,20px);font-weight:700;line-height:1.2;text-wrap:balance}
+.lado2 .pc{font-size:var(--fs-num);font-weight:800;line-height:1;letter-spacing:-.02em;margin-top:4px}
+.lado2 .au{font-size:var(--fs-cap);color:var(--ink-3);text-wrap:balance}
+.lados .x{position:absolute;left:50%;top:18px;transform:translateX(-50%);font-size:var(--fs-sm);font-weight:700;color:var(--ink-3)}
+.b50{position:relative;padding-top:22px}
+.b50 .rot{position:absolute;left:50%;top:0;transform:translateX(-50%);font-size:var(--fs-cap);font-weight:700;background:var(--surface);padding:0 6px;white-space:nowrap}
+.b50 .tr{display:flex;gap:2px;height:16px;border-radius:8px;overflow:hidden;background:var(--track)}
+.b50 .tr i{display:block;height:100%;transition:width .6s}
+.b50 .mk{position:absolute;left:50%;top:18px;height:24px;width:2px;margin-left:-1px;background:var(--ink)}
+.b50 .lb{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:var(--fs-cap);color:var(--ink-2)}
+.b50 .lb .m{color:var(--ink-3);text-align:center}
+.dft{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding-top:14px;border-top:1px solid var(--line)}
+.dft span{font-size:var(--fs-sm);color:var(--ink-2)}
+.dft a{font-size:var(--fs-sm);font-weight:700;color:var(--acc)}
+.sec{display:flex;align-items:center;gap:12px;margin-top:8px}
+.sec h2{margin:0;font-size:var(--fs-h2);font-weight:800}
+.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.dsp{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.dsp h2{margin:0;font-size:var(--fs-h3);font-weight:700}
+.dsp .sub{margin:2px 0 0}
+.stk{display:flex;gap:2px;height:18px;border-radius:6px;overflow:hidden}
+.stk i{display:block}
+.lg2{display:grid;grid-template-columns:minmax(0,1fr) auto auto;column-gap:16px;row-gap:7px;font-size:var(--fs-sm);align-items:center}
+.lg2 .l{display:flex;align-items:center;gap:10px;min-width:0}
+.lg2 .l span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lg2 .sw2{width:12px;height:12px;border-radius:3px;flex:none}
+.lg2 .v{text-align:right;color:var(--ink-2)}
+.lg2 .pp{text-align:right;font-weight:700;min-width:48px}
+.aberto{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-radius:var(--r-box);background:var(--surface-2);font-size:var(--fs-sm)}
+.aberto span{color:var(--ink-2)}
+.dsp p{margin:0;font-size:var(--fs-sm);color:var(--ink-2);text-wrap:pretty}
+.dsp p strong{color:var(--ink)}
+.cap{font-size:var(--fs-cap);font-weight:700;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 6px;border:1px solid var(--line);border-radius:var(--r-pill);font-size:var(--fs-sm)}
+.mcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px}
+.mhead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 16px;align-items:flex-start}
+.mhead>div:first-child{display:flex;flex-direction:column;gap:2px;flex:1 1 260px}
+.mhead h2{margin:0;font-size:var(--fs-h3);font-weight:700}
+.cg-wrap{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.cartog{flex:1 1 300px;max-width:420px;display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.tile2{aspect-ratio:1;border-radius:8px;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;cursor:pointer;padding:0;min-width:0}
+.tile2 strong{font-size:15px}.tile2 span{font-size:var(--fs-cap);opacity:.95}
+.tile2.sel,.cel.sel{outline:2px solid var(--ink);outline-offset:2px}
+.det{flex:1 1 260px;display:flex;flex-direction:column;gap:16px}
+.detbox{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.detbox .hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.detbox .hd strong{font-size:var(--fs-lg)}.detbox .hd span{font-size:var(--fs-cap);color:var(--ink-3)}
+.detl{display:flex;flex-direction:column;gap:5px}
+.detl .r1{display:flex;justify-content:space-between;font-size:var(--fs-sm)}
+.detl .r1 .n{display:flex;gap:8px;align-items:center}
+.detl .trk{height:8px;border-radius:4px;background:var(--track);overflow:hidden}
+.detl .trk i{display:block;height:100%}
+.lnk{background:none;border:0;padding:0;text-align:left;font-size:var(--fs-sm);font-weight:700;color:var(--acc);cursor:pointer}
+.leg3{display:flex;flex-direction:column;gap:8px;font-size:var(--fs-cap);color:var(--ink-2)}
+.leg3 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.leg3 .row>span{display:flex;gap:6px;align-items:center}
+.leg3 .sq{display:flex;gap:2px}.leg3 .sq i{width:14px;height:14px;border-radius:3px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(15px,1fr));gap:3px}
+.cel{aspect-ratio:1;border-radius:3px;border:0;padding:0;cursor:pointer}
+.mfoot{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;font-size:var(--fs-cap);color:var(--ink-3)}
+
+/* ---- hemiciclo ---- */
+.skel{height:120px;border-radius:var(--r-card);background:linear-gradient(90deg,var(--track),var(--surface-2),var(--track));background-size:200% 100%;animation:sk 1.4s infinite}
 @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
-@media(max-width:620px){
-  main{padding:14px 12px 30px}.top{padding:10px 12px}.card{padding:14px 14px}
-  .duelo{gap:6px}.lado .p{font-size:24px}.lado .av{width:52px;height:52px}
-  .ufbox label{display:none}
-  .turnos a{padding:5px 9px}
-  .top{gap:10px}.dot:not(.off)+#status{display:none}      /* cabeçalho em 1 linha: o ponto verde basta */
-  .ufbox select{max-width:180px}
+
+/* ---- rodapé ---- */
+footer#rodape{max-width:var(--max);margin:0 auto;padding:16px 24px 96px;display:flex;flex-direction:column;gap:8px;color:var(--ink-3);font-size:var(--fs-cap)}
+footer#rodape .topo{border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:8px}
+footer#rodape strong{color:var(--ink-2)}
+footer#rodape .tm{align-self:flex-start;background:none;border:1px solid var(--line);border-radius:var(--r-pill);padding:6px 12px;color:var(--ink-2);cursor:pointer;font-size:var(--fs-cap)}
+
+/* ---- chat flutuante ---- */
+.bal{display:inline-block;width:18px;height:14px;border:2px solid currentColor;border-radius:7px 7px 7px 2px;box-sizing:border-box;flex:none}
+#cw{position:fixed;right:24px;bottom:20px;z-index:40}
+#cw-fab{display:flex;align-items:center;gap:8px;height:48px;padding:0 18px 0 14px;border:0;border-radius:var(--r-pill);background:var(--acc);color:var(--acc-ink);font-weight:700;font-size:var(--fs-body);cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#cw-fab:hover{filter:brightness(1.06)}
+#cw-fab .fc{display:none}
+#cw[data-aberto="1"] #cw-fab{display:none}
+#cw-scrim{display:none}
+#cw-painel{display:none;position:relative;width:400px;height:min(660px,calc(100vh - 40px));flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.28);overflow:hidden}
+#cw[data-aberto="1"] #cw-painel{display:flex}
+.alca{display:none}
+.cw-h{display:flex;align-items:flex-start;gap:12px;padding:14px 14px 12px 16px;border-bottom:1px solid var(--line)}
+.cw-ic{width:34px;height:34px;flex:none;border-radius:10px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center}
+.cw-ic .bal{width:16px;height:13px;border-radius:6px 6px 6px 2px}
+.cw-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.cw-t strong{font-size:var(--fs-lg);line-height:1.2}
+.ctx{align-self:flex-start;display:flex;align-items:center;gap:6px;font-size:var(--fs-cap);color:var(--ink-2);background:var(--surface-2);padding:2px 8px;border-radius:var(--r-pill);max-width:100%}
+.ctx i{width:6px;height:6px;border-radius:50%;background:var(--acc);flex:none}
+.ctx span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cw-b{display:flex;gap:4px}
+.cw-b button{width:36px;height:36px;border-radius:var(--r-box);display:grid;place-items:center;color:var(--ink-2);font-size:18px;border:1px solid var(--line);background:transparent;cursor:pointer;padding:0}
+.cw-b button:hover{background:var(--surface-2)}
+#chat-msgs{flex:1;min-height:0;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+.cw-vazio{display:flex;flex-direction:column;gap:6px}
+.cw-vazio strong{font-size:var(--fs-h3)}
+.cw-vazio>span{font-size:var(--fs-sm);color:var(--ink-2);text-wrap:pretty}
+.sugs{display:flex;flex-direction:column;gap:8px}
+.sugs button{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;font-size:var(--fs-sm);background:var(--surface);text-align:left;cursor:pointer}
+.sugs button:hover{border-color:var(--acc)}
+.sugs button b{color:var(--acc)}
+.cwbox{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:var(--r-box);border:1px solid var(--line)}
+.cwbox strong{font-size:var(--fs-cap);letter-spacing:.05em}
+.cwbox span{font-size:var(--fs-sm)}
+.cwbox.warn{background:var(--warn-soft)}.cwbox.warn strong{color:var(--warn)}
+.cwbox.bad{background:var(--bad-soft)}.cwbox.bad strong{color:var(--bad)}
+.cwbox button{align-self:flex-start;padding:7px 14px;border-radius:var(--r-pill);border:1px solid var(--line);background:var(--surface);font-size:var(--fs-sm);font-weight:700;cursor:pointer;min-height:36px}
+.etapas{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:var(--r-box);background:var(--surface-2);font-size:var(--fs-sm)}
+.etapas .e{display:flex;gap:10px;align-items:center;color:var(--ink-3)}
+.etapas .e.on{color:var(--ink);font-weight:600}
+.etapas .e .ic{width:16px;display:grid;place-items:center;flex:none}
+.etapas .e.ok .ic{color:var(--ok);font-weight:800}
+.etapas .e .d{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--ink-3);box-sizing:border-box}
+.etapas .e.on .d{background:var(--acc);border-color:var(--acc);box-shadow:0 0 0 4px var(--acc-soft)}
+.msg{font-size:var(--fs-sm)}
+.msg.u{align-self:flex-end;max-width:82%;padding:10px 14px;border-radius:16px 16px 4px 16px;background:var(--acc-soft);color:var(--ink);font-weight:600;border:1px solid var(--line);word-wrap:break-word}
+.msg.a{display:flex;flex-direction:column;gap:12px}
+.msg.a p{margin:0;text-wrap:pretty}
+.msg.a ul,.msg.a ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.cblk{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:12px}
+.cblk .ch2{display:flex;align-items:center;gap:8px}
+.av3{width:26px;height:26px;border-radius:50%;color:#fff;display:grid;place-items:center;font-size:var(--fs-cap);font-weight:800;flex:none}
+.ref{display:inline-grid;place-items:center;min-width:22px;height:20px;padding:0 5px;border-radius:6px;background:var(--acc-soft);color:var(--acc);font-size:var(--fs-cap);font-weight:800;vertical-align:1px;border:1px solid var(--line);cursor:pointer}
+.fontes{display:flex;flex-direction:column;gap:8px}
+.fonte2{border:1px solid var(--line);border-radius:var(--r-box);background:var(--surface-2);overflow:hidden}
+.fonte2[open]{border-color:var(--acc)}
+.fonte2 summary{display:flex;align-items:center;gap:10px;padding:9px 12px;min-height:24px;cursor:pointer;list-style:none}
+.fonte2 summary::-webkit-details-marker{display:none}
+.fonte2 summary .q{flex:1;min-width:0;font-size:var(--fs-cap);color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fonte2 summary .q strong{color:var(--ink)}
+.fonte2 summary::after{content:"▾";color:var(--ink-3);font-size:var(--fs-cap)}
+.fonte2[open] summary::after{content:"▴"}
+.fonte2 .corpo{padding:0 12px 12px;display:flex;flex-direction:column;gap:8px}
+.fonte2 .corpo .sc{font-size:var(--fs-cap);color:var(--ink-3)}
+.fonte2 blockquote{margin:0;padding:8px 12px;border-radius:8px;background:var(--surface);font-size:var(--fs-sm);color:var(--ink);text-wrap:pretty;max-height:220px;overflow:auto}
+.fonte2 a{font-size:var(--fs-cap);font-weight:700;color:var(--acc)}
+.cw-f{border-top:1px solid var(--line);padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.cw-in{display:flex;align-items:flex-end;gap:8px;padding:6px 6px 6px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.cw-in textarea{flex:1;resize:none;border:0;background:transparent;color:var(--ink);font:inherit;font-size:var(--fs-sm);min-height:32px;max-height:96px;padding:6px 0;outline:0}
+.cw-in textarea:disabled{opacity:.55}
+.cw-in button{height:36px;padding:0 14px;border-radius:var(--r-box);background:var(--acc);color:var(--acc-ink);border:0;font-weight:800;font-size:var(--fs-sm);cursor:pointer}
+.cw-in button:disabled{opacity:.55;cursor:default}
+.cw-n{font-size:var(--fs-cap);color:var(--ink-3);text-wrap:pretty}
+
+/* ---- celular (< 620px) ---- */
+@media(max-width:619px){
+  .top{padding:12px 16px 10px;gap:10px}
+  .marca{gap:8px}.marca .nome{font-size:17px}.logo{width:20px;height:20px;border-radius:5px}
+  .live #status{display:none}
+  .ufpill{height:44px;padding:0 12px;font-weight:700;gap:6px}.ufpill .ufl,.uf-l{display:none}.uf-c{display:inline}
+  .turnos{height:44px;box-sizing:border-box;font-weight:700}
+  .turnos a{display:grid;place-items:center;padding:0 10px}.t-l{display:none}.t-c{display:inline}
+  .tema{display:none}
+  nav.menu{max-width:none;margin:0 16px 12px;padding:3px;display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:0;background:var(--surface-2);border-radius:12px}
+  nav.menu a{display:grid;place-items:center;height:40px;border-radius:9px;font-size:var(--fs-sm);font-weight:700;border-bottom:0;padding:0 4px}
+  nav.menu a[aria-current="page"]{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  main{padding:20px 16px}
+  .card,.dcard,.dsp,.mcard{padding:16px}
+  .duelo{gap:6px}.lado .p{font-size:26px}.lado .av{width:52px;height:52px}
+  .kick{width:100%}.kick .kn{max-width:none;flex:1}
+  .lados{gap:8px}
+  .g2{grid-template-columns:1fr}
+  .cartog{max-width:none}
+  .linha,.sugs button,.cw-b button{min-height:44px}
+  .cw-b button{width:44px;height:44px}
+  .cw-in button{height:44px}
+  #cw{right:16px;bottom:16px}
+  #cw-fab .fl{display:none}#cw-fab .fc{display:inline}
+  #cw[data-aberto="1"]{inset:0}
+  #cw[data-aberto="1"] #cw-scrim{display:block;position:absolute;inset:0;background:rgba(5,8,14,.55)}
+  #cw-painel{position:absolute;left:0;right:0;bottom:0;width:100%;height:84%;border-radius:20px 20px 0 0}
+  .alca{display:block;width:40px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 0}
+  .cw-h{padding-top:10px}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -202,19 +444,18 @@ footer{max-width:1180px;margin:0 auto;padding:0 20px 90px;color:var(--mut);font-
 <body>
 <header class="site">
   <div class="top">
-    <div class="brand">Apuração <span>2026</span></div>
+    <a class="marca" href="#/resumo/" aria-label="Apuração 2026"><span class="logo" aria-hidden="true"><i></i><i></i></span><span class="nome">Apuração <b>2026</b></span></a>
     <div class="live"><span class="dot" id="dot"></span><span id="status">carregando…</span></div>
+    <span class="esp"></span>
     <div class="turnos" id="turnos" role="group" aria-label="Turno"></div>
-    <div class="ufbox"><label for="sel-uf">Seu estado</label><select id="sel-uf"></select></div>
+    <label class="ufpill"><span class="ufl">Seu estado</span><strong class="uf-l" id="uf-l">RN · Rio Grande do Norte</strong><strong class="uf-c" id="uf-c">RN</strong><span class="car" aria-hidden="true">▾</span><select id="sel-uf" aria-label="Seu estado"></select></label>
+    <button class="tema" id="tema" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro"><i></i></button>
   </div>
   <nav class="menu" id="nav" aria-label="Seções"></nav>
 </header>
 <div id="tip"></div>
 <main id="app"><div class="skel"></div><div class="skel"></div></main>
-<footer>
-  <div><b>Como ler:</b> ★ eleito (confirmado pelo TSE) · ② vai ao 2º turno (confirmado pelo TSE) · ▶ se elegeria com os votos de agora.</div>
-  <div>Fonte: divulgação oficial de resultados do TSE. Projeções de deputados são estimativas próprias (quociente eleitoral, cláusulas de 80%/20% e sobras); vale o resultado que o TSE marcar como eleito.</div>
-</footer>
+<footer id="rodape"></footer>
 
 <script>
 const $ = s => document.querySelector(s);
@@ -231,7 +472,7 @@ const nome = s => String(s || "").toLowerCase().split(/\s+/).map((w, i) => {
   if (i > 0 && MINUS.has(w)) return w;
   if (/^[^aeiouáéíóúâêôãõ.]{2,4}$/.test(w)) return w.toUpperCase();          // siglas: MLB, JHC, PT
   return w.charAt(0).toUpperCase() + w.slice(1);
-}).join(" ");
+}).join(" ").replace(/\bFlavio\b/g, "Flávio");
 const bonito = t => String(t || "").replace(/[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-ZÁÉÍÓÚÂÊÔÃÕÇ.]+(?: [A-ZÁÉÍÓÚÂÊÔÃÕÇ.]+)*/g, m => SIGLAS.has(m) ? m : nome(m));
 const iniciais = n => String(n).split(/\s+/).filter(w => !MINUS.has(w.toLowerCase()) && !/^(dr|dra)\.?$/i.test(w)).slice(0, 2).map(w => w[0]).join("").toUpperCase();
 
@@ -250,11 +491,15 @@ const norm = sg => String(sg).split("/")[0].trim().toUpperCase();
 const cor = sg => {
   const k = norm(sg);
   if (PARTIDOS[k]) return PARTIDOS[k];
-  let h = 0; for (const c of k) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h} 35% 45%)`;
+  let h = 0; for (const c of k) h = (h * 31 + c.charCodeAt(0)) % 360; return `hsl(${h} 35% 38%)`;
 };
 const ordemEspectro = (a, b) => { const x = ESPECTRO.indexOf(norm(a)), y = ESPECTRO.indexOf(norm(b)); return (x < 0 ? 99 : x) - (y < 0 ? 99 : y); };
-const chip = sg => `<span class="chip" style="background:${cor(sg)}">${esc(sg)}</span>`;
-const chipN = (sg, n) => `<span class="chip" style="background:${cor(sg)}">${esc(sg)} · ${n}</span>`;
+const TOK = new Set(["pt","pl","uniao","pp","republicanos","psd","mdb","pode","psb","psol","psdb","pdt","novo","avante","pv","rede","pcdob","cidadania","solidariedade","prd","missao","up","pstu"]);
+const slug = sg => String(sg).split("/")[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+const corChip = sg => TOK.has(slug(sg)) ? `var(--p-${slug(sg)}-chip)` : cor(sg);      // selos e avatares: contraste AA com texto branco
+const corPura = sg => TOK.has(slug(sg)) ? `var(--p-${slug(sg)})` : cor(sg);          // barras e mapas (CSS)
+const chip = sg => `<span class="chip" style="background:${corChip(sg)}">${esc(sg)}</span>`;
+const chipN = (sg, n) => `<span class="chip" style="background:${corChip(sg)}">${esc(sg)} · ${n}</span>`;
 
 const ESTADOS = {AC:"Acre",AL:"Alagoas",AM:"Amazonas",AP:"Amapá",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",
   GO:"Goiás",MA:"Maranhão",MG:"Minas Gerais",MS:"Mato Grosso do Sul",MT:"Mato Grosso",PA:"Pará",PB:"Paraíba",PE:"Pernambuco",
@@ -291,7 +536,7 @@ function sincronizar() {
   const novaUf = r.u && ESTADOS[r.u] && r.u !== uf;
   if (novaUf) { uf = r.u; try { localStorage.setItem("uf", uf); } catch (e) {} }
   if (mudou || novaUf) carregar();
-  $("#sel-uf").value = uf || "";
+  atualizarUfPill();
 }
 window.addEventListener("hashchange", () => { sincronizar(); anterior = {}; desenhar(); window.scrollTo(0, 0); });
 
@@ -303,7 +548,7 @@ const statusHtml = s => s ? `<div class="status s-${s.tipo}"><b>${esc(s.rotulo)}
 function candRow(c, o = {}) {
   const sel = c.eleito ? "★ " : c.t2 ? "② " : (o.marca || "");
   return `<div class="cand${o.top ? " top" : ""}${marca((o.k || "") + c.nome, c.votos)}">
-    <span class="av" style="background:${cor(c.sg)}" aria-hidden="true">${esc(iniciais(c.nome))}</span>
+    <span class="av" style="background:${corChip(c.sg)}" aria-hidden="true">${esc(iniciais(c.nome))}</span>
     <div class="cn"><b>${sel}${esc(nome(c.nome))}</b>${chip(c.sg)}</div>
     <div class="cv"><b>${pct(c.pct)}</b><small>${milhar(c.votos)} votos</small></div>
     <div class="bar"><i style="width:${Math.min(c.pct * (o.escala || 1), 100)}%;background:${cor(c.sg)}"></i>${o.l50 ? "<u></u>" : ""}</div></div>`;
@@ -397,28 +642,31 @@ function caminho(f, pr) {
 }
 function topHtml(titulo, r) {
   const linhas = r.cands.map(c => `<div><span>${esc(nome(c.nome))} <small>${esc(c.sg)}</small></span><b style="display:inline">${pct(c.pct)}</b></div>`).join("");
-  return `<b>${esc(titulo)}</b>${linhas}<small style="color:var(--mut)">${pct(r.apur)} apurado</small>`;
+  return `<b>${esc(titulo)}</b>${linhas}<small style="color:var(--ink-3)">${pct(r.apur)} apurado</small>`;
+}
+function degrau(sg, pp) {                   // 3 degraus de vantagem: até 5 p.p., de 5 a 15, mais de 15
+  if (pp > 15) return {bg: corChip(sg), fg: "#fff", n: 3};
+  return {bg: `color-mix(in oklch, ${corPura(sg)} ${pp > 5 ? 62 : 30}%, var(--surface))`, fg: "var(--ink)", n: pp > 5 ? 2 : 1};
 }
 function svgMapa(id, fc, chave, dados, titulo, clicavel, modo) {
   const pr = projecao(fc), cont = {};
   tips[id] = {};
   const paths = fc.features.map(f => {
     const k = chave(f), r = dados[k];
-    let fill = "var(--bar)", op = 1;
+    let attr = 'fill="var(--track)"';
     if (r && r.cands.length) {
       const l = r.cands[0];
-      fill = cor(l.sg);
-      op = modo === "duelo" && r.cands[1] ? 0.4 + 0.6 * Math.max(0, Math.min(1, (l.pct - r.cands[1].pct) / 30))
-                                           : 0.42 + 0.58 * Math.max(0, Math.min(1, (l.pct - 25) / 40));
+      if (modo === "duelo" && r.cands[1]) attr = `style="fill:${degrau(l.sg, l.pct - r.cands[1].pct).bg}"`;
+      else attr = `fill="${cor(l.sg)}" fill-opacity="${(0.42 + 0.58 * Math.max(0, Math.min(1, (l.pct - 25) / 40))).toFixed(2)}"`;
       cont[l.sg] = (cont[l.sg] || 0) + 1;
       tips[id][k] = topHtml(titulo(f, k), r);
-    } else tips[id][k] = `<b>${esc(titulo(f, k))}</b><small style="color:var(--mut)">sem dados</small>`;
-    return `<path data-m="${id}" data-k="${k}" class="${clicavel ? "clic" : ""}" d="${caminho(f, pr)}" fill="${fill}" fill-opacity="${op.toFixed(2)}"></path>`;
+    } else tips[id][k] = `<b>${esc(titulo(f, k))}</b><small style="color:var(--ink-3)">sem dados</small>`;
+    return `<path data-m="${id}" data-k="${k}" class="${clicavel ? "clic" : ""}" d="${caminho(f, pr)}" ${attr}></path>`;
   }).join("");
   const leg = Object.entries(cont).sort((a, b) => b[1] - a[1]).map(([sg, n]) => chipN(sg, n)).join("");
   return `<svg viewBox="0 0 600 ${pr.H.toFixed(0)}" role="img">${paths}</svg><div class="chips">${leg}</div>
-    <p class="nota">${modo === "duelo" ? "Cor = quem tem mais votos entre os dois finalistas · cor mais forte = maior vantagem."
-      : "Cor = partido do mais votado · cor mais forte = maior fatia dos votos válidos."} Passe o mouse para ver os detalhes.</p>`;
+    <p class="nota">${modo === "duelo" ? "Cor = quem tem mais votos entre os dois finalistas, em 3 degraus de vantagem (até 5 p.p., 5 a 15, mais de 15)."
+      : "Cor = partido do mais votado · cor mais forte = maior fatia dos votos válidos."} Passe o mouse ou toque para ver os detalhes.</p>`;
 }
 const CARGOS = {"1": "Presidente", "3": "Governador", "5": "Senador"};
 function mapaBR(d, cargo, modo, sub) {
@@ -463,7 +711,7 @@ function garantirMapas(cargo) {
 const paginaTitulo = (t, sub) => `<div class="pagina-titulo"><h1>${esc(t)}</h1><p>${sub}</p></div>`;
 
 function duelo(a, b, rotulo) {
-  const lado = c => `<div class="lado"><span class="av" style="background:${cor(c.sg)}">${esc(iniciais(c.nome))}</span>
+  const lado = c => `<div class="lado"><span class="av" style="background:${corChip(c.sg)}">${esc(iniciais(c.nome))}</span>
     <div class="n">${esc(nome(c.nome))}</div>${chip(c.sg)}<div class="p">${pct1(c.pct)}</div><small>${milhar(c.votos)} votos</small></div>`;
   return `<div class="duelo">${lado(a)}<div class="vs"><span class="badge b-2turno">${esc(rotulo)}</span><span>x</span></div>${lado(b)}</div>`;
 }
@@ -555,6 +803,9 @@ function pgDeputados(d) {
 const chat = {id: null, msgs: [], ocupado: false, status: null, carregando: false, sugKey: null};
 const NOME_PAG = {resumo: "Resumo", presidente: "Presidente", governador: "Governador", senado: "Senado", deputados: "Deputados"};
 const FONTE_OK = u => /^https:\/\/divulgacandcontas\.tse\.jus\.br\//.test(u || "");
+const CAND_INFO = {"lula": ["Lula", "PT"], "flavio bolsonaro": ["Flávio Bolsonaro", "PL"], "cadu de lula": ["Cadu de Lula", "PT"],
+                   "cadu": ["Cadu de Lula", "PT"], "allyson": ["Allyson", "UNIÃO"]};
+const semAcento = t => String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
 function contextoDaPagina() {               // o que o usuário está vendo, para o assistente entender "aqui", "esse candidato"...
   const main = $("#app");
@@ -562,7 +813,8 @@ function contextoDaPagina() {               // o que o usuário está vendo, par
   return {pagina: pag, turno, uf, texto};
 }
 function rotuloContexto() {
-  return `Vendo: ${NOME_PAG[pag] || pag}${uf ? " · " + uf : ""} · ${turno}º turno`;
+  const onde = pag === "presidente" ? "Brasil" : (uf || "");
+  return `${NOME_PAG[pag] || pag}${onde ? " · " + onde : ""} · ${turno}º turno`;
 }
 function sugestoesDaPagina() {
   const E = uf || "seu estado";
@@ -571,64 +823,88 @@ function sugestoesDaPagina() {
     resumo: t2 ? ["Resuma o que está nesta tela", "Qual a diferença de votos entre Flávio Bolsonaro e Lula?", "O que está em disputa no 2º turno?"]
                : ["Resuma o resultado do 1º turno", "Quem foi ao 2º turno e com quantos votos?", "Quem lidera para o Senado no meu estado?"],
     presidente: ["Em quantos estados Lula lidera?", "O que Lula e Flávio propõem para a economia?", "Qual a diferença de votos entre os dois?"],
-    governador: [`Quem lidera em ${E} e por quanto?`, `Em quantos municípios de ${E} cada um lidera?`, "O que Cadu de Lula e Allyson propõem para a saúde no RN?"],
+    governador: t2 ? [`Quem lidera em ${E} e por quanto?`, `Por que o 1º turno não decidiu o governo de ${E}?`, "O que Allyson e Cadu de Lula propõem para segurança?"]
+                   : [`Quem lidera em ${E} e por quanto?`, `Em quantos municípios de ${E} cada um lidera?`, "O que Cadu de Lula e Allyson propõem para a saúde no RN?"],
     senado: [`Quem lidera para o Senado em ${E}?`, "Explique o que está nesta tela"],
     deputados: [`Quem se elegeria hoje para deputado federal em ${E}?`, "Como é feita a projeção dos deputados?"],
   };
   return por[pag] || por.resumo;
 }
 
-function mdSeguro(txt) {                    // markdown mínimo: parágrafos, listas, **negrito** e [n] de fontes
-  const linhas = esc(txt).split("\n"), out = [];
-  let lista = null, par = [];                // lista: "ul" | "ol" | null
-  const inline = t => t.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\[(\d{1,4})\]/g, '<button class="ref" data-ref="$1" title="Ver o trecho do plano">$1</button>');
-  const fechaPar = () => { if (par.length) out.push("<p>" + inline(par.join(" ")) + "</p>"); par = []; };
-  const fechaLista = () => { if (lista) { out.push(`</${lista}>`); lista = null; } };
+function mdRico(txt) {                      // markdown mínimo + um bloco por candidato, SEMPRE em ordem alfabética
+  const linhas = esc(txt).split("\n");
+  const antes = [], depois = [], blocos = [];
+  let alvo = antes, lista = null, par = [], blk = null, blkLista = false;
+  const inline = t => t.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\[(\d{1,4}(?:\s*[;,]\s*\d{1,4})*)\]/g, (m, g) =>
+      g.split(/\s*[;,]\s*/).map(n => `<button class="ref" data-ref="${n}" aria-label="Fonte ${n}">${n}</button>`).join(""));      // [3] ou [3; 5]
+  const fechaPar = () => { if (par.length) alvo.push("<p>" + inline(par.join(" ")) + "</p>"); par = []; };
+  const fechaLista = () => { if (lista) { alvo.push(`</${lista}>`); lista = null; } };
+  const fechaBloco = () => { fechaPar(); fechaLista(); if (blk) { blk.html.push("</div>"); blk = null; blkLista = false; alvo = depois; } };
   for (const l of linhas) {
+    const h = l.match(/^\s*\*\*(.+?)\*\*\s*:?\s*$/);
+    const info = h && CAND_INFO[semAcento(h[1].replace(/\s*\([^)]*\)\s*$/, ""))];
+    if (info) {
+      fechaBloco();
+      blk = {k: info[0], html: [`<div class="cblk"><div class="ch2"><span class="av3" style="background:${corChip(info[1])}" aria-hidden="true">${esc(iniciais(info[0]))}</span><strong>${esc(info[0])}</strong>${chip(info[1])}</div>`]};
+      blocos.push(blk); alvo = blk.html; continue;
+    }
     const ul = l.match(/^\s*[-*•]\s+(.*)/), ol = l.match(/^\s*\d{1,2}[.)]\s+(.*)/), m = ul || ol;
     if (m) {
       const tipo = ul ? "ul" : "ol";
       fechaPar();
-      if (lista !== tipo) { fechaLista(); out.push(`<${tipo}>`); lista = tipo; }
-      out.push("<li>" + inline(m[1]) + "</li>");
+      if (lista !== tipo) { fechaLista(); alvo.push(`<${tipo}>`); lista = tipo; }
+      alvo.push("<li>" + inline(m[1]) + "</li>"); blkLista = !!blk;
     } else if (!l.trim()) { fechaPar(); fechaLista(); }
-    else { fechaLista(); par.push(l.trim()); }
+    else {
+      if (blk && blkLista && !lista) fechaBloco();      // texto depois da lista do bloco: fecha o bloco
+      fechaLista(); par.push(l.trim());
+    }
   }
-  fechaPar(); fechaLista();
-  return out.join("");
+  fechaBloco();
+  blocos.sort((a, b) => a.k.localeCompare(b.k, "pt-BR"));    // neutralidade: a ordem não depende do que o modelo escreveu
+  return antes.join("") + blocos.map(b => b.html.join("")).join("") + depois.join("");
 }
 
+function etapasHtml(m) {
+  return `<div class="etapas" role="status" aria-live="polite">
+    <span class="e ok"><span class="ic">✓</span>Pergunta entendida</span>
+    <span class="e on"><span class="ic"><span class="d"></span></span>${esc(m.ferr || "Pensando")}…</span>
+    <span class="e"><span class="ic"><span class="d"></span></span>Escrever a resposta com as fontes</span></div>`;
+}
 function msgHtml(m, i) {
   if (m.papel === "u") return `<div class="msg u">${esc(m.texto)}</div>`;
   const ativo = chat.ocupado && i === chat.msgs.length - 1;
-  const corpo = m.texto ? mdSeguro(m.texto) : "";
-  const ferr = ativo && m.ferr ? `<div class="ferr"><i></i>${esc(m.ferr)}…</div>` : (ativo && !m.texto && !m.erro ? '<div class="ferr"><i></i>Pensando…</div>' : "");
-  const fontes = m.fontes && m.fontes.length ? `<div class="fontes"><b>Fontes</b>${m.fontes.map(f => `
-    <details class="fonte" id="f${i}-${f.ref}"><summary>[${f.ref}] ${esc(nome(f.candidato))} · ${esc(f.cargo)} · p. ${f.pagina}${f.pagina_fim && f.pagina_fim !== f.pagina ? "–" + f.pagina_fim : ""}${f.secao ? " · " + esc(f.secao) : ""}</summary>
-      <blockquote>${esc(f.texto)}</blockquote>${FONTE_OK(f.fonte_url) ? `<a href="${esc(f.fonte_url)}" target="_blank" rel="noopener">Abrir o plano completo no site do TSE ↗</a>` : ""}</details>`).join("")}</div>` : "";
-  return `<div class="msg a" data-i="${i}">${corpo}${ferr}${m.erro ? `<div class="erro">${esc(m.erro)}</div>` : ""}${fontes}</div>`;
+  const corpo = m.texto ? mdRico(m.texto) : "";
+  const etapas = ativo && !m.texto && !m.erro ? etapasHtml(m) : "";
+  const erro = m.erro ? `<div class="cwbox bad" role="alert"><strong>NÃO CONSEGUI RESPONDER</strong><span>${esc(m.erro)} Sua pergunta foi mantida.</span><button data-retry="${i}">Tentar de novo</button></div>` : "";
+  const fontes = m.fontes && m.fontes.length ? `<div class="fontes"><span class="cap">Fontes · ${m.fontes.length} ${m.fontes.length === 1 ? "trecho" : "trechos"}</span>${m.fontes.map(f => `
+    <details class="fonte2" id="f${i}-${f.ref}"><summary><span class="ref">${f.ref}</span><span class="q"><strong>${esc(nome(f.candidato))}</strong> · ${esc(f.cargo)} · p. ${f.pagina}${f.pagina_fim && f.pagina_fim !== f.pagina ? "–" + f.pagina_fim : ""}</span></summary>
+      <div class="corpo">${f.secao ? `<div class="sc">${esc(f.secao)}</div>` : ""}<blockquote>“${esc(f.texto)}”</blockquote>${FONTE_OK(f.fonte_url) ? `<a href="${esc(f.fonte_url)}" target="_blank" rel="noopener">Abrir o plano completo no TSE ↗</a>` : ""}</div></details>`).join("")}</div>` : "";
+  return `<div class="msg a" data-i="${i}">${corpo}${etapas}${erro}${fontes}</div>`;
 }
-
+function avisoChat() {
+  const st = chat.status;
+  return st && !st.ativo ? `<div class="cwbox warn" role="status"><strong>CHAT INDISPONÍVEL</strong><span>${esc(st.motivo || "O assistente não está configurado neste servidor.")} Os resultados do painel continuam funcionando normalmente.</span></div>` : "";
+}
 function vazioHtml() {
-  const docs = chat.status && chat.status.documentos ? chat.status.documentos.map(d => d.candidato).join(", ") : "";
-  return `<div class="cw-vazio"><p>Olá! Posso explicar o que você está vendo nesta tela, informar os números da apuração e mostrar o que os planos de governo propõem${docs ? " (" + esc(docs) + ")" : ""}, sempre citando a página.</p>
-    <div class="sugestoes">${sugestoesDaPagina().map(q => `<button data-sug="${esc(q)}">${esc(q)}</button>`).join("")}</div></div>`;
+  return `<div class="cw-vazio"><strong>Pergunte sobre o que está na tela</strong><span>Explico os números do TSE e mostro o que os planos de governo propõem, citando a página. Não indico voto.</span></div>
+    <div class="sugs"><span class="cap">Sugestões para esta página</span>${sugestoesDaPagina().map(q => `<button data-sug="${esc(q)}"><span>${esc(q)}</span><b>→</b></button>`).join("")}</div>`;
 }
 
 function renderMsgs() {
   const box = $("#chat-msgs");
   if (!box) return;
-  if (!chat.msgs.length) { box.innerHTML = vazioHtml(); chat.sugKey = pag + turno + uf; return; }
   const perto = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
   const abertos = new Set([...box.querySelectorAll("details[open]")].map(d => d.id));
-  box.innerHTML = chat.msgs.map(msgHtml).join("");
+  box.innerHTML = avisoChat() + (chat.msgs.length ? chat.msgs.map(msgHtml).join("") : vazioHtml());
+  chat.sugKey = pag + turno + uf;
   abertos.forEach(id => { const d = document.getElementById(id); if (d) d.open = true; });
   if (perto || chat.ocupado) box.scrollTop = box.scrollHeight;
 }
-function atualizarCtx() {                   // chamado a cada redesenho: mantém o rótulo e as sugestões da página atual
+function atualizarCtx() {                   // a cada redesenho: mantém o rótulo e as sugestões da página atual
   const el = $("#cw-ctx");
   if (!el) return;
-  el.textContent = rotuloContexto();
+  el.textContent = "Vendo: " + rotuloContexto();
   if (!chat.msgs.length && chat.sugKey !== pag + turno + uf) renderMsgs();
 }
 function atualizarEntrada() {
@@ -637,9 +913,7 @@ function atualizarEntrada() {
   const ok = !!(chat.status && chat.status.ativo);
   b.disabled = chat.ocupado || !ok;
   t.disabled = !ok;
-  t.placeholder = ok ? "Pergunte sobre o que está na tela…" : "Chat indisponível";
-  const av = $("#cw-aviso");
-  if (av) av.innerHTML = chat.status && !chat.status.ativo ? `<div class="status s-2turno"><b>Chat indisponível</b><span>${esc(chat.status.motivo || "")}</span></div>` : "";
+  t.placeholder = ok ? "Pergunte sobre o que está na tela…" : "Chat indisponível no momento";
 }
 
 function abrirChat(abrir) {
@@ -655,7 +929,7 @@ function abrirChat(abrir) {
       fetch("/api/chat/status").then(r => r.json()).catch(() => ({ativo: false, motivo: "Servidor indisponível."}))
         .then(j => { chat.status = j; chat.carregando = false; renderMsgs(); atualizarEntrada(); });
     }
-    setTimeout(() => { const t = $("#chat-texto"); if (t && !t.disabled && innerWidth > 620) t.focus(); }, 50);
+    setTimeout(() => { const t = $("#chat-texto"); if (t && !t.disabled && innerWidth > 619) t.focus(); }, 50);
   }
 }
 
@@ -663,16 +937,17 @@ function montarWidget() {
   const w = document.createElement("div");
   w.id = "cw"; w.dataset.aberto = "0";
   w.innerHTML = `
-    <button id="cw-fab" aria-expanded="false" aria-controls="cw-painel" title="Pergunte ao assistente">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span>Pergunte</span></button>
+    <button id="cw-fab" aria-expanded="false" aria-controls="cw-painel"><span class="bal" aria-hidden="true"></span><span class="fl">Pergunte ao assistente</span><span class="fc">Pergunte</span></button>
+    <div id="cw-scrim"></div>
     <section id="cw-painel" role="dialog" aria-label="Assistente do painel">
-      <header class="cw-topo"><div><b>Assistente do painel</b><small id="cw-ctx"></small></div>
-        <div><button id="cw-novo" title="Nova conversa" aria-label="Nova conversa">↺</button><button id="cw-fechar" title="Fechar" aria-label="Fechar">×</button></div></header>
-      <div id="cw-aviso"></div>
+      <div class="alca" aria-hidden="true"></div>
+      <header class="cw-h"><div class="cw-ic"><span class="bal" aria-hidden="true"></span></div>
+        <div class="cw-t"><strong>Assistente do painel</strong><span class="ctx"><i></i><span id="cw-ctx"></span></span></div>
+        <div class="cw-b"><button id="cw-novo" title="Nova conversa" aria-label="Nova conversa">↺</button><button id="cw-fechar" title="Fechar (Esc)" aria-label="Fechar">×</button></div></header>
       <div id="chat-msgs" aria-live="polite"></div>
-      <div class="cw-entrada"><textarea id="chat-texto" rows="1" maxlength="600" placeholder="Pergunte sobre o que está na tela…"></textarea>
-        <button id="chat-enviar">Enviar</button></div>
-      <p class="cw-rodape">Assistente de IA informativo, não oficial: pode errar, confira as fontes. Não indica voto.</p>
+      <footer class="cw-f"><div class="cw-in"><textarea id="chat-texto" rows="1" maxlength="600" placeholder="Pergunte sobre o que está na tela…"></textarea>
+        <button id="chat-enviar" aria-label="Enviar">Enviar</button></div>
+        <span class="cw-n">Assistente de IA informativo, não oficial: pode errar, confira as fontes. Não indica voto.</span></footer>
     </section>`;
   document.body.appendChild(w);
   let aberto = false;
@@ -689,11 +964,11 @@ function eventoChat(ev, m) {
   renderMsgs();
 }
 
-async function enviarPergunta(texto) {
+async function enviarPergunta(texto, reenvio) {
   texto = String(texto || "").trim();
   if (!texto || chat.ocupado || !(chat.status && chat.status.ativo)) return;
   const m = {papel: "a", texto: "", fontes: [], ferr: null, erro: null};
-  chat.msgs.push({papel: "u", texto}, m);
+  if (reenvio) chat.msgs.push(m); else chat.msgs.push({papel: "u", texto}, m);
   chat.ocupado = true; renderMsgs(); atualizarEntrada();
   try {
     const r = await fetch("/api/chat", {method: "POST", headers: {"Content-Type": "application/json"},
@@ -717,69 +992,77 @@ async function enviarPergunta(texto) {
   m.ferr = null; chat.ocupado = false; renderMsgs(); atualizarEntrada();
 }
 
-document.addEventListener("click", e => {
-  const t = e.target;
-  if (!t.closest) return;
-  if (t.closest("#cw-fab")) { abrirChat(true); return; }
-  if (t.closest("#cw-fechar")) { abrirChat(false); return; }
-  const sug = t.closest("[data-sug]");
-  if (sug) { enviarPergunta(sug.dataset.sug); return; }
-  if (t.closest("#chat-enviar")) { const ta = $("#chat-texto"); const v = ta.value; ta.value = ""; enviarPergunta(v); return; }
-  if (t.closest("#cw-novo")) { if (!chat.ocupado) { chat.id = null; chat.msgs = []; renderMsgs(); } return; }
-  const ref = t.closest(".ref");
-  if (ref) {
-    const msg = ref.closest(".msg"), d = msg && msg.querySelector(`details[id$="-${ref.dataset.ref}"]`);
-    if (d) { d.open = true; d.scrollIntoView({behavior: "smooth", block: "nearest"}); }
-  }
-});
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape" && $("#cw") && $("#cw").dataset.aberto === "1") { abrirChat(false); return; }
-  if (e.target && e.target.id === "chat-texto" && e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault(); const v = e.target.value; e.target.value = ""; enviarPergunta(v);
-  }
-});
-
-/* ---- 2º turno ---- */
+/* ---- 2º turno (redesenho) ---- */
+const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
 const diasPara = iso => { const [y, m, d] = iso.split("-").map(Number), h = new Date();
   return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(h.getFullYear(), h.getMonth(), h.getDate())) / 864e5); };
 const dataBr = iso => iso.split("-").reverse().slice(0, 2).join("/");
-const avisoSim = d => d.meta && d.meta.simulado ? '<div class="aviso">SIMULAÇÃO · dados fabricados para teste; não são resultados reais.</div>' : "";
+const dataExtenso = iso => { const [, m, d] = iso.split("-").map(Number); return `${d} de ${MESES[m - 1]}`; };
+const alfa = cs => [...cs].sort((x, y) => nome(x.nome).localeCompare(nome(y.nome), "pt-BR"));     // ordem fixa: não muda com o placar
+const curto = c => nome(c.nome).split(" ")[0];
+const pp2 = n => n.toLocaleString("pt-BR", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const avisoSim = d => d.meta && d.meta.simulado ? '<div class="sim"><strong>SIMULAÇÃO</strong><span>Dados fabricados para teste; não são resultados reais.</span></div>' : "";
+const POS = {RR:[2,1],AP:[4,1],AM:[2,2],PA:[3,2],MA:[4,2],CE:[5,2],RN:[6,2],AC:[1,3],RO:[2,3],TO:[3,3],PI:[4,3],PE:[5,3],PB:[6,3],
+  MT:[2,4],GO:[3,4],DF:[4,4],BA:[5,4],AL:[6,4],MS:[2,5],SP:[3,5],MG:[4,5],ES:[5,5],SE:[6,5],PR:[3,6],RJ:[4,6],SC:[3,7],RS:[3,8]};
+const foco = {uf: null, mun: null};
+let munModo = "grade";
 
-function cardDuelo(titulo, d, link) {
-  if (!d || d.cands.length < 2) return cardVazio(titulo);
-  const [a, b] = d.cands, ao = d.ao_vivo;
-  const lado = c => `<div class="lado${marca("d" + titulo + c.nome, c.votos)}"><span class="av" style="background:${cor(c.sg)}">${esc(iniciais(c.nome))}</span>
-    <div class="n">${c.eleito ? "★ " : ""}${esc(nome(c.nome))}</div>${chip(c.sg)}
-    <div class="p">${ao ? pct(c.pct) : pct1(c.pct)}</div>
-    <small>${ao ? milhar(c.votos) + " votos · 1º turno: " + pct1(c.pct1t) : "no 1º turno · " + milhar(c.votos) + " votos"}</small></div>`;
+function kicker(d) {
+  const ao = d.pres && d.pres.ao_vivo, m = d.meta;
+  let rotulo, valor, nota;
+  if (ao) {
+    const g = d.uf && d.uf.em_2turno && d.uf.gov && d.uf.gov.ao_vivo ? d.uf.gov : null;
+    rotulo = "Seções apuradas"; valor = pct(d.pres.apur);
+    nota = "Presidente." + (g ? ` No ${uf}, governador está em ${pct(g.apur)}.` : "");
+  } else {
+    const dias = diasPara(m.data_2t);
+    rotulo = dataExtenso(m.data_2t);
+    valor = dias > 1 ? `faltam ${dias} dias` : dias === 1 ? "amanhã" : dias === 0 ? "hoje" : "aguardando";
+    nota = "Votação das 8h às 17h, horário de Brasília.";
+  }
+  return `<div class="kick"><div><span class="kl">${esc(rotulo)}</span><strong>${esc(valor)}</strong></div><div class="vl"></div><div class="kn">${esc(nota)}</div></div>`;
+}
+const blocoTitulo = (t, sub, d) => `<div class="tit"><div><h1>${esc(t)}</h1><div class="sub2">${esc(sub)}</div></div>${kicker(d)}</div>`;
+
+function cardDuelo(cargo, escopo, d, link) {
+  if (!d || d.cands.length < 2) return cardVazio(escopo);
+  const ao = d.ao_vivo, [a, b] = alfa(d.cands), s = d.situacao || {};
+  const tom = {aberto: "info", "2turno": "warn", eleito: "ok", "1turno": "ok"}[s.tipo] || "info";
+  const lado = c => `<div class="lado2${marca("d" + escopo + c.nome, c.votos)}"><span class="av2" style="background:${corChip(c.sg)}" aria-hidden="true">${esc(iniciais(c.nome))}</span>
+    <div class="nm">${c.eleito ? "★ " : ""}${esc(nome(c.nome))}</div>${chip(c.sg)}
+    <div class="pc">${ao ? pct(c.pct) : pct1(c.pct)}</div>
+    <div class="au">${ao ? `${milhar(c.votos)} votos · 1º turno ${pct1(c.pct1t)}` : `${milhar(c.votos)} votos no 1º turno`}</div></div>`;
   const resto = Math.max(0, 100 - a.pct - b.pct);
-  return `<section class="card"><div class="ch"><h2>${esc(titulo)}</h2><span class="apur-t">${ao ? pct(d.apur) + " apurado" : "2º turno em " + dataBr(ultimo.meta.data_2t)}</span></div>
-    ${ao ? apurBar(d.apur) : '<div style="height:10px"></div>'}
-    ${statusHtml(d.situacao)}
-    <div class="duelo">${lado(a)}<div class="vs"><span>x</span></div>${lado(b)}</div>
-    <div class="dbar" title="participação de cada candidato">
-      <i style="width:${a.pct}%;background:${cor(a.sg)}"></i><i style="width:${resto}%;background:var(--bar)"></i><i style="width:${b.pct}%;background:${cor(b.sg)}"></i>${ao ? "<u></u>" : ""}</div>
-    <p class="nota">${ao ? "A linha no meio marca 50% dos votos válidos: quem passar dela vence." : "Barras do 1º turno; o cinza no meio são os votos dos candidatos que ficaram de fora."}</p>
-    ${link ? `<div class="rodape-card"><span></span><a class="link" href="#/${link}/${uf || ""}">Ver detalhes →</a></div>` : ""}</section>`;
+  const segs = ao ? [[a.pct, corPura(a.sg)], [b.pct, corPura(b.sg)]] : [[a.pct, corPura(a.sg)], [resto, "var(--n-elim)"], [b.pct, corPura(b.sg)]];
+  const dpp = Math.abs(a.pct - b.pct), dv = Math.abs(a.votos - b.votos);
+  return `<section class="dcard"><div class="dtop"><div><span class="cg">${esc(cargo)}</span><h2>${esc(escopo)}</h2></div>
+      <span class="meta">${ao ? pct(d.apur) + " apurado" : "2º turno em " + dataBr(ultimo.meta.data_2t)}</span></div>
+    ${ao ? `<div class="apur6" role="progressbar" aria-label="Seções apuradas" aria-valuenow="${d.apur}" aria-valuemin="0" aria-valuemax="100"><i style="width:${d.apur}%"></i></div>` : ""}
+    <div class="st ${tom}"><b>${esc(s.rotulo || "")}</b><span>${esc(bonito(s.texto || ""))}</span></div>
+    <div class="lados">${lado(a)}${lado(b)}<span class="x" aria-hidden="true">×</span></div>
+    <div class="b50"><span class="rot">50% vence</span><div class="tr">${segs.map(([w, bg]) => `<i style="width:${w}%;background:${bg}"></i>`).join("")}</div><span class="mk"></span>
+      <div class="lb"><span>${esc(curto(a))} ${ao ? pct(a.pct) : pct1(a.pct)}</span><span class="m">${ao ? "% dos votos válidos" : `cinza: ${pct1(resto)} foram para eliminados`}</span><span>${esc(curto(b))} ${ao ? pct(b.pct) : pct1(b.pct)}</span></div></div>
+    <div class="dft"><span>${ao ? "Diferença agora" : "Diferença no 1º turno"}: ${pp2(dpp)} p.p. · ${milhar(dv)} votos</span>${link ? `<a href="#/${link}/${uf || ""}">Ver detalhes →</a>` : ""}</div></section>`;
 }
 
-function cardBase(titulo, d) {
-  if (!d || !d.base || d.cands.length < 2) return cardVazio(titulo);
-  const b = d.base;
-  const fin = d.cands.map(c => c.votos1t);                                                  // votos de cada finalista no 1º turno
-  const seg = [
-    [nome(d.cands[0].nome), fin[0], cor(d.cands[0].sg)], [nome(d.cands[1].nome), fin[1], cor(d.cands[1].sg)],
-    ["Candidatos eliminados", b.outros_votos, "#8b93a1"], ["Votos brancos", b.brancos, "#c6ccd8"],
-    ["Votos nulos", b.nulos, "#a9b0bf"], ["Abstenção", b.abstencao, "var(--bar)"]];
-  const tot = b.aptos || seg.reduce((a, s2) => a + s2[1], 0);
-  const barra = seg.map(([n, v, c]) => `<i style="width:${v / tot * 100}%;background:${c}" title="${esc(n)}"></i>`).join("");
-  const leg = seg.map(([n, v, c]) => `<span class="sw" style="background:${c};border:1px solid var(--bd)"></span><span>${esc(n)}</span><span class="n">${milhar(v)}</span><span class="p">${pct1(v / tot * 100)}</span>`).join("");
-  const elim = b.eliminados.slice(0, 5).map(c => `<span>${esc(nome(c.nome))} ${chip(c.sg)} <small style="color:var(--mut)">${pct1(c.pct)}</small></span>`).join(" &nbsp; ");
-  return `<section class="card"><div class="ch"><h2>O que está em disputa · ${esc(titulo)}</h2></div>
-    <p class="sub">Como o eleitorado se dividiu no 1º turno (percentuais sobre todos os eleitores aptos).</p>
-    <div class="stack">${barra}</div><div class="leg">${leg}</div>
-    <p class="nota" style="margin-top:12px"><b>${pct1(b.outros_pct)}</b> dos votos válidos foram para candidatos que não chegaram ao 2º turno. Esses votos, os brancos, os nulos e a abstenção são o que ainda pode mudar o placar.</p>
-    ${b.eliminados.length ? `<p class="nota" style="line-height:1.9">Mais votados entre os eliminados: ${elim}</p>` : ""}</section>`;
+function cardDisputa(escopo, d) {
+  if (!d || !d.base || d.cands.length < 2) return cardVazio("O que está em disputa");
+  const b = d.base, [a, c2] = alfa(d.cands), tot = b.aptos || 1;
+  const aberto = b.outros_votos + b.brancos + b.nulos + b.abstencao;
+  const linhas = [
+    [nome(a.nome), a.votos1t, corPura(a.sg), "", 700], [nome(c2.nome), c2.votos1t, corPura(c2.sg), "", 700],
+    ["Candidatos eliminados", b.outros_votos, "var(--n-elim)", "8px", 400], ["Votos brancos", b.brancos, "var(--n-branco)", "", 400],
+    ["Votos nulos", b.nulos, "var(--n-nulo)", "", 400], ["Abstenção", b.abstencao, "var(--track)", "", 400]];
+  const aresta = n => `box-shadow:inset 0 0 0 1px ${n === "Abstenção" ? "var(--line)" : "transparent"}`;
+  const stk = linhas.map(([n, v, bg]) => `<i style="width:${v / tot * 100}%;background:${bg};${aresta(n)}" title="${esc(n)}"></i>`).join("");
+  const leg = linhas.map(([n, v, bg, gap, fw]) => { const pt = gap ? `padding-top:${gap}` : "";
+    return `<div class="l" style="${pt}"><span class="sw2" style="background:${bg};${aresta(n)}"></span><span style="font-weight:${fw}">${esc(n)}</span></div><span class="v" style="${pt}">${milhar(v)}</span><span class="pp" style="${pt}">${pct1(v / tot * 100)}</span>`; }).join("");
+  const pills = b.eliminados.slice(0, 4).map(e => `<div class="pill">${chip(e.sg)}<span>${esc(nome(e.nome))}</span><strong>${pct1(e.pct)}</strong></div>`).join("");
+  return `<section class="dsp"><div><h2>O que está em disputa · ${esc(escopo)}</h2><div class="sub">Como o eleitorado se dividiu no 1º turno · % de todos os eleitores aptos</div></div>
+    <div class="stk">${stk}</div><div class="lg2">${leg}</div>
+    <div class="aberto"><span>Em aberto para o 2º turno</span><strong>${pct1(aberto / tot * 100)} dos aptos</strong></div>
+    <p><strong>${pct1(b.outros_pct)}</strong> dos votos válidos foram para candidatos que não chegaram ao 2º turno. Esses votos, os brancos, os nulos e a abstenção são o que ainda pode mudar o placar.</p>
+    ${pills ? `<div style="display:flex;flex-direction:column;gap:8px"><span class="cap">Mais votados entre os eliminados</span><div class="pills">${pills}</div></div>` : ""}</section>`;
 }
 
 function cardUfSemT2(d) {
@@ -789,42 +1072,114 @@ function cardUfSemT2(d) {
     <div class="rodape-card"><a class="link" href="#/governador/${u.sigla}/1">Ver o resultado do 1º turno →</a></div></section>`;
 }
 
-function subtituloT2(d) {
-  const ao = d.pres && d.pres.ao_vivo, dias = diasPara(d.meta.data_2t);
-  if (ao) return `Apuração em andamento · ${pct(d.pres.apur)} das seções`;
-  if (dias > 1) return `O 2º turno é em ${dataBr(d.meta.data_2t)} · faltam ${dias} dias`;
-  if (dias === 1) return `O 2º turno é amanhã, ${dataBr(d.meta.data_2t)}`;
-  return `O 2º turno é hoje, ${dataBr(d.meta.data_2t)} · aguardando os primeiros resultados`;
+function detHtml(titulo, r, selecionado) {         // painel de detalhe (funciona com mouse, teclado e toque)
+  if (!r || !r.cands || r.cands.length < 2) return `<div class="hd"><strong>${esc(titulo)}</strong><span>sem dados</span></div>`;
+  return `<div class="hd"><strong>${esc(titulo)}</strong><span>${selecionado ? "selecionado" : "visualizando"} · ${pct1(r.apur)} apurado</span></div>` +
+    alfa(r.cands).map(c => `<div class="detl"><div class="r1"><span class="n">${esc(nome(c.nome))} ${chip(c.sg)}</span><strong>${pct1(c.pct)}</strong></div>
+      <div class="trk"><i style="width:${c.pct}%;background:${corPura(c.sg)}"></i></div></div>`).join("");
+}
+function detUfHtml(d, x) {
+  x = x || foco.uf || uf;
+  const r = d.mapa_br && d.mapa_br[x] && d.mapa_br[x]["1"];
+  return detHtml(ESTADOS[x] || x, r, x === uf) + (x === uf && pag === "presidente" ? `<button class="lnk" data-ir-mun>Ver o ${x} por município ↓</button>` : "");
+}
+
+function cardCartograma(d) {
+  const dados = d.mapa_br || {}, cont = {}, ao = d.pres && d.pres.ao_vivo;
+  const tiles = Object.entries(POS).map(([u, [col, row]]) => {
+    const r = dados[u] && dados[u]["1"], c = r && r.cands, pos = `grid-column:${col};grid-row:${row}`;
+    if (!c || c.length < 2) return `<div class="tile2" style="${pos};background:var(--track);color:var(--ink-3)"><strong>${u}</strong></div>`;
+    const pp = c[0].pct - c[1].pct, g = degrau(c[0].sg, pp);
+    cont[c[0].sg] = (cont[c[0].sg] || 0) + 1;
+    return `<button class="tile2${u === uf ? " sel" : ""}" data-cg="${u}" style="${pos};background:${g.bg};color:${g.fg}" aria-label="${esc(ESTADOS[u])}: ${esc(nome(c[0].nome))} na frente por ${pp2(pp)} pontos percentuais"><strong>${u}</strong><span>+${Math.round(pp)}</span></button>`;
+  }).join("");
+  const top = Object.entries(cont).sort((a, b) => b[1] - a[1]), ex = top.slice(0, 2).map(x => x[0]);
+  const quad = n => ex.map(sg => `<i style="background:${n === 3 ? corChip(sg) : `color-mix(in oklch, ${corPura(sg)} ${n === 2 ? 62 : 30}%, var(--surface))`}"></i>`).join("");
+  return `<section class="mcard"><div class="mhead"><div><h2>Brasil por estado</h2><span class="sub">Quem teve mais votos entre os dois finalistas ${ao ? "no 2º turno" : "no 1º turno"}. Toque num estado para escolher.</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${top.map(([sg, n]) => chipN(sg, n)).join("")}</div></div>
+    <div class="cg-wrap"><div class="cartog" id="cartog">${tiles}</div>
+      <div class="det"><div class="detbox" id="det-uf">${detUfHtml(d)}</div>
+        <div class="leg3"><span class="cap">Vantagem</span><div class="row"><span><span class="sq">${quad(1)}</span>até 5 p.p.</span><span><span class="sq">${quad(2)}</span>5 a 15 p.p.</span><span><span class="sq">${quad(3)}</span>mais de 15 p.p.</span></div>
+          <span>Mapa em grade: cada estado tem o mesmo tamanho, para que estados grandes e pouco populosos não pareçam pesar mais.</span></div></div></div></section>`;
+}
+
+const cargoDaPagina = () => pag === "presidente" ? 1 : 3;
+const munDados = () => { const m = mapaCache[`${uf || "RN"}:${cargoDaPagina()}:${turno}`]; return m && m.v ? m.v : null; };
+function munDetHtml(k) {
+  const v = munDados(), r = v && k && v.municipios[k];
+  if (!r) return '<span class="cap">Toque num quadrado para ver o município.</span>';
+  return detHtml(r.nome, r, true).replace("selecionado", k === foco.mun ? "selecionado" : "visualizando");
+}
+
+function cardMunicipios(d) {
+  const u = uf || "RN", v = munDados(), E = ESTADOS[u] || u;
+  const cargo = cargoDaPagina();
+  let corpo = '<div class="skel"></div>', leg = "", n = 0;
+  if (v) {
+    const itens = Object.entries(v.municipios).map(([k, r]) => ({k, r, c: r.cands, pp: r.cands.length > 1 ? r.cands[0].pct - r.cands[1].pct : 0})).filter(x => x.c.length);
+    n = itens.length;
+    const grupos = {};
+    itens.forEach(x => (grupos[x.c[0].sg] = grupos[x.c[0].sg] || []).push(x));
+    const ordem = Object.entries(grupos).sort((p, q) => q[1].length - p[1].length);
+    leg = ordem.map(([sg, xs]) => chipN(sg, xs.length)).join("");
+    if (munModo === "grade") {
+      corpo = `<div class="mgrid" id="mgrid">${ordem.flatMap(([, xs]) => xs.sort((p, q) => q.pp - p.pp)).map(x => {
+        const g = degrau(x.c[0].sg, x.pp);
+        return `<button class="cel${foco.mun === x.k ? " sel" : ""}" data-mun="${x.k}" tabindex="-1" style="background:${g.bg}" aria-label="${esc(x.r.nome)}: ${esc(nome(x.c[0].nome))} na frente por ${pp2(x.pp)} pontos percentuais"></button>`; }).join("")}</div>`;
+    } else {
+      const g = geoCache["/geo/uf/" + u];
+      corpo = g && g.v ? svgMapa("uf", g.v, f => f.properties.codarea, v.municipios, (f, k) => `${v.municipios[k] ? v.municipios[k].nome : k} — ${CARGOS[cargo]}`, false, "duelo") : '<div class="skel"></div>';
+    }
+  }
+  const modoTxt = v && v.modo === "2t" ? "no 2º turno" : "no 1º turno";
+  return `<section class="mcard" id="mun-card"><div class="mhead"><div><h2>${esc(E)} por município</h2>
+      <span class="sub">${n || "…"} municípios. ${munModo === "grade" ? "Cada quadrado é um município, agrupado por quem liderou e ordenado pela vantagem." : "Quem teve mais votos entre os dois finalistas " + modoTxt + "."}</span></div>
+      <div class="seg2" role="group" aria-label="Modo de exibição"><button data-mm="grade" class="${munModo === "grade" ? "on" : ""}">Grade</button><button data-mm="mapa" class="${munModo === "mapa" ? "on" : ""}">Mapa</button></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${leg}</div>${corpo}
+    <div class="detbox" id="det-mun">${munDetHtml(foco.mun)}</div>
+    <div class="mfoot"><span>Cores em 3 degraus de vantagem: até 5 p.p., 5 a 15, mais de 15. Toque num quadrado para ver o município.</span><span>${n} de ${v ? v.total : "…"} com dados</span></div></section>`;
 }
 
 function pgResumo2(d) {
-  const u = d.uf || {};
-  const gov = u.em_2turno ? cardDuelo("Governador · " + (ESTADOS[u.sigla] || u.sigla), u.gov, "governador") : cardUfSemT2(d);
-  return avisoSim(d) + paginaTitulo("2º turno", subtituloT2(d)) +
-    `<div class="grid">${cardDuelo("Presidente da República", d.pres, "presidente")}${gov}</div>
-    <div class="grid">${cardBase("Presidente", d.pres)}${u.em_2turno ? cardBase("Governador · " + u.sigla, u.gov) : ""}</div>
-    <p class="nota">Quer ver como foi o 1º turno? <a class="link" href="${hashDe("resumo", uf, 1)}">Resultado final do 1º turno →</a></p>`;
+  const u = d.uf || {}, ao = d.pres && d.pres.ao_vivo, E = ESTADOS[u.sigla] || u.sigla;
+  const gov = u.em_2turno ? cardDuelo("Governador", E, u.gov, "governador") : cardUfSemT2(d);
+  const sub = ao ? "Apuração em andamento. Ordem fixa, alfabética."
+    : (u.em_2turno ? `Presidente e governador de ${E}. Abaixo, como cada finalista foi no 1º turno.` : "Presidente. Abaixo, como cada finalista foi no 1º turno.");
+  return avisoSim(d) + blocoTitulo(ao ? "2º turno · apuração" : "2º turno", sub, d) +
+    `<div class="g2">${cardDuelo("Presidente da República", "Brasil", d.pres, "presidente")}${gov}</div>
+    <div class="sec"><h2>O que está em disputa</h2></div>
+    <div class="g2">${cardDisputa("Brasil", d.pres)}${u.em_2turno ? cardDisputa(u.sigla, u.gov) : ""}</div>`;
 }
 function pgPresidente2(d) {
   garantirMapas("1");
   const ao = d.pres && d.pres.ao_vivo;
-  return avisoSim(d) + paginaTitulo("Presidente da República", subtituloT2(d)) +
-    `<div class="grid">${cardDuelo("Brasil", d.pres)}${cardBase("Brasil", d.pres)}</div>
-    <div class="grid">${mapaBR(d, "1", "duelo", ao ? "Resultado do 2º turno por estado." : "Os dois finalistas no 1º turno, estado a estado.")}${mapaUF("1", "duelo")}</div>`;
+  return avisoSim(d) + blocoTitulo("Presidente da República", `Duelo nacional, o que está em disputa e o mapa do ${ao ? "2º" : "1º"} turno.`, d) +
+    `<div class="g2">${cardDuelo("Presidente da República", "Brasil", d.pres)}${cardDisputa("Brasil", d.pres)}</div>${cardCartograma(d)}${cardMunicipios(d)}`;
 }
 function pgGovernador2(d) {
-  const u = d.uf || {};
-  if (!u.em_2turno) return avisoSim(d) + paginaTitulo("Governador", subtituloT2(d)) + `<div class="grid">${cardUfSemT2(d)}</div>`;
+  const u = d.uf || {}, ao = u.gov && u.gov.ao_vivo, E = ESTADOS[u.sigla] || u.sigla;
+  if (!u.em_2turno) return avisoSim(d) + blocoTitulo("Governador", `O governo de ${E} foi decidido no 1º turno.`, d) + cardUfSemT2(d);
   garantirMapas("3");
-  return avisoSim(d) + paginaTitulo("Governador · " + (ESTADOS[u.sigla] || u.sigla), subtituloT2(d)) +
-    `<div class="grid">${cardDuelo("Governador", u.gov)}${cardBase("Governador", u.gov)}</div>
-    <div class="grid">${mapaUF("3", "duelo")}</div>`;
+  return avisoSim(d) + blocoTitulo("Governador · " + E, `Duelo no seu estado e o mapa do ${ao ? "2º" : "1º"} turno por município.`, d) +
+    `<div class="g2">${cardDuelo("Governador", E, u.gov)}${cardDisputa(u.sigla, u.gov)}</div>${cardMunicipios(d)}`;
 }
 
 /* ---- desenho ---- */
+const setHtml = (el, h) => { if (el && el._h !== h) { el.innerHTML = h; el._h = h; return true; } return false; };   // não recria nós se nada mudou
+function rodape() {
+  const t2 = turno === 2;
+  setHtml($("#rodape"), `<div class="topo">${t2 ? `<a class="link" href="${hashDe("resumo", uf, 1)}">Resultado final do 1º turno →</a>` : `<a class="link" href="${hashDe("resumo", uf, 2)}">← Voltar ao 2º turno</a>`}
+    <span><strong>Painel não oficial.</strong> Fonte: divulgação oficial de resultados do TSE. O resultado oficial é o que o TSE marcar como eleito. ${t2 ? "A ordem dos candidatos é alfabética e não muda com o placar."
+      : "<strong>Como ler:</strong> ★ eleito (confirmado pelo TSE) · ② vai ao 2º turno (confirmado pelo TSE) · ▶ se elegeria com os votos de agora. Projeções de deputados são estimativas próprias (quociente eleitoral, cláusulas de 80%/20% e sobras)."}</span>
+    <button class="tm" id="tema2">Alternar tema claro/escuro</button></div>`);
+}
 function desenharMenu() {
-  $("#nav").innerHTML = paginasAtuais().map(([id, n]) => `<a href="${hashDe(id)}" ${pag === id ? 'aria-current="page"' : ""}>${n}</a>`).join("");
-  $("#turnos").innerHTML = [[2, "2º turno"], [1, "1º turno"]].map(([t, n]) => `<a href="${hashDe(pag, uf, t)}" ${turno === t ? 'aria-current="true"' : ""}>${n}</a>`).join("");
+  const pgs = paginasAtuais(), nav = $("#nav");
+  nav.style.setProperty("--n", pgs.length);
+  setHtml(nav, pgs.map(([id, n]) => `<a href="${hashDe(id)}" ${pag === id ? 'aria-current="page"' : ""}>${n}</a>`).join(""));
+  setHtml($("#turnos"), [[2, "2º turno", "2º"], [1, "1º turno", "1º"]].map(([t, n, c]) =>
+    `<a href="${hashDe(pag, uf, t)}" ${turno === t ? 'aria-current="true"' : ""}><span class="t-l">${n}</span><span class="t-c">${c}</span></a>`).join(""));
+  rodape();
 }
 function desenhar() {
   desenharMenu();
@@ -834,10 +1189,34 @@ function desenhar() {
   const f = (turno === 2 ? {resumo: pgResumo2, presidente: pgPresidente2, governador: pgGovernador2}
                          : {resumo: pgResumo, presidente: pgPresidente, governador: pgGovernador, senado: pgSenado, deputados: pgDeputados})[pag] || pgResumo;
   // os links internos das páginas do 1º turno não carregam o turno: acrescenta aqui
-  $("#app").innerHTML = f(ultimo).replace(/href="#\/(\w+)\/([A-Z]*)"/g, (m, p, u) => `href="${hashDe(p, u)}"`);
+  const html = f(ultimo).replace(/href="#\/(\w+)\/([A-Z]*)"/g, (m, p, u) => `href="${hashDe(p, u)}"`);
+  const y = window.scrollY;
+  if (setHtml($("#app"), html)) window.scrollTo({top: y, behavior: "instant"});     // troca de dados não pode jogar o usuário para o topo
+}
+
+/* ---- tema claro/escuro ---- */
+const temaEfetivo = () => document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+function alternarTema() {
+  const t = temaEfetivo() === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem("tema", t); } catch (e) {}
 }
 
 /* ---- interação ---- */
+function previewUf(x) {
+  foco.uf = x;
+  const el = $("#det-uf");
+  if (el && ultimo) el.innerHTML = detUfHtml(ultimo, x || uf);
+}
+function previewMun(k, fixar) {
+  if (fixar) {
+    foco.mun = k;
+    document.querySelectorAll(".cel.sel").forEach(e => e.classList.remove("sel"));
+    const c = document.querySelector(`.cel[data-mun="${k}"]`); if (c) c.classList.add("sel");
+  }
+  const el = $("#det-mun");
+  if (el) el.innerHTML = munDetHtml(k || foco.mun);
+}
 document.addEventListener("mousemove", e => {
   const t = $("#tip"), p = e.target.closest && e.target.closest("path[data-k]");
   if (!p) { t.style.display = "none"; return; }
@@ -845,19 +1224,72 @@ document.addEventListener("mousemove", e => {
   t.style.display = "block";
   t.style.left = Math.min(e.clientX + 14, innerWidth - 290) + "px"; t.style.top = Math.min(e.clientY + 14, innerHeight - 140) + "px";
 });
+const sobre = e => {
+  const c = e.target.closest && e.target.closest("[data-cg]"); if (c) previewUf(c.dataset.cg);
+  const m = e.target.closest && e.target.closest("[data-mun]"); if (m) previewMun(m.dataset.mun, false);
+};
+document.addEventListener("mouseover", sobre);
+document.addEventListener("focusin", sobre);
+document.addEventListener("mouseout", e => {
+  const c = e.target.closest && e.target.closest("#cartog");
+  if (c && !c.contains(e.relatedTarget)) previewUf(null);
+  const g = e.target.closest && e.target.closest("#mgrid");
+  if (g && !g.contains(e.relatedTarget)) previewMun(foco.mun, false);
+});
 document.addEventListener("click", e => {
-  const dep = e.target.closest && e.target.closest("[data-dep]");
+  const t = e.target;
+  if (!t.closest) return;
+  // chat
+  if (t.closest("#cw-fab")) { abrirChat(true); return; }
+  if (t.closest("#cw-fechar") || t.closest("#cw-scrim")) { abrirChat(false); return; }
+  const sug = t.closest("[data-sug]");
+  if (sug) { enviarPergunta(sug.dataset.sug); return; }
+  if (t.closest("#chat-enviar")) { const ta = $("#chat-texto"); const v = ta.value; ta.value = ""; enviarPergunta(v); return; }
+  if (t.closest("#cw-novo")) { if (!chat.ocupado) { chat.id = null; chat.msgs = []; renderMsgs(); } return; }
+  const re = t.closest("[data-retry]");
+  if (re) { const i = +re.dataset.retry, u = chat.msgs[i - 1]; if (u && !chat.ocupado) { chat.msgs.splice(i, 1); enviarPergunta(u.texto, true); } return; }
+  const ref = t.closest("button.ref");
+  if (ref) {
+    const msg = ref.closest(".msg"), d = msg && msg.querySelector(`details[id$="-${ref.dataset.ref}"]`);
+    if (d) { d.open = true; d.scrollIntoView({behavior: "smooth", block: "nearest"}); }
+    return;
+  }
+  // tema
+  if (t.closest("#tema") || t.closest("#tema2")) { alternarTema(); return; }
+  // 2º turno: cartograma, grade de municípios, modo
+  const cg = t.closest("[data-cg]");
+  if (cg) { irPara(pag, cg.dataset.cg); return; }
+  const mm = t.closest("[data-mm]");
+  if (mm) { munModo = mm.dataset.mm; $("#app")._h = null; desenhar(); return; }
+  const cel = t.closest("[data-mun]");
+  if (cel) { previewMun(cel.dataset.mun, true); return; }
+  if (t.closest("[data-ir-mun]")) { const c = $("#mun-card"); if (c) c.scrollIntoView({behavior: "smooth", block: "start"}); return; }
+  const pm = t.closest('path[data-m="uf"]');
+  if (pm && $("#det-mun")) { previewMun(pm.dataset.k, true); return; }
+  // 1º turno
+  const dep = t.closest("[data-dep]");
   if (dep) { depTipo = dep.dataset.dep; desenhar(); return; }
-  const lin = e.target.closest && e.target.closest(".linha[data-uf]");
+  const lin = t.closest(".linha[data-uf]");
   if (lin) { irPara(pag, lin.dataset.uf); return; }
-  const p = e.target.closest && e.target.closest('path.clic[data-m="br"]');
+  const p = t.closest('path.clic[data-m="br"]');
   if (p && ESTADOS[p.dataset.k]) irPara(pag, p.dataset.k);
 });
 document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && $("#cw") && $("#cw").dataset.aberto === "1") { abrirChat(false); return; }
+  if (e.target && e.target.id === "chat-texto" && e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault(); const v = e.target.value; e.target.value = ""; enviarPergunta(v); return;
+  }
   if (e.key === "Enter" && e.target.matches && e.target.matches(".linha[data-uf]")) irPara(pag, e.target.dataset.uf);
 });
+document.addEventListener("input", e => { if (e.target && e.target.id === "chat-texto") atualizarEntrada(); });
 
-$("#sel-uf").innerHTML = Object.entries(ESTADOS).map(([s, n]) => `<option value="${s}">${s} — ${n}</option>`).join("");
+function atualizarUfPill() {
+  const u = uf || "";
+  $("#sel-uf").value = u;
+  $("#uf-l").textContent = u ? `${u} · ${ESTADOS[u] || u}` : "—";
+  $("#uf-c").textContent = u || "—";
+}
+$("#sel-uf").innerHTML = Object.entries(ESTADOS).map(([s, n]) => `<option value="${s}">${s} · ${n}</option>`).join("");
 $("#sel-uf").onchange = () => irPara(pag, $("#sel-uf").value);
 
 async function carregar() {
@@ -868,15 +1300,20 @@ async function carregar() {
     if (j.turno !== turno || (uf && j.uf && j.uf.sigla !== uf)) return;        // resposta de uma escolha anterior
     ultimo = j;
     if (!uf && ultimo.uf) { uf = ultimo.uf.sigla; try { localStorage.setItem("uf", uf); } catch (e) {} }
-    $("#sel-uf").value = uf;
+    atualizarUfPill();
+    const ao = ultimo.turno === 2 && ultimo.pres && ultimo.pres.ao_vivo;
+    const txt = (ao ? "ao vivo · " : "atualizado às ") + ultimo.agora;
     $("#dot").classList.remove("off");
-    $("#status").textContent = "ao vivo · " + ultimo.agora;
+    $("#dot").setAttribute("aria-label", txt);
+    $("#status").textContent = txt;
     desenhar();
   } catch (e) {
     $("#dot").classList.add("off");
-    $("#status").textContent = location.protocol === "file:"
-      ? "abra pelo iniciar.bat (http://localhost:8765)"
+    const msg = location.protocol === "file:" ? "abra pelo iniciar.bat (http://localhost:8765)"
       : "servidor local parado — mantenha a janela do iniciar.bat aberta";
+    $("#status").textContent = msg;
+    $("#dot").setAttribute("aria-label", msg);
+    $("#status").style.display = "inline";
   }
 }
 
