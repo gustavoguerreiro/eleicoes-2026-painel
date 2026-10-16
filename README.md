@@ -158,6 +158,13 @@ User questions are sent to the Anthropic API.
 
 ## Runoff night and going live
 
+> Full production guide (nginx, HTTPS certificate, automatic deploy with rollback): [deploy/README.md](deploy/README.md).
+
+**Public mode is the default.** Only the `--uf` state (RN) exists for visitors: the state selector and the chat are hidden,
+`?uf=` and `#/…/SP` are ignored (the URL snaps back to RN), `/geo/uf/` serves only that state, and the server-side chat
+stays off unless `CHAT_ATIVO=1`. For development (all states, selector, chat) run with `--livre` (or `MODO_LIVRE=1`),
+e.g. `iniciar.bat --livre`.
+
 ```bash
 # TV on the same PC: restarts itself if it crashes and opens the browser full screen
 iniciar_tv.bat
@@ -344,6 +351,13 @@ python -m rag.ingestao                                         # reconstrói o �
 5. Botão de **tema claro/escuro** no cabeçalho. Esc fecha o chat; ↺ inicia uma conversa nova.
 
 ## Noite do 2º turno e colocar no ar
+
+> Guia completo de produção (nginx, certificado HTTPS, deploy automático com rollback): [deploy/README.md](deploy/README.md).
+
+**O modo público é o padrão.** Só o estado de `--uf` (RN) existe para quem acessa: o seletor de estado e o chat ficam
+escondidos, `?uf=` e `#/…/SP` são ignorados (o endereço volta para RN), `/geo/uf/` só serve esse estado e o chat do
+servidor fica desligado a menos que `CHAT_ATIVO=1`. Para desenvolver (todos os estados, seletor, chat) rode com `--livre`
+(ou `MODO_LIVRE=1`), por exemplo `iniciar.bat --livre`.
 
 ```bash
 # TV no mesmo PC: reinicia sozinho se cair e abre o navegador em tela cheia

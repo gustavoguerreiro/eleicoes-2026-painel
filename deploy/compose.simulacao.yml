@@ -1,0 +1,7 @@
+# Ensaio geral no servidor de verdade (nginx, HTTPS, domínio), com a noite da eleição SIMULADA (17h→22h em 5 min):
+#   cd /opt/eleicoes && docker compose -f docker-compose.yml -f deploy/compose.simulacao.yml up -d
+# Para voltar ao normal (o deploy.sh também volta, por ser `docker compose up -d` sem este arquivo):
+#   docker compose up -d
+services:
+  painel:
+    command: ["python", "backend/painel_server.py", "--web", "--simular-2t", "--sim-inicio", "18:55"]

@@ -5,3 +5,5 @@ __pycache__/
 .idea/
 .vscode/
 logs/
+dados/
+.env.make

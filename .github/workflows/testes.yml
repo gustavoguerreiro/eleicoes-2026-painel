@@ -1,5 +1,9 @@
-name: testes
-on: [push, pull_request]
+name: testes-e-deploy
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
 jobs:
   testes:
     runs-on: ubuntu-latest
@@ -10,3 +14,29 @@ jobs:
           python-version: "3.12"
       - run: pip install -r backend/requirements.txt
       - run: python -m unittest discover -s tests
+
+  # Deploy automático: só em push na main, só depois dos testes e só se a variável DEPLOY_ATIVO for "true"
+  # (Settings > Secrets and variables > Actions > Variables). Na noite da eleição, ponha DEPLOY_ATIVO=false: congela o deploy.
+  deploy:
+    needs: testes
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_ATIVO == 'true'
+    runs-on: ubuntu-latest
+    concurrency: deploy-producao
+    steps:
+      - name: Preparar SSH
+        env:
+          CHAVE: ${{ secrets.DEPLOY_SSH_KEY }}
+          HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$CHAVE" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$HOSTS" > ~/.ssh/known_hosts
+      - name: Publicar no servidor
+        env:
+          ALVO: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+        run: ssh -o BatchMode=yes "$ALVO" 'bash /opt/eleicoes/deploy/deploy.sh'
+      - name: Conferir que o site respondeu
+        env:
+          DOMINIO: ${{ vars.DOMINIO }}
+        run: curl -fsS --retry 5 --retry-delay 5 "https://$DOMINIO/healthz"
