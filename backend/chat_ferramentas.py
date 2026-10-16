@@ -4,7 +4,7 @@ O modelo nunca faz conta nem lembra número: tudo vem daqui, calculado em Python
 já mantém em cache. Cada ferramenta devolve um dicionário simples (vira JSON para o modelo) e, quando for o caso, uma
 lista de trechos para o chat poder citar a página de origem.
 """
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 
 from rag.texto import sem_acento
 
@@ -89,6 +89,8 @@ ROTULOS = {
     "listar_documentos": "Conferindo os documentos disponíveis",
 }
 
+BRT = timezone(timedelta(hours=-3))
+
 
 def _n(s):
     return sem_acento(str(s)).lower().strip()
@@ -103,7 +105,7 @@ class Ferramentas:
 
     def __init__(self, obter, mapa, indice, hoje=None):
         self.obter, self.mapa, self.indice = obter, mapa, indice
-        self.hoje = hoje or date.today
+        self.hoje = hoje or (lambda: datetime.now(BRT).date())
 
     # ---- despacho --------------------------------------------------------------------------------------------------
     def executar(self, nome, entrada):
@@ -286,7 +288,7 @@ class Ferramentas:
         iso = meta.get("data_2t", "2026-10-25")
         dias = (date.fromisoformat(iso) - self.hoje()).days
         out = dict(data_2t=iso, dias_para_o_2_turno=dias, resultados_do_2_turno_disponiveis=bool(meta.get("t2_disponivel")),
-                   simulado=bool(meta.get("simulado")), agora=datetime.now().strftime("%d/%m/%Y %H:%M"))
+                   simulado=bool(meta.get("simulado")), agora=datetime.now(BRT).strftime("%d/%m/%Y %H:%M"))
         for rotulo, args in (("presidente", (2, "presidente", "BR")), ("governador_rn", (2, "governador", "RN"))):
             try:
                 out[rotulo] = self._resultados(*args)

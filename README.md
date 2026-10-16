@@ -33,9 +33,16 @@ This project started as a terminal script and grew into a full-stack portfolio p
 ## Features
 
 - **Runoff mode (2nd round)** with scoreboard, the 50% line, margin in votes, and "what is still up for grabs"
-  (eliminated candidates' votes, blank, null, abstention). Before the TSE publishes runoff files (they return 404 until
-  25 Oct) the dashboard detects this itself and shows each finalist's first-round performance. When files appear, it
-  switches to live mode on its own.
+  (eliminated candidates' votes, blank, null, abstention). The TSE publishes the runoff files days
+  early, zeroed, so "file exists" is not the signal: the dashboard shows each finalist's first-round performance (and a
+  countdown) until votes are actually counted, then switches to live mode on its own and never goes back, even if the
+  TSE feed hiccups.
+- **Split screen (RN + Brazil)**: governor of the state on the left, president on the right, each with the duel, a live
+  vote-share chart and a map. **TV mode** (`?tv=1`, key `T`) scales it to fill a TV, hides controls and the chat, keeps the
+  screen awake and reloads itself every 4 h; `F` is full screen, `?rodar=30` rotates pages.
+- **Built for election night**: the server refreshes in the background and serves from memory (a slow TSE never blocks a
+  page), keeps the last good data if the feed fails, uses `ETag`/304 against the TSE, and the header dot turns amber when
+  the data is stale. "Projected victory" requires a 30% safety margin over the remaining count and 30% of sections.
 - **First-round results** for President, Governor, Senate, federal and state deputies, with Congress seat projections.
 - **Maps built from IBGE data**: a state cartogram for Brazil and a 167-municipality view for Rio Grande do Norte (grid
   or true-shape map, hover/focus/click detail panel).
@@ -64,7 +71,7 @@ order** (enforced in the browser, not just requested from the model), with `[n]`
 | Data | TSE results JSON (`resultados.tse.jus.br`), IBGE meshes API (GeoJSON), TSE candidate-registration PDFs | Official public sources |
 | Retrieval | **PyMuPDF** extraction → heading-aware chunking → **BM25** with Portuguese normalisation and stemming | Exact-term queries (names, programmes, numbers) work well; no vector DB needed at this corpus size |
 | LLM | **Anthropic Claude** via the official Python SDK (tool use + streaming), **Haiku 4.5** by default | Cheap and good enough; model is configurable |
-| Tests | `unittest` — 43 tests, plus a retrieval evaluation harness | Runs offline, no API key |
+| Tests | `unittest` — 75 tests, plus a retrieval evaluation harness | Runs offline, no API key |
 
 Only two third-party packages: `anthropic` and `pymupdf`.
 
@@ -142,10 +149,32 @@ User questions are sent to the Anthropic API.
 
 (The interface is in Portuguese, as it targets Brazilian voters.)
 
+## Runoff night and going live
+
+```bash
+# TV on the same PC: restarts itself if it crashes and opens the browser full screen
+iniciar_tv.bat
+# or any browser: http://localhost:8765/?tv=1#/tela/RN   (T toggles TV mode, F full screen)
+```
+
+To let friends watch, expose the server: `python backend/painel_server.py --web --host 0.0.0.0` (or the `Dockerfile`; `PORT`
+and `HOST` environment variables are honoured) behind a tunnel/proxy such as Cloudflare Tunnel or Caddy. Notes:
+
+- Set `CONFIAR_PROXY=1` behind a proxy so the chat rate limit uses each visitor's real IP (`CF-Connecting-IP` /
+  `X-Forwarded-For`). Without a proxy leave it unset: the headers can be forged.
+- The chat only accepts requests whose `Origin` matches the `Host` header. If your proxy rewrites `Host`, list the public
+  origin in `ORIGENS_PERMITIDAS=https://painel.example.com`.
+- `/api` answers with `Cache-Control: public, s-maxage=8` and `ETag`, so a CDN in front turns any number of viewers into
+  about one request per 8 s to your machine. `/healthz` returns 503 if data is more than 2 minutes old.
+- Cost cap for the chat: `CHAT_LIMITE_GLOBAL_DIA` (default 1500 questions/day ≈ US$ 8 with Haiku), `CHAT_LIMITE_GLOBAL_HORA`,
+  `CHAT_LIMITE_IP_DIA`. Also set a monthly spend limit in the Anthropic console.
+- Keep the PC awake and pause Windows Update for the night. Move the repository out of OneDrive if you can (sync conflicts on `logs/`).
+- Never leave `--simular-2t` on in production (the screen is labelled "SIMULAÇÃO", but still).
+
 ## Testing and evaluation
 
 ```bash
-python -m unittest discover -s tests -v   # 43 tests: cleaning, search, tools, chat loop, page context, rate limiter
+python -m unittest discover -s tests -v   # 75 tests: TSE client, runoff state, duel status, history, cache, chat, search
 python -m rag.avaliacao                    # retrieval quality, no cost: hit@k and MRR on data/rag/avaliacao.json
 ```
 
@@ -164,7 +193,8 @@ this is optimistic — treat it as a regression alarm, not a final grade. Tests 
 
 ## Limitations
 
-- The live runoff path is verified only with the simulator until the TSE publishes real files on 25 Oct.
+- The live runoff path is verified with the simulator and with the real zeroed runoff files; the first real vote counts
+  arrive on 25 Oct. If a real file differs from the simulated one, `/healthz` and the amber dot will not catch it: watch the screen.
 - First-round pages use the new colour tokens but the previous layout.
 - The municipality grid has no keyboard navigation yet.
 - Deputy/Senate seat counts are **estimates** (electoral quotient, 80%/20% thresholds, largest remainders).
@@ -174,7 +204,8 @@ this is optimistic — treat it as a regression alarm, not a final grade. Tests 
 
 - [x] Brazil and RN maps (IBGE) · [x] RAG over TSE-filed plans · [x] Chat with citations · [x] Automated tests
 - [ ] Hybrid search with embeddings if the corpus grows (swap point: `Indice.pontuar`)
-- [ ] CI and deployment
+- [x] CI (GitHub Actions) and Dockerfile
+- [ ] Hybrid search with embeddings; history chart persisted beyond one election night
 
 ## Notes
 
@@ -211,8 +242,15 @@ O projeto começou como um script de terminal e virou uma peça de portfólio fu
 ## Funcionalidades
 
 - **Modo 2º turno** com placar, linha dos 50%, diferença em votos e "o que está em disputa" (votos dos eliminados,
-  brancos, nulos e abstenção). Antes de o TSE publicar os arquivos (dão 404 até 25/10) o painel detecta sozinho e mostra
-  o desempenho dos finalistas no 1º turno; quando os arquivos surgem, passa ao modo ao vivo.
+  brancos, nulos e abstenção). O TSE publica os arquivos do 2º turno dias antes,
+  zerados, então "o arquivo existe" não é o sinal: o painel mostra o desempenho dos finalistas no 1º turno (e uma contagem
+  regressiva) até haver votos apurados; aí passa sozinho ao modo ao vivo e nunca volta atrás, mesmo se o TSE falhar um instante.
+- **Tela dividida (RN + Brasil)**: governador do estado à esquerda, presidente à direita, cada um com o duelo, gráfico
+  da evolução do placar e mapa. O **modo TV** (`?tv=1`, tecla `T`) amplia tudo para preencher a TV, esconde controles e chat,
+  mantém a tela acesa e se recarrega a cada 4 h; `F` é tela cheia e `?rodar=30` alterna as páginas.
+- **Feito para a noite da eleição**: o servidor atualiza em segundo plano e responde da memória (um TSE lento nunca trava a
+  página), mantém o último dado bom se a fonte falhar, usa `ETag`/304 com o TSE, e a bolinha do cabeçalho fica âmbar quando
+  o dado está velho. "Vitória projetada" exige folga de 30% sobre o que falta apurar e 30% das seções.
 - **Resultados do 1º turno** para Presidente, Governador, Senador, deputados federal e estadual, com projeção de cadeiras.
 - **Mapas com dados do IBGE**: cartograma de estados do Brasil e visão dos 167 municípios do RN (grade ou mapa, com painel
   de detalhe por passar o mouse, foco ou clique).
@@ -237,7 +275,7 @@ ordem alfabética** (garantido no navegador, e não só pedido ao modelo), e cit
 | Dados | JSON do TSE, API de malhas do IBGE (GeoJSON), PDFs de registro de candidatura do TSE | Fontes públicas oficiais |
 | Recuperação | **PyMuPDF** → trechos por seção → **BM25** com normalização e stemmer em português | Bom para termos exatos (nomes, programas, números); não precisa de banco vetorial neste volume |
 | LLM | **Anthropic Claude** (SDK oficial, tool use + streaming), **Haiku 4.5** por padrão | Barato e suficiente; modelo configurável |
-| Testes | `unittest` — 43 testes + avaliação da busca | Roda offline, sem chave |
+| Testes | `unittest` — 75 testes + avaliação da busca | Roda offline, sem chave |
 
 Só duas dependências externas: `anthropic` e `pymupdf`.
 
@@ -291,10 +329,32 @@ python -m rag.ingestao                                         # reconstrói o �
    *"Compare as propostas de educação"*, *"Quem lidera no RN?"*. Clique em `[n]` para ver a fonte.
 5. Botão de **tema claro/escuro** no cabeçalho. Esc fecha o chat; ↺ inicia uma conversa nova.
 
+## Noite do 2º turno e colocar no ar
+
+```bash
+# TV no mesmo PC: reinicia sozinho se cair e abre o navegador em tela cheia
+iniciar_tv.bat
+# ou em qualquer navegador: http://localhost:8765/?tv=1#/tela/RN   (T alterna o modo TV, F tela cheia)
+```
+
+Para os amigos assistirem, exponha o servidor: `python backend/painel_server.py --web --host 0.0.0.0` (ou o `Dockerfile`; as
+variáveis `PORT` e `HOST` são respeitadas) atrás de um túnel/proxy como Cloudflare Tunnel ou Caddy. Notas:
+
+- Atrás de proxy, defina `CONFIAR_PROXY=1` para o limite do chat usar o IP real de cada visitante (`CF-Connecting-IP` /
+  `X-Forwarded-For`). Sem proxy, deixe desligado: esses cabeçalhos podem ser forjados.
+- O chat só aceita requisições cujo `Origin` bate com o `Host`. Se o proxy reescrever o `Host`, liste a origem pública em
+  `ORIGENS_PERMITIDAS=https://painel.exemplo.com`.
+- `/api` responde com `Cache-Control: public, s-maxage=8` e `ETag`: um CDN na frente transforma qualquer número de
+  espectadores em cerca de 1 requisição a cada 8 s para a sua máquina. `/healthz` devolve 503 se o dado tiver mais de 2 min.
+- Teto de gasto do chat: `CHAT_LIMITE_GLOBAL_DIA` (padrão 1500 perguntas/dia ≈ US$ 8 com Haiku), `CHAT_LIMITE_GLOBAL_HORA`,
+  `CHAT_LIMITE_IP_DIA`. Defina também um limite mensal de gasto no console da Anthropic.
+- Mantenha o PC acordado e pause o Windows Update na noite. Se puder, tire o repositório do OneDrive (conflitos em `logs/`).
+- Nunca deixe `--simular-2t` ligado em produção (a tela avisa "SIMULAÇÃO", mas mesmo assim).
+
 ## Testes e avaliação
 
 ```bash
-python -m unittest discover -s tests -v   # 43 testes: limpeza, busca, ferramentas, laço do chat, contexto, limitador
+python -m unittest discover -s tests -v   # 75 testes: cliente do TSE, estado do 2º turno, situação do duelo, histórico, cache, chat, busca
 python -m rag.avaliacao                    # qualidade da busca, sem custo: hit@k e MRR em data/rag/avaliacao.json
 ```
 
@@ -314,7 +374,8 @@ serve como alarme de regressão, não como nota final. Os testes passam em Pytho
 
 ## Limitações
 
-- O 2º turno ao vivo só foi verificado com o simulador até o TSE publicar os arquivos reais em 25/10.
+- O 2º turno ao vivo foi verificado com o simulador e com os arquivos reais ainda zerados; as primeiras apurações reais
+  chegam em 25/10. Se um arquivo real vier diferente do simulado, nem o `/healthz` nem a bolinha âmbar avisam: acompanhe a tela.
 - As telas do 1º turno usam as novas cores, mas ainda o layout anterior.
 - A grade de municípios ainda não tem navegação por teclado.
 - Cadeiras de deputados e Senado são **estimativas** (quociente eleitoral, cláusulas de 80%/20% e sobras).
@@ -324,7 +385,8 @@ serve como alarme de regressão, não como nota final. Os testes passam em Pytho
 
 - [x] Mapas do Brasil e do RN (IBGE) · [x] RAG com os planos do TSE · [x] Chat com citações · [x] Testes automatizados
 - [ ] Busca híbrida (embeddings) se o corpus crescer — ponto de troca em `Indice.pontuar`
-- [ ] CI e deploy
+- [x] CI (GitHub Actions) e Dockerfile
+- [ ] Busca híbrida (embeddings); histórico do gráfico persistido além de uma noite de eleição
 
 ## Notas
 

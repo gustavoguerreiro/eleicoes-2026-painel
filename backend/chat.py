@@ -26,8 +26,9 @@ TRECHO_MAX = 1500                # caracteres de cada trecho de plano enviados a
 MAX_MENSAGEM = 600                # caracteres por pergunta
 MAX_PERGUNTAS_POR_CONVERSA = 20
 LIMITE_JANELA = (20, 600)         # 20 perguntas a cada 10 min por IP
-LIMITE_DIA = 120
-LIMITE_GLOBAL_HORA = 400
+LIMITE_DIA = int(os.environ.get("CHAT_LIMITE_IP_DIA", 120))
+LIMITE_GLOBAL_HORA = int(os.environ.get("CHAT_LIMITE_GLOBAL_HORA", 300))
+LIMITE_GLOBAL_DIA = int(os.environ.get("CHAT_LIMITE_GLOBAL_DIA", 1500))     # teto de gasto: ~US$ 0,005 por pergunta (Haiku)
 
 SISTEMA = """Você é o assistente do painel "Apuração 2026". Ajuda eleitores a entender (1) o que os candidatos propõem, com base nos planos de governo que registraram no TSE, e (2) os números da apuração mostrados no painel.
 
@@ -101,22 +102,29 @@ class Limitador:
     """Janela deslizante por IP + teto diário por IP + teto global por hora, para ninguém gastar o crédito da chave."""
 
     def __init__(self):
-        self.janela, self.dia, self.global_hora = defaultdict(deque), defaultdict(deque), deque()
+        self.janela, self.dia, self.global_hora, self.global_dia = defaultdict(deque), defaultdict(deque), deque(), deque()
         self.trava = threading.Lock()
 
     def permitir(self, ip, agora=None):
         agora = agora or time.time()
         with self.trava:
-            for fila, limite in ((self.janela[ip], LIMITE_JANELA[1]), (self.dia[ip], 86400), (self.global_hora, 3600)):
+            for fila, limite in ((self.janela[ip], LIMITE_JANELA[1]), (self.dia[ip], 86400), (self.global_hora, 3600),
+                                 (self.global_dia, 86400)):
                 while fila and fila[0] < agora - limite:
                     fila.popleft()
+            if len(self.dia) > 2000:                                  # não deixa a memória crescer com IPs que sumiram
+                for k in [k for k, f in self.dia.items() if not f or f[-1] < agora - 86400]:
+                    self.dia.pop(k, None)
+                    self.janela.pop(k, None)
             if len(self.janela[ip]) >= LIMITE_JANELA[0]:
                 return False, "Muitas perguntas em pouco tempo. Aguarde alguns minutos e tente de novo."
             if len(self.dia[ip]) >= LIMITE_DIA:
                 return False, "Limite diário de perguntas atingido."
             if len(self.global_hora) >= LIMITE_GLOBAL_HORA:
                 return False, "O assistente está com muitas consultas agora. Tente novamente em instantes."
-            for fila in (self.janela[ip], self.dia[ip], self.global_hora):
+            if len(self.global_dia) >= LIMITE_GLOBAL_DIA:
+                return False, "O assistente atingiu o limite de uso de hoje. Os resultados do painel seguem normais."
+            for fila in (self.janela[ip], self.dia[ip], self.global_hora, self.global_dia):
                 fila.append(agora)
             return True, ""
 
@@ -126,7 +134,7 @@ def _limpa(s, limite=MAX_MENSAGEM):
     return re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", "", str(s)).strip()[:limite]
 
 
-PAGINAS = ("resumo", "presidente", "governador", "senado", "deputados")
+PAGINAS = ("tela", "resumo", "presidente", "governador", "senado", "deputados")
 MAX_CONTEXTO = 4500                # caracteres do texto exibido na tela
 
 

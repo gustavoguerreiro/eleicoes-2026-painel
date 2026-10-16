@@ -171,7 +171,7 @@ main{max-width:var(--max);margin:0 auto;padding:24px;display:flex;flex-direction
 
 /* ---- candidatos (1º turno) ---- */
 .cand{display:grid;grid-template-columns:40px 1fr auto;gap:3px 12px;align-items:center;padding:8px 8px;margin:0 -8px;border-radius:var(--r-box)}
-.cand.flash,.item.flash,.linha.flash,.lado2.flash{animation:fl 2.4s ease-out}
+.cand.flash,.item.flash,.linha.flash,.lado2.flash,.lc.flash{animation:fl 2.4s ease-out}
 @keyframes fl{0%{background:var(--flash)}100%{background:transparent}}
 .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:var(--fs-cap)}
 .cn{min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -408,6 +408,68 @@ footer#rodape .tm{align-self:flex-start;background:none;border:1px solid var(--l
 .cw-in button:disabled{opacity:.55;cursor:default}
 .cw-n{font-size:var(--fs-cap);color:var(--ink-3);text-wrap:pretty}
 
+/* ---- tela dividida (RN + Brasil) ---- */
+.dot.warn{background:var(--warn);box-shadow:0 0 0 3px var(--warn-soft)}
+.tela{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+.painel2{display:flex;flex-direction:column;gap:14px;min-width:0}
+.dc{gap:12px;padding:16px}
+.dc .dtop>div{flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap}
+.dc .dtop h2{font-size:var(--fs-h2);font-weight:800}
+.dc .st{flex-direction:row;align-items:baseline;gap:4px 10px;flex-wrap:wrap;padding:8px 12px}
+.dc .lados2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lc{display:flex;align-items:center;gap:12px;min-width:0;border-radius:var(--r-box);padding:4px}
+.lc .av2{width:46px;height:46px;font-size:16px;flex:none}
+.lcb{min-width:0;display:flex;flex-direction:column;gap:2px}
+.lcb .nm{font-size:var(--fs-lg);font-weight:700;line-height:1.2;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.lcb .pc{font-size:clamp(30px,8cqi,48px);font-weight:800;line-height:1;letter-spacing:-.02em}
+.lcb .au{font-size:var(--fs-cap);color:var(--ink-3)}
+.lc.flash{animation:fl 2.4s ease-out}
+.dc .b50{padding-top:10px}.dc .b50 .rot{display:none}.dc .b50 .mk{top:6px}
+.dc .dft{padding-top:10px}
+.serie{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow);padding:12px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.serie svg{width:100%;height:auto;display:block;overflow:visible;max-height:100px}
+.serie .eixo{fill:var(--ink-3);font-size:11px}
+.serie .rot-l{font-size:12px;font-weight:700}
+.serie.vazio-s{min-height:96px;justify-content:center}
+.serie.vazio-s p{margin:0;color:var(--ink-3);font-size:var(--fs-sm)}
+.vence{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;padding:12px 18px;border-radius:var(--r-card);border:1px solid var(--line);font-size:var(--fs-lg)}
+.vence b{font-size:var(--fs-h2);font-weight:800;letter-spacing:.02em}
+.vence.ok{background:var(--ok-soft);color:var(--ok)}
+.vence.proj{background:var(--info-soft);color:var(--info)}
+.vence span{color:var(--ink);font-weight:600}
+.cel.pend{background:var(--track);cursor:default}
+.tela .mcard,.tela .cg-wrap{gap:10px}
+.tela .mcard{padding:14px}
+.tela .mhead>div:first-child{flex-basis:200px}
+.tela .cg-wrap{flex-wrap:nowrap;gap:16px}
+.tela .cartog{flex:0 0 330px;gap:4px}
+.tela .tile2{aspect-ratio:1.45}
+.tela .tile2 strong{font-size:13px}.tela .tile2 span{font-size:11px}
+.tela .det{flex:1 1 0;min-width:0;gap:12px}
+
+/* ---- modo TV (?tv=1): sem mouse, de longe ---- */
+html.tv{cursor:none}
+.tv header.site{position:static}
+.tv .top{padding:8px 16px;max-width:none}
+.tv #nav,.tv #turnos,.tv .ufpill,.tv .tema,.tv #cw,.tv #tip,.tv .tit .sub2,.tv .kick .kn,.tv .kick .vl,.tv .detbox,
+.tv .tela .mhead .sub,.tv .tela .mfoot,.tv .leg3>span,.tv footer#rodape .link,.tv footer#rodape .tm{display:none!important}
+.tv main{max-width:none;padding:10px 16px;gap:10px}
+.tv .tit h1{display:none}
+.tv .tit{position:fixed;top:5px;right:16px;z-index:11}
+.tv .sim{padding:3px 12px}
+.tv .dft{display:none}
+.tv .serie .cap{display:none}
+.tv .serie.vazio-s{min-height:0;padding:6px 14px}
+.tv .tela .tile2{aspect-ratio:1.9}.tv .tela .tile2 span{display:none}
+.tv .tela .cartog{flex-basis:290px}
+.tv .kick{padding:3px 12px;gap:10px}.tv .kick strong{font-size:17px}.tv .kick .kl{display:inline;margin-right:8px}.tv .kick>div{display:flex;align-items:baseline}.tv .apur6{display:none}
+.tv .tela{gap:14px}.tv .painel2{gap:10px}
+.tv .dc{padding:12px 14px;gap:8px}
+.tv .serie{padding:8px 14px}
+.tv footer#rodape{padding:4px 16px 8px;max-width:none}
+.tv footer#rodape .topo{padding-top:6px}
+
+@media(max-width:899px){.tela{grid-template-columns:1fr}.tela .cg-wrap{flex-wrap:wrap}.tela .cartog{flex-basis:300px}}
 /* ---- celular (< 620px) ---- */
 @media(max-width:619px){
   .top{padding:12px 16px 10px;gap:10px}
@@ -425,6 +487,7 @@ footer#rodape .tm{align-self:flex-start;background:none;border:1px solid var(--l
   .duelo{gap:6px}.lado .p{font-size:26px}.lado .av{width:52px;height:52px}
   .kick{width:100%}.kick .kn{max-width:none;flex:1}
   .lados{gap:8px}
+  .dc .lados2{grid-template-columns:1fr;gap:6px}
   .g2{grid-template-columns:1fr}
   .cartog{max-width:none}
   .linha,.sugs button,.cw-b button{min-height:44px}
@@ -511,8 +574,8 @@ const UF_COD = {"12":"AC","27":"AL","13":"AM","16":"AP","29":"BA","23":"CE","53"
 
 /* ---- estado da aplicação ---- */
 const PAG_T1 = [["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"], ["senado","Senado"], ["deputados","Deputados"]];
-const PAG_T2 = [["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"]];
-let turno = 2, pag = "resumo", uf = null, ultimo = null, anterior = {}, atual = {}, depTipo = "fed";
+const PAG_T2 = [["tela","RN + Brasil"], ["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"]];
+let turno = 2, pag = "tela", uf = null, ultimo = null, anterior = {}, atual = {}, depTipo = "fed";
 const paginasAtuais = () => turno === 1 ? PAG_T1 : PAG_T2;
 try { uf = localStorage.getItem("uf"); } catch (e) {}
 
@@ -524,14 +587,15 @@ function marca(chave, valor) {            // " flash" quando o valor mudou desde
 /* ---- roteamento por hash: #/pagina/UF ---- */
 function lerHash() {                                    // #/pagina/UF[/1]  (sem o "/1" = 2º turno)
   const [p, u, t] = location.hash.replace(/^#\/?/, "").split("/");
-  return {p: PAG_T1.some(x => x[0] === p) ? p : "resumo", u: (u || "").toUpperCase(), t: t === "1" ? 1 : 2};
+  const t1 = t === "1";
+  return {p: (t1 ? PAG_T1 : PAG_T2).some(x => x[0] === p) ? p : (t1 ? "resumo" : "tela"), u: (u || "").toUpperCase(), t: t1 ? 1 : 2};
 }
 const hashDe = (p, u, t) => `#/${p}/${u || uf || ""}${(t || turno) === 1 ? "/1" : ""}`;
 function irPara(p, u, t) { location.hash = hashDe(p, u, t); }
 function sincronizar() {
   const r = lerHash(), mudou = r.t !== turno;
   turno = r.t; pag = r.p;
-  if (!paginasAtuais().some(x => x[0] === pag)) pag = "resumo";
+  if (!paginasAtuais().some(x => x[0] === pag)) pag = turno === 1 ? "resumo" : "tela";
   if (mudou) ultimo = null;
   const novaUf = r.u && ESTADOS[r.u] && r.u !== uf;
   if (novaUf) { uf = r.u; try { localStorage.setItem("uf", uf); } catch (e) {} }
@@ -801,7 +865,7 @@ function pgDeputados(d) {
 
 /* ---- chat flutuante: RAG sobre os planos + ferramentas + o que está na tela ---- */
 const chat = {id: null, msgs: [], ocupado: false, status: null, carregando: false, sugKey: null};
-const NOME_PAG = {resumo: "Resumo", presidente: "Presidente", governador: "Governador", senado: "Senado", deputados: "Deputados"};
+const NOME_PAG = {tela: "RN + Brasil", resumo: "Resumo", presidente: "Presidente", governador: "Governador", senado: "Senado", deputados: "Deputados"};
 const FONTE_OK = u => /^https:\/\/divulgacandcontas\.tse\.jus\.br\//.test(u || "");
 const CAND_INFO = {"lula": ["Lula", "PT"], "flavio bolsonaro": ["Flávio Bolsonaro", "PL"], "cadu de lula": ["Cadu de Lula", "PT"],
                    "cadu": ["Cadu de Lula", "PT"], "allyson": ["Allyson", "UNIÃO"]};
@@ -813,7 +877,7 @@ function contextoDaPagina() {               // o que o usuário está vendo, par
   return {pagina: pag, turno, uf, texto};
 }
 function rotuloContexto() {
-  const onde = pag === "presidente" ? "Brasil" : (uf || "");
+  const onde = pag === "presidente" ? "Brasil" : pag === "tela" ? `${uf || ""} e Brasil` : (uf || "");
   return `${NOME_PAG[pag] || pag}${onde ? " · " + onde : ""} · ${turno}º turno`;
 }
 function sugestoesDaPagina() {
@@ -1015,12 +1079,11 @@ function kicker(d) {
     rotulo = "Seções apuradas"; valor = pct(d.pres.apur);
     nota = "Presidente." + (g ? ` No ${uf}, governador está em ${pct(g.apur)}.` : "");
   } else {
-    const dias = diasPara(m.data_2t);
     rotulo = dataExtenso(m.data_2t);
-    valor = dias > 1 ? `faltam ${dias} dias` : dias === 1 ? "amanhã" : dias === 0 ? "hoje" : "aguardando";
-    nota = "Votação das 8h às 17h, horário de Brasília.";
+    valor = null;                                     // a contagem regressiva é preenchida a cada segundo (data-cd)
+    nota = "Votação das 8h às 17h, horário de Brasília. Os resultados saem depois do fim da votação no Acre (cerca de 19h).";
   }
-  return `<div class="kick"><div><span class="kl">${esc(rotulo)}</span><strong>${esc(valor)}</strong></div><div class="vl"></div><div class="kn">${esc(nota)}</div></div>`;
+  return `<div class="kick"><div><span class="kl">${esc(rotulo)}</span><strong${valor === null ? ` data-cd="${esc(m.inicio_2t)}"` : ""}>${valor === null ? "" : esc(valor)}</strong></div><div class="vl"></div><div class="kn">${esc(nota)}</div></div>`;
 }
 const blocoTitulo = (t, sub, d) => `<div class="tit"><div><h1>${esc(t)}</h1><div class="sub2">${esc(sub)}</div></div>${kicker(d)}</div>`;
 
@@ -1122,10 +1185,11 @@ function cardMunicipios(d) {
     itens.forEach(x => (grupos[x.c[0].sg] = grupos[x.c[0].sg] || []).push(x));
     const ordem = Object.entries(grupos).sort((p, q) => q[1].length - p[1].length);
     leg = ordem.map(([sg, xs]) => chipN(sg, xs.length)).join("");
+    const pend = Math.max(0, (v.total || 0) - n);
     if (munModo === "grade") {
       corpo = `<div class="mgrid" id="mgrid">${ordem.flatMap(([, xs]) => xs.sort((p, q) => q.pp - p.pp)).map(x => {
         const g = degrau(x.c[0].sg, x.pp);
-        return `<button class="cel${foco.mun === x.k ? " sel" : ""}" data-mun="${x.k}" tabindex="-1" style="background:${g.bg}" aria-label="${esc(x.r.nome)}: ${esc(nome(x.c[0].nome))} na frente por ${pp2(x.pp)} pontos percentuais"></button>`; }).join("")}</div>`;
+        return `<button class="cel${foco.mun === x.k ? " sel" : ""}" data-mun="${x.k}" tabindex="-1" style="background:${g.bg}" aria-label="${esc(x.r.nome)}: ${esc(nome(x.c[0].nome))} na frente por ${pp2(x.pp)} pontos percentuais"></button>`; }).join("")}${'<span class="cel pend" title="ainda sem apuração"></span>'.repeat(pend)}</div>`;
     } else {
       const g = geoCache["/geo/uf/" + u];
       corpo = g && g.v ? svgMapa("uf", g.v, f => f.properties.codarea, v.municipios, (f, k) => `${v.municipios[k] ? v.municipios[k].nome : k} — ${CARGOS[cargo]}`, false, "duelo") : '<div class="skel"></div>';
@@ -1164,6 +1228,78 @@ function pgGovernador2(d) {
     `<div class="g2">${cardDuelo("Governador", E, u.gov)}${cardDisputa(u.sigla, u.gov)}</div>${cardMunicipios(d)}`;
 }
 
+/* ---- tela dividida: governador do estado (RN) e presidente (Brasil) lado a lado ---- */
+function cardDueloC(cargo, escopo, d) {
+  if (!d || d.cands.length < 2) return cardVazio(escopo);
+  const ao = d.ao_vivo, [a, b] = alfa(d.cands), s = d.situacao || {};
+  const tom = {aberto: "info", "2turno": "warn", eleito: "ok", "1turno": "ok"}[s.tipo] || "info";
+  const lado = c => `<div class="lc${marca("c" + escopo + c.nome, c.votos)}"><span class="av2" style="background:${corChip(c.sg)}" aria-hidden="true">${esc(iniciais(c.nome))}</span>
+    <div class="lcb"><div class="nm">${c.eleito ? "★ " : ""}${esc(nome(c.nome))} ${chip(c.sg)}</div>
+    <div class="pc">${ao ? pct(c.pct) : pct1(c.pct)}</div><div class="au">${milhar(c.votos)} votos${ao ? "" : " no 1º turno"}</div></div></div>`;
+  const resto = Math.max(0, 100 - a.pct - b.pct);
+  const segs = ao ? [[a.pct, corPura(a.sg)], [b.pct, corPura(b.sg)]] : [[a.pct, corPura(a.sg)], [resto, "var(--n-elim)"], [b.pct, corPura(b.sg)]];
+  const dpp = Math.abs(a.pct - b.pct), dv = Math.abs(a.votos - b.votos);
+  return `<section class="dcard dc"><div class="dtop"><div><span class="cg">${esc(cargo)}</span><h2>${esc(escopo)}</h2></div>
+      <span class="meta">${ao ? pct(d.apur) + " apurado" : "2º turno em " + dataBr(ultimo.meta.data_2t)}</span></div>
+    ${ao ? `<div class="apur6" role="progressbar" aria-label="Seções apuradas" aria-valuenow="${d.apur}" aria-valuemin="0" aria-valuemax="100"><i style="width:${d.apur}%"></i></div>` : ""}
+    <div class="lados2">${lado(a)}${lado(b)}</div>
+    <div class="b50"><div class="tr">${segs.map(([w, bg]) => `<i style="width:${w}%;background:${bg}"></i>`).join("")}</div><span class="mk"></span></div>
+    <div class="dft"><span>${ao ? "Diferença" : "Diferença no 1º turno"}: ${pp2(dpp)} p.p. · ${milhar(dv)} votos</span></div>
+    <div class="st ${tom}"><b>${esc(s.rotulo || "")}</b><span>${esc(bonito(s.texto || ""))}</span></div></section>`;
+}
+
+function cardSerie(d) {
+  if (!d || d.cands.length < 2) return "";
+  const vazio = m => `<div class="serie vazio-s"><span class="cap">Evolução da apuração</span><p>${m}</p></div>`;
+  const [a, b] = alfa(d.cands);
+  const pts = (d.serie || []).map(p => {
+    const va = p.v[a.n], vb = p.v[b.n];
+    return va != null && vb != null && va + vb > 0 ? {x: p.a, y: va / (va + vb) * 100} : null;
+  }).filter(Boolean);
+  if (!d.ao_vivo) return vazio("Quando a apuração começar, aqui aparece como o placar evolui.");
+  if (pts.length < 2) return vazio("O gráfico aparece a partir da segunda atualização do TSE.");
+  const W = 560, H = 100, L = 34, R = 58, T = 8, B = 22;
+  const ys = pts.flatMap(p => [p.y, 100 - p.y]).concat([50]);
+  let lo = Math.floor(Math.min(...ys) - 1), hi = Math.ceil(Math.max(...ys) + 1);
+  if (hi - lo < 6) { const m = (hi + lo) / 2; lo = Math.floor(m - 3); hi = Math.ceil(m + 3); }
+  const X = v => L + (W - L - R) * v / 100, Y = v => T + (H - T - B) * (hi - v) / (hi - lo);
+  const linha = f => pts.map((p, i) => `${i ? "L" : "M"}${X(p.x).toFixed(1)},${Y(f(p)).toFixed(1)}`).join("");
+  const u = pts[pts.length - 1];
+  let ya = Y(u.y), yb = Y(100 - u.y);
+  if (Math.abs(ya - yb) < 14) { const m = (ya + yb) / 2, s = ya < yb ? -1 : 1; ya = m + s * 7; yb = m - s * 7; }
+  const ca = corPura(a.sg), cb = corPura(b.sg);
+  return `<div class="serie"><span class="cap">Evolução do placar · % dos votos válidos</span>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolução do placar: ${esc(curto(a))} ${pct(u.y)}, ${esc(curto(b))} ${pct(100 - u.y)}">
+      <line x1="${L}" x2="${W - R}" y1="${Y(50)}" y2="${Y(50)}" stroke="var(--ink-3)" stroke-dasharray="4 4" opacity=".6"></line>
+      <text class="eixo" x="${L - 6}" y="${Y(50) + 4}" text-anchor="end">50%</text>
+      <text class="eixo" x="${L - 6}" y="${Y(hi) + 8}" text-anchor="end">${hi}%</text>
+      <text class="eixo" x="${L - 6}" y="${Y(lo)}" text-anchor="end">${lo}%</text>
+      <text class="eixo" x="${X(0)}" y="${H - 6}">0%</text><text class="eixo" x="${X(50)}" y="${H - 6}" text-anchor="middle">apurado</text><text class="eixo" x="${X(100)}" y="${H - 6}" text-anchor="end">100%</text>
+      <path d="${linha(p => p.y)}" fill="none" stroke="${ca}" stroke-width="2.6" stroke-linejoin="round"></path>
+      <path d="${linha(p => 100 - p.y)}" fill="none" stroke="${cb}" stroke-width="2.6" stroke-linejoin="round"></path>
+      <circle cx="${X(u.x)}" cy="${Y(u.y)}" r="3.5" fill="${ca}"></circle><circle cx="${X(u.x)}" cy="${Y(100 - u.y)}" r="3.5" fill="${cb}"></circle>
+      <text class="rot-l" x="${W - R + 6}" y="${ya + 4}" fill="currentColor">${esc(curto(a))} ${pct1(u.y)}</text>
+      <text class="rot-l" x="${W - R + 6}" y="${yb + 4}" fill="currentColor">${esc(curto(b))} ${pct1(100 - u.y)}</text></svg></div>`;
+}
+
+function bannerVencedor(d) {
+  const E = ESTADOS[d.uf && d.uf.sigla] || "";
+  const itens = [[d.pres, "Presidente"], [d.uf && d.uf.em_2turno ? d.uf.gov : null, "Governador" + (E ? " de " + E : "")]]
+    .filter(([x]) => x && x.ao_vivo && x.situacao && (x.situacao.tipo === "eleito" || x.situacao.tipo === "1turno"))
+    .map(([x, t]) => `<div class="vence ${x.situacao.tipo === "eleito" ? "ok" : "proj"}"><b>${x.situacao.tipo === "eleito" ? "ELEITO" : "VITÓRIA PROJETADA"}</b>
+      <span>${t}: ${esc(nome(x.cands[0].nome))} (${esc(x.cands[0].sg)}) · ${pct(x.cands[0].pct)}</span></div>`);
+  return itens.join("");
+}
+
+function pgTela(d) {
+  const u = d.uf || {}, E = ESTADOS[u.sigla] || u.sigla || "Estado", ao = d.pres && d.pres.ao_vivo;
+  garantirMapas("3");
+  const esq = u.em_2turno ? cardDueloC("Governador", E, u.gov) + cardSerie(u.gov) + cardMunicipios(d) : cardUfSemT2(d);
+  const dir = cardDueloC("Presidente da República", "Brasil", d.pres) + cardSerie(d.pres) + cardCartograma(d);
+  return avisoSim(d) + blocoTitulo(ao ? "2º turno · apuração ao vivo" : "2º turno", `${E} e Brasil lado a lado. Ordem fixa, alfabética.`, d) +
+    bannerVencedor(d) + `<div class="tela"><div class="painel2">${esq}</div><div class="painel2">${dir}</div></div>`;
+}
+
 /* ---- desenho ---- */
 const setHtml = (el, h) => { if (el && el._h !== h) { el.innerHTML = h; el._h = h; return true; } return false; };   // não recria nós se nada mudou
 function rodape() {
@@ -1186,12 +1322,13 @@ function desenhar() {
   atualizarCtx();
   if (!ultimo || ultimo.turno !== turno) return;
   anterior = atual; atual = {};
-  const f = (turno === 2 ? {resumo: pgResumo2, presidente: pgPresidente2, governador: pgGovernador2}
+  const f = (turno === 2 ? {tela: pgTela, resumo: pgResumo2, presidente: pgPresidente2, governador: pgGovernador2}
                          : {resumo: pgResumo, presidente: pgPresidente, governador: pgGovernador, senado: pgSenado, deputados: pgDeputados})[pag] || pgResumo;
   // os links internos das páginas do 1º turno não carregam o turno: acrescenta aqui
   const html = f(ultimo).replace(/href="#\/(\w+)\/([A-Z]*)"/g, (m, p, u) => `href="${hashDe(p, u)}"`);
   const y = window.scrollY;
   if (setHtml($("#app"), html)) window.scrollTo({top: y, behavior: "instant"});     // troca de dados não pode jogar o usuário para o topo
+  preencherContagem();                                                              // a contagem não pode piscar vazia a cada redesenho
 }
 
 /* ---- tema claro/escuro ---- */
@@ -1292,32 +1429,103 @@ function atualizarUfPill() {
 $("#sel-uf").innerHTML = Object.entries(ESTADOS).map(([s, n]) => `<option value="${s}">${s} · ${n}</option>`).join("");
 $("#sel-uf").onchange = () => irPara(pag, $("#sel-uf").value);
 
+/* ---- carga de dados: nunca empilha pedidos, tem prazo e avisa quando o dado está velho ---- */
+let timerCarga = null, abortCarga = null, falhasRede = 0, geradoVisto = 0, geradoEm = 0, ultimaCarga = 0;
 async function carregar() {
+  clearTimeout(timerCarga);
+  if (abortCarga) abortCarga.abort();
+  const ac = abortCarga = new AbortController(), prazo = setTimeout(() => ac.abort(), 9000);
   try {
-    const r = await fetch(`/api?uf=${uf || ""}&turno=${turno}&t=${Date.now()}`);
+    const r = await fetch(`/api?uf=${uf || ""}&turno=${turno}`, {signal: ac.signal});
     if (!r.ok) throw new Error(r.status);
     const j = await r.json();
     if (j.turno !== turno || (uf && j.uf && j.uf.sigla !== uf)) return;        // resposta de uma escolha anterior
-    ultimo = j;
+    ultimo = j; falhasRede = 0; ultimaCarga = Date.now();
+    const g = (j.servidor && j.servidor.gerado) || 0;
+    if (g !== geradoVisto) { geradoVisto = g; geradoEm = Date.now(); }
     if (!uf && ultimo.uf) { uf = ultimo.uf.sigla; try { localStorage.setItem("uf", uf); } catch (e) {} }
     atualizarUfPill();
-    const ao = ultimo.turno === 2 && ultimo.pres && ultimo.pres.ao_vivo;
-    const txt = (ao ? "ao vivo · " : "atualizado às ") + ultimo.agora;
-    $("#dot").classList.remove("off");
-    $("#dot").setAttribute("aria-label", txt);
-    $("#status").textContent = txt;
     desenhar();
   } catch (e) {
-    $("#dot").classList.add("off");
-    const msg = location.protocol === "file:" ? "abra pelo iniciar.bat (http://localhost:8765)"
-      : "servidor local parado — mantenha a janela do iniciar.bat aberta";
-    $("#status").textContent = msg;
-    $("#dot").setAttribute("aria-label", msg);
-    $("#status").style.display = "inline";
+    if (abortCarga !== ac) return;                                              // trocada por um pedido mais novo
+    falhasRede++;
+  } finally {
+    clearTimeout(prazo);
+    if (abortCarga === ac) timerCarga = setTimeout(carregar, falhasRede ? Math.min(30000, 3000 * falhasRede) : 10000);
+    atualizarStatus();
   }
 }
 
-montarWidget(); sincronizar(); desenharMenu(); carregar(); setInterval(carregar, 10000);
+const dur = s => s < 90 ? `${Math.round(s)} s` : s < 5400 ? `${Math.round(s / 60)} min` : `${(s / 3600).toFixed(1).replace(".", ",")} h`;
+function atualizarStatus() {
+  const dot = $("#dot"), st = $("#status");
+  if (!dot || !st) return;
+  let cls = "dot", txt;
+  if (falhasRede) {
+    cls = "dot off";
+    txt = location.protocol === "file:" ? "abra pelo servidor (http://localhost:8765)" : "sem conexão com o servidor, tentando de novo…";
+  } else if (!ultimo) {
+    txt = "carregando…";
+  } else {
+    const srv = ultimo.servidor || {}, ao = ultimo.turno === 2 && ultimo.pres && ultimo.pres.ao_vivo;
+    const atrasoTse = srv.gerado && srv.ultimo_ok ? srv.gerado - srv.ultimo_ok + (Date.now() - geradoEm) / 1000 : (Date.now() - geradoEm) / 1000;
+    const semRenovar = (Date.now() - geradoEm) / 1000;
+    txt = (ao ? "ao vivo · " : "atualizado às ") + ultimo.agora;
+    if (atrasoTse > 90 || semRenovar > 90) {
+      cls = "dot warn";
+      txt += ` · sem resposta nova do TSE há ${dur(Math.max(atrasoTse, semRenovar))}`;
+    }
+  }
+  if (dot.className !== cls) dot.className = cls;
+  if (st.textContent !== txt) { st.textContent = txt; dot.setAttribute("aria-label", txt); }       // só mexe no DOM se mudou
+  st.style.display = falhasRede ? "inline" : "";
+}
+
+/* ---- contagem regressiva até a divulgação do 2º turno ---- */
+function contagem(iso) {
+  const ms = Date.parse(iso) - Date.now();
+  if (!(ms > 0)) return "aguardando o TSE";
+  const s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), seg = s % 60;
+  const p = n => String(n).padStart(2, "0");
+  return d >= 1 ? `faltam ${d} ${d === 1 ? "dia" : "dias"} e ${h} h` : `${p(h)}:${p(m)}:${p(seg)}`;
+}
+function tique() {
+  atualizarStatus();
+  preencherContagem();
+}
+function preencherContagem() {
+  document.querySelectorAll("[data-cd]").forEach(e => { const t = contagem(e.dataset.cd); if (e.textContent !== t) e.textContent = t; });
+}
+
+/* ---- modo TV: ?tv=1 (tecla T alterna, F tela cheia). ?rodar=30 troca de página a cada 30 s ---- */
+const qs = new URLSearchParams(location.search);
+let tv = qs.get("tv") === "1", wake = null;
+function ajustarZoom() {       // a TV é vista de longe: o layout de 1280 px é ampliado até preencher a tela
+  document.body.style.zoom = tv ? String(Math.max(0.6, Math.min(innerWidth / 1280, innerHeight / 800)).toFixed(3)) : "";
+}
+async function pedirWake() {
+  try { if (tv && "wakeLock" in navigator && document.visibilityState === "visible") wake = await navigator.wakeLock.request("screen"); } catch (e) {}
+}
+function aplicarTv() {
+  document.documentElement.classList.toggle("tv", tv);
+  ajustarZoom(); pedirWake();
+  const u = new URL(location.href); tv ? u.searchParams.set("tv", "1") : u.searchParams.delete("tv");
+  history.replaceState(null, "", u);
+}
+window.addEventListener("resize", ajustarZoom);
+document.addEventListener("visibilitychange", () => { pedirWake(); if (document.visibilityState === "visible" && Date.now() - ultimaCarga > 15000) carregar(); });
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target || {}).tagName || "")) return;
+  if (e.key === "t" || e.key === "T") { tv = !tv; aplicarTv(); }
+  if (e.key === "f" || e.key === "F") { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {}); }
+});
+if (tv) {                                                            // quiosque: recarrega de tempos em tempos (memória limpa, versão nova)
+  setTimeout(() => location.reload(), 4 * 3600 * 1000);
+  const seg = +qs.get("rodar") || 0;
+  if (seg >= 10) setInterval(() => { const ids = paginasAtuais().map(x => x[0]); irPara(ids[(ids.indexOf(pag) + 1) % ids.length]); }, seg * 1000);
+}
+
+montarWidget(); sincronizar(); desenharMenu(); aplicarTv(); carregar(); setInterval(tique, 1000);
 </script>
 </body>
 </html>
