@@ -988,8 +988,11 @@ def ip_cliente(cabecalhos, par, confiar_proxy):
     return par
 
 
-def criar_servidor(host, porta, uf, so_uf, so_br, intervalo):
-    """Monta o servidor HTTP e o cache (sem iniciar nada). `servir` o inicia; os testes o usam numa porta efêmera."""
+def criar_servidor(host, porta, uf, so_uf, so_br, intervalo, publico=False):
+    """Monta o servidor HTTP e o cache (sem iniciar nada). `servir` o inicia; os testes o usam numa porta efêmera.
+    publico=True (padrão da linha de comando): só o estado `uf` existe para o visitante (a API ignora ?uf=, /geo/uf/ só
+    serve esse estado), a página recebe window.PAINEL = {ufFixa, chat} para esconder o seletor e o chat, e o chat do
+    servidor só liga com CHAT_ATIVO=1. Com --livre (ou MODO_LIVRE=1) tudo funciona como no desenvolvimento."""
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
     from types import SimpleNamespace
     from urllib.parse import parse_qs, urlparse
@@ -1029,7 +1032,10 @@ def criar_servidor(host, porta, uf, so_uf, so_br, intervalo):
         return json.loads(p.js)
 
     chat = None
+    ufs_ok = {uf} if publico else set(UFS)
     try:
+        if publico and os.environ.get("CHAT_ATIVO") != "1":
+            raise RuntimeError("modo público: chat desligado (CHAT_ATIVO=1 para ligar)")
         from chat import Chat
         from chat_ferramentas import Ferramentas
         from rag import busca
@@ -1037,9 +1043,13 @@ def criar_servidor(host, porta, uf, so_uf, so_br, intervalo):
         if not chat.ativo:
             log.warning("o chat não vai responder. %s", chat.motivo_inativo())
     except Exception as e:                                         # noqa: BLE001 - sem trechos indexados ou sem dependências
-        log.warning("Chat desativado: %s: %s  (rode 'python -m rag.ingestao' e 'pip install -r requirements.txt')",
-                    type(e).__name__, e)
+        chat = None
+        if not (publico and isinstance(e, RuntimeError)):          # desligado de propósito no modo público: sem alarme
+            log.warning("Chat desativado: %s: %s  (rode 'python -m rag.ingestao' e 'pip install -r requirements.txt')",
+                        type(e).__name__, e)
 
+    cfg = dict(ufFixa=uf.upper() if publico else None, chat=chat is not None if publico else True)
+    config_js = ("<script>window.PAINEL=" + json.dumps(cfg) + ";</script>").encode()
     geo_cache, html_cache = {}, {}
     json_tipo = "application/json; charset=utf-8"
 
@@ -1050,7 +1060,7 @@ def criar_servidor(host, porta, uf, so_uf, so_br, intervalo):
             m = os.path.getmtime(pagina)
             if html_cache.get("m") != m:
                 with open(pagina, "rb") as f:
-                    html_cache.update(m=m, p=empacotar(f.read()))
+                    html_cache.update(m=m, p=empacotar(f.read().replace(b"<head>", b"<head>\n" + config_js, 1)))
             return html_cache["p"]
 
         def _enviar(self, p, tipo, cache_ctl="no-store", status=200):
@@ -1118,7 +1128,7 @@ def criar_servidor(host, porta, uf, so_uf, so_br, intervalo):
         def do_GET(self):
             rota, qs = urlparse(self.path).path, parse_qs(urlparse(self.path).query)
             sel = qs.get("uf", [uf])[0].lower()
-            sel = sel if sel in UFS else uf
+            sel = sel if sel in ufs_ok else uf                     # modo público: qualquer ?uf= vira o estado fixo
             turno = 2 if qs.get("turno", ["1"])[0] == "2" else 1
             if rota in ("/", "/index.html"):
                 self._enviar(self._html(), "text/html; charset=utf-8", "no-cache")
@@ -1129,7 +1139,7 @@ def criar_servidor(host, porta, uf, so_uf, so_br, intervalo):
                               200 if ok else 503)
             elif rota == "/api/chat/status":
                 self._pequeno(chat.status() if chat else dict(ativo=False, motivo="Chat não configurado."))
-            elif rota == "/geo/br" or (rota.startswith("/geo/uf/") and rota[8:].lower() in UFS):
+            elif rota == "/geo/br" or (rota.startswith("/geo/uf/") and rota[8:].lower() in ufs_ok):
                 import geo
                 if rota not in geo_cache:
                     geo_cache[rota] = empacotar(geo.geojson_br() if rota == "/geo/br" else geo.geojson_uf(rota[8:]))
@@ -1166,10 +1176,12 @@ def criar_servidor(host, porta, uf, so_uf, so_br, intervalo):
     return SimpleNamespace(srv=srv, cache=cache, gerar=gerar, gerar_mapa=gerar_mapa, fn_api=fn_api)
 
 
-def servir(host, porta, uf, so_uf, so_br, intervalo, abrir_navegador=True):
+def servir(host, porta, uf, so_uf, so_br, intervalo, abrir_navegador=True, publico=True):
     if not SIM["ativo"]:
         HIST.abrir(os.path.join(RAIZ_PROJETO, "logs", "historico_2t.json"))      # recarrega do disco, se houver
-    s = criar_servidor(host, porta, uf, so_uf, so_br, intervalo)
+    s = criar_servidor(host, porta, uf, so_uf, so_br, intervalo, publico)
+    if publico:
+        log.info("Modo público: só %s no ar, sem seletor de estado e sem chat (use --livre para desenvolver)", uf.upper())
     url = f"http://localhost:{porta}"
     log.info("Painel em %s  (escutando em %s:%s; Ctrl+C para encerrar)", url, host, porta)
     for k in dict.fromkeys(("rn", uf)):                            # o duelo de cada estado é renovado sempre, com ou sem público
@@ -1192,6 +1204,7 @@ def main():
     ap.add_argument("--host", default=os.environ.get("HOST", "127.0.0.1"),
                     help="endereço de escuta (padrão 127.0.0.1; use 0.0.0.0 para a rede/produção)")
     ap.add_argument("--porta", type=int, default=int(os.environ.get("PORT", 8765)))
+    ap.add_argument("--livre", action="store_true", help="desenvolvimento: libera todos os estados, o seletor e o chat (também MODO_LIVRE=1)")
     ap.add_argument("--sem-navegador", action="store_true", help="não abre o navegador (automático fora do localhost)")
     ap.add_argument("--simular-2t", action="store_true",
                     help="TESTE: fabrica arquivos de 2º turno a partir do 1º, com apuração que avança até 100%%")
@@ -1217,7 +1230,8 @@ def main():
     if a.web:
         local = a.host in ("127.0.0.1", "localhost", "::1")
         servir(a.host, a.porta, uf, a.so_uf, a.so_br, a.intervalo or (2 if a.simular_2t else 15),
-               abrir_navegador=local and not a.sem_navegador and "PORT" not in os.environ)
+               abrir_navegador=local and not a.sem_navegador and "PORT" not in os.environ,
+               publico=not (a.livre or os.environ.get("MODO_LIVRE") == "1"))
         return
     while True:
         try:

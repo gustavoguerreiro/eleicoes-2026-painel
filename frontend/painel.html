@@ -502,6 +502,8 @@ html.tv:not(.mouse){cursor:none}
 html.tv .tvbtn{position:fixed;right:12px;bottom:10px;z-index:20;height:28px;font-size:12px;opacity:.35;background:var(--surface)}
 html.tv.mouse .tvbtn,html.tv .tvbtn:focus-visible{opacity:1}
 @media(max-width:899px){html:not(.tv) .tvbtn{display:none}}
+html.fixa .ufpill{display:none}
+html.fixa .tile2,html.fixa .lt[data-cg],html.fixa .linha[data-uf],html.fixa path.clic{cursor:default}
 .tv header.site{position:static}
 .tv .top{padding:5px 16px;max-width:none}
 .tv #nav,.tv #turnos,.tv .ufpill,.tv .tema,.tv #cw,.tv #tip,.tv .tit .sub2,.tv .kick .kn,.tv .kick .vl,.tv .detbox,
@@ -634,7 +636,9 @@ const PAG_T1 = [["resumo","Resumo"], ["presidente","Presidente"], ["governador",
 const PAG_T2 = [["tela","RN + Brasil"], ["resumo","Resumo"], ["presidente","Presidente"], ["governador","Governador"]];
 let turno = 2, pag = "tela", uf = null, ultimo = null, anterior = {}, atual = {}, depTipo = "fed";
 const paginasAtuais = () => turno === 1 ? PAG_T1 : PAG_T2;
+const CFG = window.PAINEL || {}, UF_FIXA = CFG.ufFixa || null;      // injetado pelo servidor em modo público: só esse estado existe
 try { uf = localStorage.getItem("uf"); } catch (e) {}
+if (UF_FIXA) { uf = UF_FIXA; document.documentElement.classList.add("fixa"); }
 
 function marca(chave, valor) {            // " flash" quando o valor mudou desde a última leitura
   atual[chave] = valor;
@@ -648,13 +652,14 @@ function lerHash() {                                    // #/pagina/UF[/1]  (sem
   return {p: (t1 ? PAG_T1 : PAG_T2).some(x => x[0] === p) ? p : (t1 ? "resumo" : "tela"), u: (u || "").toUpperCase(), t: t1 ? 1 : 2};
 }
 const hashDe = (p, u, t) => `#/${p}/${u || uf || ""}${(t || turno) === 1 ? "/1" : ""}`;
-function irPara(p, u, t) { location.hash = hashDe(p, u, t); }
+function irPara(p, u, t) { location.hash = hashDe(p, UF_FIXA || u, t); }
 function sincronizar() {
   const r = lerHash(), mudou = r.t !== turno;
   turno = r.t; pag = r.p;
   if (!paginasAtuais().some(x => x[0] === pag)) pag = turno === 1 ? "resumo" : "tela";
   if (mudou) ultimo = null;
-  const novaUf = r.u && ESTADOS[r.u] && r.u !== uf;
+  const novaUf = !UF_FIXA && r.u && ESTADOS[r.u] && r.u !== uf;
+  if (UF_FIXA && r.u !== UF_FIXA) history.replaceState(null, "", hashDe(r.p, UF_FIXA, r.t));      // #/tela/SP vira #/tela/RN
   if (novaUf) { uf = r.u; try { localStorage.setItem("uf", uf); } catch (e) {} }
   if (mudou || novaUf) carregar();
   atualizarUfPill();
@@ -1681,7 +1686,8 @@ setInterval(() => { if (tv) location.reload(); }, 4 * 3600 * 1000);             
 const segRodar = +qs.get("rodar") || 0;
 if (segRodar >= 10) setInterval(() => { if (tv) { const ids = paginasAtuais().map(x => x[0]); irPara(ids[(ids.indexOf(pag) + 1) % ids.length]); } }, segRodar * 1000);
 
-montarWidget(); sincronizar(); desenharMenu(); aplicarTv(); carregar(); setInterval(tique, 1000);
+if (CFG.chat !== false) montarWidget();
+sincronizar(); desenharMenu(); aplicarTv(); carregar(); setInterval(tique, 1000);
 </script>
 </body>
 </html>

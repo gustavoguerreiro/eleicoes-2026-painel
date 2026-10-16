@@ -386,5 +386,66 @@ class SimuladorDoSegundoTurno(unittest.TestCase):
         self.assertTrue(m["inicio_2t"].startswith(time.strftime("%Y-%m-%d")))
 
 
+class ServidorPublico(unittest.TestCase):
+    """Modo público: só o RN existe para o visitante; qualquer tentativa de trocar o estado cai no RN."""
+
+    @classmethod
+    def setUpClass(cls):
+        import threading
+        cls.vistos = []
+
+        def dados(uf):
+            cls.vistos.append(uf)
+            return {"turno": 2, "uf": {"sigla": uf.upper()}}
+        cls.patches = [unittest.mock.patch.object(p, "dados_2t", side_effect=dados),
+                       unittest.mock.patch.object(p, "dados_web", side_effect=lambda uf, *a: {"turno": 1, "uf": {"sigla": uf.upper()}}),
+                       unittest.mock.patch.object(p, "mapa_municipios", side_effect=lambda uf, *a: {"uf": uf, "municipios": {}}),
+                       unittest.mock.patch.dict(os.environ, {"CHAT_ATIVO": "0"})]
+        for x in cls.patches:
+            x.start()
+        cls.s = p.criar_servidor("127.0.0.1", 0, "rn", False, False, 15, publico=True)
+        cls.porta = cls.s.srv.server_address[1]
+        threading.Thread(target=cls.s.srv.serve_forever, daemon=True).start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.s.srv.shutdown()
+        cls.s.srv.server_close()
+        for x in cls.patches:
+            x.stop()
+
+    def req(self, metodo, caminho, corpo=None, **cab):
+        import http.client
+        c = http.client.HTTPConnection("127.0.0.1", self.porta, timeout=10)
+        c.request(metodo, caminho, corpo, cab)
+        r = c.getresponse()
+        return r, r.read()
+
+    def test_api_ignora_o_estado_pedido(self):
+        for uf in ("sp", "SP", "mg", "xx", "rn"):
+            _, dados = self.req("GET", f"/api?uf={uf}&turno=2")
+            self.assertEqual(json.loads(dados)["uf"]["sigla"], "RN")
+        self.assertEqual(set(self.vistos), {"rn"})                     # o TSE nunca é consultado por outro estado
+
+    def test_mapa_ignora_o_estado_pedido(self):
+        _, dados = self.req("GET", "/api/mapa?uf=sp&cargo=3&turno=2")
+        self.assertEqual(json.loads(dados)["uf"], "rn")
+
+    def test_geo_so_do_rn_e_do_brasil(self):
+        self.assertEqual(self.req("GET", "/geo/uf/SP")[0].status, 404)
+        self.assertEqual(self.req("GET", "/geo/uf/MG")[0].status, 404)
+
+    def test_pagina_recebe_a_configuracao_sem_seletor_nem_chat(self):
+        r, html = self.req("GET", "/")
+        self.assertIn(b'window.PAINEL={"ufFixa": "RN", "chat": false}', html)
+        self.assertLess(html.index(b"window.PAINEL"), html.index(b"<style>"))   # antes do script da página
+
+    def test_chat_do_servidor_desligado(self):
+        cab = {"Content-Type": "application/json", "Origin": f"http://127.0.0.1:{self.porta}"}
+        self.assertEqual(self.req("POST", "/api/chat", json.dumps({"mensagem": "oi"}), **cab)[0].status, 404)
+        _, st = self.req("GET", "/api/chat/status")
+        self.assertFalse(json.loads(st)["ativo"])
+
+
 if __name__ == "__main__":
     unittest.main()
