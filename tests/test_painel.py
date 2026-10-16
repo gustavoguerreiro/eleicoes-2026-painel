@@ -321,5 +321,70 @@ class ServidorHttp(unittest.TestCase):
         self.assertEqual(r.status, 200)
 
 
+class SimuladorDoSegundoTurno(unittest.TestCase):
+    """O relógio simulado vai de 17h a 22h; os testes fixam o minuto em vez de esperar."""
+
+    def setUp(self):
+        self.j1 = parcial(100, 600_000, 450_000)
+        self.fim = lambda: None
+        patches = [unittest.mock.patch.object(p, "_1t_fixo", return_value=self.j1),
+                   unittest.mock.patch.object(p, "codigos_turno",
+                                              return_value=dict(pres1="6257", pres2="6258", dem1="6259", dem2="6260"))]
+        for x in patches:
+            x.start()
+            self.addCleanup(x.stop)
+
+    def estado(self, hora, minuto=0):
+        with unittest.mock.patch.object(p, "minuto_sim", return_value=float(hora * 60 + minuto)):
+            return p.sintetizar_2t(self.j1, "https://tse/6258/dados/rn/rn-c0001-e006258-u.json")
+
+    def brasil(self, hora, minuto=0):
+        with unittest.mock.patch.object(p, "minuto_sim", return_value=float(hora * 60 + minuto)):
+            return p.sintetizar_br(self.j1)
+
+    def votos(self, j):
+        return {c["n"]: c["votos"] for c in p.candidatos(j)}
+
+    def test_zerado_ate_as_19h(self):
+        for j in (self.estado(17), self.estado(18, 59), self.brasil(18, 30)):
+            self.assertEqual(p.apurado(j), 0)
+            self.assertEqual(sum(self.votos(j).values()), 0)
+
+    def test_a_contagem_so_acumula_e_termina_em_100(self):
+        ant, ant_ap = {"22": 0, "13": 0}, 0.0
+        for minuto in range(19 * 60, 22 * 60 + 1, 5):
+            j = self.estado(minuto // 60, minuto % 60)
+            v, ap = self.votos(j), p.apurado(j)
+            self.assertTrue(all(v[n] >= ant[n] for n in v), f"votos diminuíram às {minuto // 60}:{minuto % 60:02d}")
+            self.assertGreaterEqual(ap, ant_ap)
+            ant, ant_ap = v, ap
+        self.assertAlmostEqual(p.apurado(j), 100, places=3)
+        self.assertEqual(sum(1 for c in p.candidatos(j) if c["eleito"]), 1)           # o TSE só marca o eleito no fim
+
+    def test_no_meio_da_apuracao_ninguem_esta_eleito(self):
+        j = self.estado(20, 30)
+        self.assertTrue(0 < p.apurado(j) < 100)
+        self.assertFalse(any(c["eleito"] for c in p.candidatos(j)))
+
+    def test_o_brasil_e_a_soma_dos_estados(self):
+        j = self.brasil(22, 0)
+        por_estado = self.votos(self.estado(22, 0))
+        for n, v in self.votos(j).items():
+            self.assertEqual(v, por_estado[n] * len(p.UFS))
+        self.assertEqual(p.apurado(j), 100.0)
+
+    def test_horario_do_arquivo_e_o_relogio_simulado(self):
+        self.assertEqual(self.estado(20, 14)["ht"], "20:14:00")
+
+    def test_meta_da_simulacao_tem_relogio_e_contagem(self):
+        p.SIM.update(ativo=True, t0=time.time(), duracao=300.0)
+        self.addCleanup(lambda: p.SIM.update(ativo=False))
+        with unittest.mock.patch.object(p, "t2_disponivel", return_value=False):
+            m = p.meta()
+        self.assertEqual(m["relogio_sim"], "17:00")
+        self.assertTrue(m["simulado"])
+        self.assertTrue(m["inicio_2t"].startswith(time.strftime("%Y-%m-%d")))
+
+
 if __name__ == "__main__":
     unittest.main()

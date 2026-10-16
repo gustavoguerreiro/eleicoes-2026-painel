@@ -409,6 +409,27 @@ footer#rodape .tm{align-self:flex-start;background:none;border:1px solid var(--l
 .cw-n{font-size:var(--fs-cap);color:var(--ink-3);text-wrap:pretty}
 
 /* ---- tela dividida (RN + Brasil) ---- */
+body.wide{--max:2400px}
+body.wide main{padding:12px 28px 24px;gap:12px}
+body.wide header.site{position:static}
+body.wide footer#rodape{padding-bottom:60px}
+body.wide .top{padding-top:10px}
+body.wide .tit .sub2{display:none}
+body.wide .tit h1{font-size:22px}
+body.wide .tela{gap:16px}body.wide .painel2{gap:10px}
+body.wide .dc{padding:12px 16px;gap:8px}
+body.wide .tela .mcard{padding:12px 16px}
+body.wide .dft.ao,body.wide .kick .kn,body.wide .kick .vl,body.wide .leg3>span,body.wide .mfoot{display:none}
+body.wide .tit{align-items:center}
+body.wide .lcb .pc{font-size:clamp(30px,6cqi,42px)}
+body.wide .mun-linha{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;align-items:start}
+body.wide .tela .mhead .sub{display:none}
+html.tv .mun-linha{grid-template-columns:1fr}
+html.tv body.wide main{padding:6px 16px;gap:8px}
+html.tv body.wide .top{padding-top:5px}
+html.tv body.wide .tela{gap:14px}html.tv body.wide .painel2{gap:8px}
+html.tv body.wide .dc{padding:12px 14px}
+html.tv body.wide .tela .mcard{padding:10px}
 .dot.warn{background:var(--warn);box-shadow:0 0 0 3px var(--warn-soft)}
 .tela{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
 .painel2{display:flex;flex-direction:column;gap:14px;min-width:0}
@@ -426,17 +447,44 @@ footer#rodape .tm{align-self:flex-start;background:none;border:1px solid var(--l
 .lc.flash{animation:fl 2.4s ease-out}
 .dc .b50{padding-top:10px}.dc .b50 .rot{display:none}.dc .b50 .mk{top:6px}
 .dc .dft{padding-top:10px}
-.serie{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow);padding:12px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.serie svg{width:100%;height:auto;display:block;overflow:visible;max-height:100px}
-.serie .eixo{fill:var(--ink-3);font-size:11px}
-.serie .rot-l{font-size:12px;font-weight:700}
-.serie.vazio-s{min-height:96px;justify-content:center}
+.serie{display:flex;flex-direction:column;gap:4px;min-width:0}
+.dtop-d{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.pbody{display:flex;flex-direction:column;gap:10px}
+html:not(.tv) .dc .pbody{min-height:250px}
+.serie svg{width:100%;height:auto;display:block;overflow:visible}
+.serie .eixo{fill:var(--ink-3);font-size:12.5px}
+.serie .rot-l{font-size:14px;font-weight:700}
+.insta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:var(--fs-sm);color:var(--ink-2)}
+.ins{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.ins b{color:var(--ink);font-weight:700;margin-right:2px}
+.ins i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.serie.vazio-s{min-height:70px;justify-content:center}
 .serie.vazio-s p{margin:0;color:var(--ink-3);font-size:var(--fs-sm)}
 .vence{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;padding:12px 18px;border-radius:var(--r-card);border:1px solid var(--line);font-size:var(--fs-lg)}
 .vence b{font-size:var(--fs-h2);font-weight:800;letter-spacing:.02em}
+.vences{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.tv .vences{gap:14px}
+@media(max-width:899px){.vences{grid-template-columns:1fr;gap:8px}.vences>div:empty{display:none}}
 .vence.ok{background:var(--ok-soft);color:var(--ok)}
 .vence.proj{background:var(--info-soft);color:var(--info)}
 .vence span{color:var(--ink);font-weight:600}
+.vt{font-weight:400;color:var(--ink-3);font-size:var(--fs-cap)}
+.tabuf-wrap{container-type:inline-size;display:flex;flex-direction:column;gap:2px}
+.lt{display:grid;grid-template-columns:26px 34px 44px 72px minmax(26px,1fr) 72px 44px;gap:6px;align-items:center;font-size:12.5px;padding:2px 4px;border-radius:6px;font-variant-numeric:tabular-nums;cursor:pointer}
+.lt.h,.lt.tot{cursor:default}
+.lt.h{font-size:var(--fs-cap);font-weight:700;color:var(--ink-2);padding-bottom:4px}
+.lt.h .ga{grid-column:3 / 5;display:flex;align-items:center;gap:5px}.lt.h .gb{grid-column:6 / 8;display:flex;align-items:center;gap:5px;justify-content:flex-end}
+.lt.h i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.lt.tot{background:var(--surface-2);font-weight:700;margin-bottom:4px;padding:5px 4px}
+.lt .u{font-weight:800}.lt .ap{color:var(--ink-3);text-align:right}
+.lt .p{text-align:right;color:var(--ink-2)}.lt .p.w{color:var(--ink);font-weight:800}
+.lt .v{text-align:right;color:var(--ink-2)}
+.lt .br{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--track)}.lt .br i{display:block;height:100%}
+.lt.sel{outline:2px solid var(--ink);outline-offset:-1px}
+.lt.flash{animation:fl 2.4s ease-out}
+.tabuf{display:grid;grid-template-columns:1fr}
+@container (min-width:700px){.tabuf{grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(14,auto);column-gap:22px}}
+@container (max-width:470px){.lt{grid-template-columns:26px 46px 1fr 1fr 46px}.lt .ap,.lt .br{display:none}.lt.h .ga{grid-column:2 / 4}.lt.h .gb{grid-column:4 / 6}}
 .cel.pend{background:var(--track);cursor:default}
 .tela .mcard,.tela .cg-wrap{gap:10px}
 .tela .mcard{padding:14px}
@@ -448,24 +496,32 @@ footer#rodape .tm{align-self:flex-start;background:none;border:1px solid var(--l
 .tela .det{flex:1 1 0;min-width:0;gap:12px}
 
 /* ---- modo TV (?tv=1): sem mouse, de longe ---- */
-html.tv{cursor:none}
+html.tv:not(.mouse){cursor:none}
+.tvbtn{height:34px;padding:0 14px;border-radius:var(--r-pill);border:1px solid var(--line);background:transparent;color:var(--ink-2);font-size:var(--fs-sm);font-weight:700;cursor:pointer;white-space:nowrap}
+.tvbtn:hover{border-color:var(--acc);color:var(--ink)}
+html.tv .tvbtn{position:fixed;right:12px;bottom:10px;z-index:20;height:28px;font-size:12px;opacity:.35;background:var(--surface)}
+html.tv.mouse .tvbtn,html.tv .tvbtn:focus-visible{opacity:1}
+@media(max-width:899px){html:not(.tv) .tvbtn{display:none}}
 .tv header.site{position:static}
-.tv .top{padding:8px 16px;max-width:none}
+.tv .top{padding:5px 16px;max-width:none}
 .tv #nav,.tv #turnos,.tv .ufpill,.tv .tema,.tv #cw,.tv #tip,.tv .tit .sub2,.tv .kick .kn,.tv .kick .vl,.tv .detbox,
 .tv .tela .mhead .sub,.tv .tela .mfoot,.tv .leg3>span,.tv footer#rodape .link,.tv footer#rodape .tm{display:none!important}
-.tv main{max-width:none;padding:10px 16px;gap:10px}
+.tv main{max-width:none;padding:6px 16px;gap:8px}
 .tv .tit h1{display:none}
 .tv .tit{position:fixed;top:5px;right:16px;z-index:11}
 .tv .sim{padding:3px 12px}
 .tv .dft{display:none}
 .tv .serie .cap{display:none}
-.tv .serie.vazio-s{min-height:0;padding:6px 14px}
-.tv .tela .tile2{aspect-ratio:1.9}.tv .tela .tile2 span{display:none}
+.tv .serie.vazio-s{min-height:0}
+.tv .vence{padding:5px 16px;font-size:var(--fs-body)}.tv .vence b{font-size:17px}
+.tv .insta{flex-wrap:nowrap;gap:10px}.tv .ins:nth-last-child(n+5){display:none}
+.tv .tabuf-wrap .nota{display:none}.tv .lt{font-size:13.5px;padding:1px 4px}.tv .lt.h{font-size:13px}
+.tv .mun-linha svg{max-height:300px;margin:0 auto;display:block}
+.tv .tela .tile2{aspect-ratio:2.05}.tv .tela .tile2 span{display:none}
 .tv .tela .cartog{flex-basis:290px}
 .tv .kick{padding:3px 12px;gap:10px}.tv .kick strong{font-size:17px}.tv .kick .kl{display:inline;margin-right:8px}.tv .kick>div{display:flex;align-items:baseline}.tv .apur6{display:none}
-.tv .tela{gap:14px}.tv .painel2{gap:10px}
+.tv .tela{gap:14px}.tv .painel2{gap:8px}.tv .tela .mcard{padding:10px}
 .tv .dc{padding:12px 14px;gap:8px}
-.tv .serie{padding:8px 14px}
 .tv footer#rodape{padding:4px 16px 8px;max-width:none}
 .tv footer#rodape .topo{padding-top:6px}
 
@@ -513,6 +569,7 @@ html.tv{cursor:none}
     <div class="turnos" id="turnos" role="group" aria-label="Turno"></div>
     <label class="ufpill"><span class="ufl">Seu estado</span><strong class="uf-l" id="uf-l">RN · Rio Grande do Norte</strong><strong class="uf-c" id="uf-c">RN</strong><span class="car" aria-hidden="true">▾</span><select id="sel-uf" aria-label="Seu estado"></select></label>
     <button class="tema" id="tema" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro"><i></i></button>
+    <button class="tvbtn" id="tv-btn" title="Modo TV: tela cheia, sem menus, tudo numa tela só (tecla T)" aria-pressed="false">Modo TV</button>
   </div>
   <nav class="menu" id="nav" aria-label="Seções"></nav>
 </header>
@@ -712,7 +769,7 @@ function degrau(sg, pp) {                   // 3 degraus de vantagem: até 5 p.p
   if (pp > 15) return {bg: corChip(sg), fg: "#fff", n: 3};
   return {bg: `color-mix(in oklch, ${corPura(sg)} ${pp > 5 ? 62 : 30}%, var(--surface))`, fg: "var(--ink)", n: pp > 5 ? 2 : 1};
 }
-function svgMapa(id, fc, chave, dados, titulo, clicavel, modo) {
+function svgMapa(id, fc, chave, dados, titulo, clicavel, modo, compacto) {
   const pr = projecao(fc), cont = {};
   tips[id] = {};
   const paths = fc.features.map(f => {
@@ -728,6 +785,7 @@ function svgMapa(id, fc, chave, dados, titulo, clicavel, modo) {
     return `<path data-m="${id}" data-k="${k}" class="${clicavel ? "clic" : ""}" d="${caminho(f, pr)}" ${attr}></path>`;
   }).join("");
   const leg = Object.entries(cont).sort((a, b) => b[1] - a[1]).map(([sg, n]) => chipN(sg, n)).join("");
+  if (compacto) return `<svg viewBox="0 0 600 ${pr.H.toFixed(0)}" role="img" aria-label="Mapa do estado por município">${paths}</svg>`;
   return `<svg viewBox="0 0 600 ${pr.H.toFixed(0)}" role="img">${paths}</svg><div class="chips">${leg}</div>
     <p class="nota">${modo === "duelo" ? "Cor = quem tem mais votos entre os dois finalistas, em 3 degraus de vantagem (até 5 p.p., 5 a 15, mais de 15)."
       : "Cor = partido do mais votado · cor mais forte = maior fatia dos votos válidos."} Passe o mouse ou toque para ver os detalhes.</p>`;
@@ -755,11 +813,12 @@ function mapaUF(cargo, modo) {
     : (m && m.v && m.v.modo === "2t" ? "Resultado do 2º turno em cada município." : "Os dois finalistas no 1º turno, município a município.");
   return `<section class="card mapa"><div class="ch"><h2>${esc(ESTADOS[u] || u)} por município</h2></div><p class="sub" style="margin-bottom:10px">${sub}</p>${corpo}</section>`;
 }
+const vidaMapa = () => ultimo && ultimo.meta && ultimo.meta.simulado ? 2000 : 60000;     // mapa dos municípios: a cada 60 s (o resto da tela, a cada 10 s)
 function garantirMapas(cargo) {
   const u = uf || (ultimo && ultimo.uf && ultimo.uf.sigla);
   const carrega = (chave, url, destino) => {
     const x = destino[chave];
-    if (x && (x.fixo || Date.now() - x.t < 45000)) return;
+    if (x && (x.fixo || Date.now() - x.t < vidaMapa())) return;
     if (mapaVai[chave]) return;
     mapaVai[chave] = 1;
     fetch(url).then(r => { if (!r.ok) throw 0; return r.json(); })
@@ -1065,11 +1124,11 @@ const dataExtenso = iso => { const [, m, d] = iso.split("-").map(Number); return
 const alfa = cs => [...cs].sort((x, y) => nome(x.nome).localeCompare(nome(y.nome), "pt-BR"));     // ordem fixa: não muda com o placar
 const curto = c => nome(c.nome).split(" ")[0];
 const pp2 = n => n.toLocaleString("pt-BR", {minimumFractionDigits: 2, maximumFractionDigits: 2});
-const avisoSim = d => d.meta && d.meta.simulado ? '<div class="sim"><strong>SIMULAÇÃO</strong><span>Dados fabricados para teste; não são resultados reais.</span></div>' : "";
+const avisoSim = d => d.meta && d.meta.simulado ? `<div class="sim"><strong>SIMULAÇÃO</strong><span>Dados fabricados para teste; não são resultados reais.${d.meta.relogio_sim ? ` Relógio simulado: <b>${esc(d.meta.relogio_sim)}</b>.` : ""}</span></div>` : "";
 const POS = {RR:[2,1],AP:[4,1],AM:[2,2],PA:[3,2],MA:[4,2],CE:[5,2],RN:[6,2],AC:[1,3],RO:[2,3],TO:[3,3],PI:[4,3],PE:[5,3],PB:[6,3],
   MT:[2,4],GO:[3,4],DF:[4,4],BA:[5,4],AL:[6,4],MS:[2,5],SP:[3,5],MG:[4,5],ES:[5,5],SE:[6,5],PR:[3,6],RJ:[4,6],SC:[3,7],RS:[3,8]};
 const foco = {uf: null, mun: null};
-let munModo = "grade";
+let munModo = "mapa";
 
 function kicker(d) {
   const ao = d.pres && d.pres.ao_vivo, m = d.meta;
@@ -1138,13 +1197,33 @@ function cardUfSemT2(d) {
 function detHtml(titulo, r, selecionado) {         // painel de detalhe (funciona com mouse, teclado e toque)
   if (!r || !r.cands || r.cands.length < 2) return `<div class="hd"><strong>${esc(titulo)}</strong><span>sem dados</span></div>`;
   return `<div class="hd"><strong>${esc(titulo)}</strong><span>${selecionado ? "selecionado" : "visualizando"} · ${pct1(r.apur)} apurado</span></div>` +
-    alfa(r.cands).map(c => `<div class="detl"><div class="r1"><span class="n">${esc(nome(c.nome))} ${chip(c.sg)}</span><strong>${pct1(c.pct)}</strong></div>
+    alfa(r.cands).map(c => `<div class="detl"><div class="r1"><span class="n">${esc(nome(c.nome))} ${chip(c.sg)}</span><strong>${pct1(c.pct)} <small class="vt">· ${milhar(c.votos)} votos</small></strong></div>
       <div class="trk"><i style="width:${c.pct}%;background:${corPura(c.sg)}"></i></div></div>`).join("");
 }
 function detUfHtml(d, x) {
   x = x || foco.uf || uf;
   const r = d.mapa_br && d.mapa_br[x] && d.mapa_br[x]["1"];
   return detHtml(ESTADOS[x] || x, r, x === uf) + (x === uf && pag === "presidente" ? `<button class="lnk" data-ir-mun>Ver o ${x} por município ↓</button>` : "");
+}
+
+let brVista = "mapa";                                   // "mapa" (cartograma) ou "tabela" (% e votos de cada estado)
+const pct0 = n => Math.round(n) + "%";
+function tabelaEstados(d) {
+  const ao = d.pres && d.pres.ao_vivo, base = d.pres && d.pres.cands.length > 1 ? alfa(d.pres.cands) : null;
+  if (!base) return '<div class="vazio">Sem dados ainda.</div>';
+  const [A, B] = base, acha = (r, c) => (r.cands || []).find(x => x.nome === c.nome);
+  const linhas = Object.entries(d.mapa_br || {}).map(([u, v]) => {
+    const r = v["1"], a = r && acha(r, A), b = r && acha(r, B);
+    return a && b ? {u, a, b, ap: r.apur} : null;
+  }).filter(Boolean).sort((x, y) => (y.a.votos + y.b.votos) - (x.a.votos + x.b.votos));
+  const barra = (a, b) => `<span class="br"><i style="width:${a.pct / (a.pct + b.pct) * 100}%;background:${corPura(A.sg)}"></i><i style="flex:1;background:${corPura(B.sg)}"></i></span>`;
+  const cels = (l, ap) => `<span class="ap">${ap}</span><span class="p${l.a.pct > l.b.pct ? " w" : ""}">${pct1(l.a.pct)}</span><span class="v">${milhar(l.a.votos)}</span>${barra(l.a, l.b)}<span class="v">${milhar(l.b.votos)}</span><span class="p${l.b.pct > l.a.pct ? " w" : ""}">${pct1(l.b.pct)}</span>`;
+  const lin = l => `<div class="lt${l.u === uf ? " sel" : ""}${marca("t" + l.u, l.a.votos + l.b.votos)}" data-cg="${l.u}" tabindex="0"><b class="u">${l.u}</b>${cels(l, pct0(l.ap))}</div>`;
+  const totA = acha({cands: d.pres.cands}, A), totB = acha({cands: d.pres.cands}, B);
+  const cab = `<div class="lt h"><span></span><span class="ap">${ao ? "apur." : ""}</span><span class="ga"><i style="background:${corPura(A.sg)}"></i>${esc(curto(A))}</span><span class="gb">${esc(curto(B))}<i style="background:${corPura(B.sg)}"></i></span></div>`;
+  const total = totA && totB ? `<div class="lt tot"><b class="u">BR</b>${cels({a: totA, b: totB}, ao ? pct0(d.pres.apur) : "")}</div>` : "";
+  return `<div class="tabuf-wrap">${cab}${total}<div class="tabuf">${linhas.map(lin).join("")}</div>
+    <p class="nota">${ao ? "Votos válidos apurados até agora" : "Votos válidos no 1º turno"}, do estado com mais votos para o com menos. % = fatia dos votos válidos dos dois finalistas.</p></div>`;
 }
 
 function cardCartograma(d) {
@@ -1158,19 +1237,21 @@ function cardCartograma(d) {
   }).join("");
   const top = Object.entries(cont).sort((a, b) => b[1] - a[1]), ex = top.slice(0, 2).map(x => x[0]);
   const quad = n => ex.map(sg => `<i style="background:${n === 3 ? corChip(sg) : `color-mix(in oklch, ${corPura(sg)} ${n === 2 ? 62 : 30}%, var(--surface))`}"></i>`).join("");
-  return `<section class="mcard"><div class="mhead"><div><h2>Brasil por estado</h2><span class="sub">Quem teve mais votos entre os dois finalistas ${ao ? "no 2º turno" : "no 1º turno"}. Toque num estado para escolher.</span></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">${top.map(([sg, n]) => chipN(sg, n)).join("")}</div></div>
-    <div class="cg-wrap"><div class="cartog" id="cartog">${tiles}</div>
+  const corpo = brVista === "tabela" ? tabelaEstados(d) : `<div class="cg-wrap"><div class="cartog" id="cartog">${tiles}</div>
       <div class="det"><div class="detbox" id="det-uf">${detUfHtml(d)}</div>
         <div class="leg3"><span class="cap">Vantagem</span><div class="row"><span><span class="sq">${quad(1)}</span>até 5 p.p.</span><span><span class="sq">${quad(2)}</span>5 a 15 p.p.</span><span><span class="sq">${quad(3)}</span>mais de 15 p.p.</span></div>
-          <span>Mapa em grade: cada estado tem o mesmo tamanho, para que estados grandes e pouco populosos não pareçam pesar mais.</span></div></div></div></section>`;
+          <span>Mapa em grade: cada estado tem o mesmo tamanho, para que estados grandes e pouco populosos não pareçam pesar mais.</span></div></div></div>`;
+  return `<section class="mcard"><div class="mhead"><div><h2>Brasil por estado</h2><span class="sub">Quem teve mais votos entre os dois finalistas ${ao ? "no 2º turno" : "no 1º turno"}. Toque num estado para escolher.</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${top.map(([sg, n]) => chipN(sg, n)).join("")}
+        <div class="seg2" role="group" aria-label="Forma de exibição"><button data-bv="mapa" class="${brVista === "mapa" ? "on" : ""}">Mapa</button><button data-bv="tabela" class="${brVista === "tabela" ? "on" : ""}">Votos</button></div></div></div>
+    ${corpo}</section>`;
 }
 
 const cargoDaPagina = () => pag === "presidente" ? 1 : 3;
 const munDados = () => { const m = mapaCache[`${uf || "RN"}:${cargoDaPagina()}:${turno}`]; return m && m.v ? m.v : null; };
 function munDetHtml(k) {
   const v = munDados(), r = v && k && v.municipios[k];
-  if (!r) return '<span class="cap">Toque num quadrado para ver o município.</span>';
+  if (!r) return '<span class="cap">Passe o mouse ou toque num município para ver o detalhe.</span>';
   return detHtml(r.nome, r, true).replace("selecionado", k === foco.mun ? "selecionado" : "visualizando");
 }
 
@@ -1192,16 +1273,16 @@ function cardMunicipios(d) {
         return `<button class="cel${foco.mun === x.k ? " sel" : ""}" data-mun="${x.k}" tabindex="-1" style="background:${g.bg}" aria-label="${esc(x.r.nome)}: ${esc(nome(x.c[0].nome))} na frente por ${pp2(x.pp)} pontos percentuais"></button>`; }).join("")}${'<span class="cel pend" title="ainda sem apuração"></span>'.repeat(pend)}</div>`;
     } else {
       const g = geoCache["/geo/uf/" + u];
-      corpo = g && g.v ? svgMapa("uf", g.v, f => f.properties.codarea, v.municipios, (f, k) => `${v.municipios[k] ? v.municipios[k].nome : k} — ${CARGOS[cargo]}`, false, "duelo") : '<div class="skel"></div>';
+      corpo = g && g.v ? svgMapa("uf", g.v, f => f.properties.codarea, v.municipios, (f, k) => `${v.municipios[k] ? v.municipios[k].nome : k} — ${CARGOS[cargo]}`, false, "duelo", true) : '<div class="skel"></div>';
     }
   }
   const modoTxt = v && v.modo === "2t" ? "no 2º turno" : "no 1º turno";
   return `<section class="mcard" id="mun-card"><div class="mhead"><div><h2>${esc(E)} por município</h2>
       <span class="sub">${n || "…"} municípios. ${munModo === "grade" ? "Cada quadrado é um município, agrupado por quem liderou e ordenado pela vantagem." : "Quem teve mais votos entre os dois finalistas " + modoTxt + "."}</span></div>
-      <div class="seg2" role="group" aria-label="Modo de exibição"><button data-mm="grade" class="${munModo === "grade" ? "on" : ""}">Grade</button><button data-mm="mapa" class="${munModo === "mapa" ? "on" : ""}">Mapa</button></div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">${leg}</div>${corpo}
-    <div class="detbox" id="det-mun">${munDetHtml(foco.mun)}</div>
-    <div class="mfoot"><span>Cores em 3 degraus de vantagem: até 5 p.p., 5 a 15, mais de 15. Toque num quadrado para ver o município.</span><span>${n} de ${v ? v.total : "…"} com dados</span></div></section>`;
+      <div class="seg2" role="group" aria-label="Modo de exibição"><button data-mm="mapa" class="${munModo === "mapa" ? "on" : ""}">Mapa</button><button data-mm="grade" class="${munModo === "grade" ? "on" : ""}">Grade</button></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${leg}</div><div class="mun-linha">${corpo}
+    <div class="detbox" id="det-mun">${munDetHtml(foco.mun)}</div></div>
+    <div class="mfoot"><span>Cores em 3 degraus de vantagem: até 5 p.p., 5 a 15, mais de 15. Passe o mouse ou toque num município para ver o detalhe.</span><span>${n} de ${v ? v.total : "…"} com dados</span></div></section>`;
 }
 
 function pgResumo2(d) {
@@ -1229,7 +1310,8 @@ function pgGovernador2(d) {
 }
 
 /* ---- tela dividida: governador do estado (RN) e presidente (Brasil) lado a lado ---- */
-function cardDueloC(cargo, escopo, d) {
+const placarVista = {};                       // id do painel -> "num" | "graf" (na TV os dois aparecem juntos)
+function cardPlacar(cargo, escopo, d, id) {
   if (!d || d.cands.length < 2) return cardVazio(escopo);
   const ao = d.ao_vivo, [a, b] = alfa(d.cands), s = d.situacao || {};
   const tom = {aberto: "info", "2turno": "warn", eleito: "ok", "1turno": "ok"}[s.tipo] || "info";
@@ -1239,63 +1321,109 @@ function cardDueloC(cargo, escopo, d) {
   const resto = Math.max(0, 100 - a.pct - b.pct);
   const segs = ao ? [[a.pct, corPura(a.sg)], [b.pct, corPura(b.sg)]] : [[a.pct, corPura(a.sg)], [resto, "var(--n-elim)"], [b.pct, corPura(b.sg)]];
   const dpp = Math.abs(a.pct - b.pct), dv = Math.abs(a.votos - b.votos);
-  return `<section class="dcard dc"><div class="dtop"><div><span class="cg">${esc(cargo)}</span><h2>${esc(escopo)}</h2></div>
-      <span class="meta">${ao ? pct(d.apur) + " apurado" : "2º turno em " + dataBr(ultimo.meta.data_2t)}</span></div>
-    ${ao ? `<div class="apur6" role="progressbar" aria-label="Seções apuradas" aria-valuenow="${d.apur}" aria-valuemin="0" aria-valuemax="100"><i style="width:${d.apur}%"></i></div>` : ""}
-    <div class="lados2">${lado(a)}${lado(b)}</div>
+  const vista = tv ? "ambos" : (placarVista[id] || "num");
+  const numeros = `<div class="lados2">${lado(a)}${lado(b)}</div>
     <div class="b50"><div class="tr">${segs.map(([w, bg]) => `<i style="width:${w}%;background:${bg}"></i>`).join("")}</div><span class="mk"></span></div>
-    <div class="dft"><span>${ao ? "Diferença" : "Diferença no 1º turno"}: ${pp2(dpp)} p.p. · ${milhar(dv)} votos</span></div>
-    <div class="st ${tom}"><b>${esc(s.rotulo || "")}</b><span>${esc(bonito(s.texto || ""))}</span></div></section>`;
+    <div class="dft${ao ? " ao" : ""}"><span>${ao ? "Diferença" : "Diferença no 1º turno"}: ${pp2(dpp)} p.p. · ${milhar(dv)} votos</span></div>`;
+  const status = `<div class="st ${tom}"><b>${esc(s.rotulo || "")}</b><span>${esc(bonito(s.texto || ""))}</span></div>`;
+  const corpo = vista === "graf" ? serieInner(d, id) + status : vista === "num" ? numeros + status : numeros + status + serieInner(d, id);
+  const chave = v => `<button data-pv="${id}:${v}" class="${vista === v ? "on" : ""}">${v === "num" ? "Números" : "Gráfico"}</button>`;
+  return `<section class="dcard dc"><div class="dtop"><div><span class="cg">${esc(cargo)}</span><h2>${esc(escopo)}</h2></div>
+      <div class="dtop-d"><span class="meta">${ao ? pct(d.apur) + " apurado" : "2º turno em " + dataBr(ultimo.meta.data_2t)}</span>
+        ${tv ? "" : `<div class="seg2" role="group" aria-label="Ver números ou gráfico">${chave("num")}${chave("graf")}</div>`}</div></div>
+    ${ao ? `<div class="apur6" role="progressbar" aria-label="Seções apuradas" aria-valuenow="${d.apur}" aria-valuemin="0" aria-valuemax="100"><i style="width:${d.apur}%"></i></div>` : ""}
+    <div class="pbody">${corpo}</div></section>`;
 }
 
-function cardSerie(d) {
+/* ---- evolução do placar: % de cada um em cada horário (eixo do tempo = horário do TSE) ---- */
+const minutosDe = h => { const m = /^(\d{1,2}):(\d{2})/.exec(h || ""); return m ? +m[1] * 60 + +m[2] : null; };
+const hhmm = m => `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(Math.floor(m % 60)).padStart(2, "0")}`;
+const serieDados = {};                       // id do gráfico -> {pts, a, b, L, W, R, t0, t1}: usado pelo tooltip
+
+function pontosSerie(d, a, b) {              // [{x: minuto do dia (continua após a meia-noite), y: % de A entre A+B, ap, h}]
+  const pts = []; let ant = -1;
+  for (const p of d.serie || []) {
+    const va = p.v[a.n], vb = p.v[b.n]; let m = minutosDe(p.h);
+    if (m == null || va == null || vb == null || !(va + vb > 0)) continue;
+    if (m < ant) m += 1440;
+    ant = m; pts.push({x: m, y: va / (va + vb) * 100, ap: p.a, va, vb});
+  }
+  return pts;
+}
+
+function serieInner(d, id) {
   if (!d || d.cands.length < 2) return "";
-  const vazio = m => `<div class="serie vazio-s"><span class="cap">Evolução da apuração</span><p>${m}</p></div>`;
+  const vazio = m => `<div class="serie vazio-s"><p>${m}</p></div>`;
   const [a, b] = alfa(d.cands);
-  const pts = (d.serie || []).map(p => {
-    const va = p.v[a.n], vb = p.v[b.n];
-    return va != null && vb != null && va + vb > 0 ? {x: p.a, y: va / (va + vb) * 100} : null;
-  }).filter(Boolean);
-  if (!d.ao_vivo) return vazio("Quando a apuração começar, aqui aparece como o placar evolui.");
+  if (!d.ao_vivo) return vazio("Quando a apuração começar, aqui aparece quantos % cada um tinha em cada horário.");
+  const pts = pontosSerie(d, a, b);
   if (pts.length < 2) return vazio("O gráfico aparece a partir da segunda atualização do TSE.");
-  const W = 560, H = 100, L = 34, R = 58, T = 8, B = 22;
+  const zm = tv ? parseFloat(document.body.style.zoom) || 1 : 1, dois = innerWidth >= 900;
+  const colunaPx = (innerWidth / zm - (tv ? 32 : 56) - (dois ? (tv ? 14 : 20) : 0)) / (dois ? 2 : 1);
+  const W = Math.max(320, Math.min(1100, Math.round(colunaPx - 34))), H = tv ? 150 : 180, L = 42, R = 88, T = 10, B = 24;
   const ys = pts.flatMap(p => [p.y, 100 - p.y]).concat([50]);
   let lo = Math.floor(Math.min(...ys) - 1), hi = Math.ceil(Math.max(...ys) + 1);
   if (hi - lo < 6) { const m = (hi + lo) / 2; lo = Math.floor(m - 3); hi = Math.ceil(m + 3); }
-  const X = v => L + (W - L - R) * v / 100, Y = v => T + (H - T - B) * (hi - v) / (hi - lo);
+  const t0 = pts[0].x, u = pts[pts.length - 1], t1 = Math.max(u.x, t0 + 30);
+  const X = m => L + (W - L - R) * (m - t0) / (t1 - t0), Y = v => T + (H - T - B) * (hi - v) / (hi - lo);
+  const passoT = t1 - t0 <= 90 ? 15 : t1 - t0 <= 240 ? 30 : 60, passoY = hi - lo <= 4 ? 1 : hi - lo <= 10 ? 2 : 5;
+  let grade = "";
+  for (let m = Math.ceil(t0 / passoT) * passoT; m <= t1; m += passoT)
+    grade += `<line x1="${X(m).toFixed(1)}" x2="${X(m).toFixed(1)}" y1="${T}" y2="${H - B}" stroke="var(--line)"></line><text class="eixo" x="${X(m).toFixed(1)}" y="${H - 6}" text-anchor="middle">${hhmm(m)}</text>`;
+  for (let v = Math.ceil(lo / passoY) * passoY; v <= hi; v += passoY)
+    grade += `<line x1="${L}" x2="${W - R}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--line)"${v === 50 ? ' stroke-dasharray="4 4" opacity=".9"' : ""}></line><text class="eixo" x="${L - 6}" y="${(Y(v) + 4).toFixed(1)}" text-anchor="end">${v}%</text>`;
   const linha = f => pts.map((p, i) => `${i ? "L" : "M"}${X(p.x).toFixed(1)},${Y(f(p)).toFixed(1)}`).join("");
-  const u = pts[pts.length - 1];
   let ya = Y(u.y), yb = Y(100 - u.y);
-  if (Math.abs(ya - yb) < 14) { const m = (ya + yb) / 2, s = ya < yb ? -1 : 1; ya = m + s * 7; yb = m - s * 7; }
+  if (Math.abs(ya - yb) < 18) { const m = (ya + yb) / 2, s = ya < yb ? -1 : 1; ya = m + s * 9; yb = m - s * 9; }
   const ca = corPura(a.sg), cb = corPura(b.sg);
-  return `<div class="serie"><span class="cap">Evolução do placar · % dos votos válidos</span>
-    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolução do placar: ${esc(curto(a))} ${pct(u.y)}, ${esc(curto(b))} ${pct(100 - u.y)}">
-      <line x1="${L}" x2="${W - R}" y1="${Y(50)}" y2="${Y(50)}" stroke="var(--ink-3)" stroke-dasharray="4 4" opacity=".6"></line>
-      <text class="eixo" x="${L - 6}" y="${Y(50) + 4}" text-anchor="end">50%</text>
-      <text class="eixo" x="${L - 6}" y="${Y(hi) + 8}" text-anchor="end">${hi}%</text>
-      <text class="eixo" x="${L - 6}" y="${Y(lo)}" text-anchor="end">${lo}%</text>
-      <text class="eixo" x="${X(0)}" y="${H - 6}">0%</text><text class="eixo" x="${X(50)}" y="${H - 6}" text-anchor="middle">apurado</text><text class="eixo" x="${X(100)}" y="${H - 6}" text-anchor="end">100%</text>
-      <path d="${linha(p => p.y)}" fill="none" stroke="${ca}" stroke-width="2.6" stroke-linejoin="round"></path>
-      <path d="${linha(p => 100 - p.y)}" fill="none" stroke="${cb}" stroke-width="2.6" stroke-linejoin="round"></path>
-      <circle cx="${X(u.x)}" cy="${Y(u.y)}" r="3.5" fill="${ca}"></circle><circle cx="${X(u.x)}" cy="${Y(100 - u.y)}" r="3.5" fill="${cb}"></circle>
-      <text class="rot-l" x="${W - R + 6}" y="${ya + 4}" fill="currentColor">${esc(curto(a))} ${pct1(u.y)}</text>
-      <text class="rot-l" x="${W - R + 6}" y="${yb + 4}" fill="currentColor">${esc(curto(b))} ${pct1(100 - u.y)}</text></svg></div>`;
+  serieDados[id] = {pts, a, b, L, W, R, t0, t1};
+  // "instantâneos": a cada 30 min (e o último), para ler os % por horário sem passar o mouse
+  const marcos = []; let ult = -1e9;
+  for (const p of pts) if (p.x - ult >= 30) { marcos.push(p); ult = p.x; }
+  if (marcos[marcos.length - 1] !== u) marcos.push(u);
+  const insta = marcos.slice(-5).map(p => `<span class="ins" title="${pct(p.ap)} apurado"><b>${hhmm(p.x)}</b><i style="background:${ca}"></i>${pct1(p.y)}<i style="background:${cb}"></i>${pct1(100 - p.y)}</span>`).join("");
+  return `<div class="serie"><span class="cap">Evolução do placar · % dos votos válidos por horário</span>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolução do placar às ${hhmm(u.x)}: ${esc(curto(a))} ${pct(u.y)}, ${esc(curto(b))} ${pct(100 - u.y)}">
+      ${grade}
+      <path d="${linha(p => p.y)}" fill="none" stroke="${ca}" stroke-width="3" stroke-linejoin="round"></path>
+      <path d="${linha(p => 100 - p.y)}" fill="none" stroke="${cb}" stroke-width="3" stroke-linejoin="round"></path>
+      <circle cx="${X(u.x).toFixed(1)}" cy="${Y(u.y).toFixed(1)}" r="4.5" fill="${ca}"></circle><circle cx="${X(u.x).toFixed(1)}" cy="${Y(100 - u.y).toFixed(1)}" r="4.5" fill="${cb}"></circle>
+      <text class="rot-l" x="${W - R + 6}" y="${(ya + 4).toFixed(1)}" fill="currentColor">${esc(curto(a))} ${pct1(u.y)}</text>
+      <text class="rot-l" x="${W - R + 6}" y="${(yb + 4).toFixed(1)}" fill="currentColor">${esc(curto(b))} ${pct1(100 - u.y)}</text>
+      <line class="cur" y1="${T}" y2="${H - B}" stroke="var(--ink)" opacity=".5" style="display:none"></line>
+      <rect data-serie="${id}" x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent"></rect></svg>
+    <div class="insta">${insta}</div></div>`;
+}
+
+let cursorSerie = null;
+function mostrarSerie(rect, e) {             // tooltip do gráfico: horário, % apurado e % de cada um no ponto mais próximo
+  const s = serieDados[rect.dataset.serie]; if (!s) return;
+  const r = rect.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), alvo = s.t0 + f * (s.t1 - s.t0);
+  const p = s.pts.reduce((m, q) => Math.abs(q.x - alvo) < Math.abs(m.x - alvo) ? q : m);
+  const x = s.L + (s.W - s.L - s.R) * (p.x - s.t0) / (s.t1 - s.t0), svg = rect.ownerSVGElement;
+  cursorSerie = svg.querySelector(".cur"); cursorSerie.setAttribute("x1", x); cursorSerie.setAttribute("x2", x); cursorSerie.style.display = "";
+  const t = $("#tip");
+  t.innerHTML = `<b>${hhmm(p.x)}</b> · ${pct(p.ap)} apurado<div><span>${esc(nome(s.a.nome))} ${chip(s.a.sg)}</span><b style="display:inline">${pct(p.y)}</b></div>
+    <div><span>${esc(nome(s.b.nome))} ${chip(s.b.sg)}</span><b style="display:inline">${pct(100 - p.y)}</b></div><small style="color:var(--ink-3)">${milhar(p.va)} × ${milhar(p.vb)} votos</small>`;
+  t.style.display = "block";
+  t.style.left = Math.min(e.clientX + 14, innerWidth - 290) + "px"; t.style.top = Math.min(e.clientY + 14, innerHeight - 140) + "px";
 }
 
 function bannerVencedor(d) {
   const E = ESTADOS[d.uf && d.uf.sigla] || "";
-  const itens = [[d.pres, "Presidente"], [d.uf && d.uf.em_2turno ? d.uf.gov : null, "Governador" + (E ? " de " + E : "")]]
-    .filter(([x]) => x && x.ao_vivo && x.situacao && (x.situacao.tipo === "eleito" || x.situacao.tipo === "1turno"))
-    .map(([x, t]) => `<div class="vence ${x.situacao.tipo === "eleito" ? "ok" : "proj"}"><b>${x.situacao.tipo === "eleito" ? "ELEITO" : "VITÓRIA PROJETADA"}</b>
-      <span>${t}: ${esc(nome(x.cands[0].nome))} (${esc(x.cands[0].sg)}) · ${pct(x.cands[0].pct)}</span></div>`);
-  return itens.join("");
+  const faixa = (x, t) => x && x.ao_vivo && x.situacao && (x.situacao.tipo === "eleito" || x.situacao.tipo === "1turno")
+    ? `<div class="vence ${x.situacao.tipo === "eleito" ? "ok" : "proj"}"><b>${x.situacao.tipo === "eleito" ? "ELEITO" : "VITÓRIA PROJETADA"}</b>
+      <span>${t}: ${esc(nome(x.cands[0].nome))} (${esc(x.cands[0].sg)}) · ${pct(x.cands[0].pct)}</span></div>` : "";
+  // mesma ordem dos cartões (governador à esquerda, presidente à direita), com o lugar vazio mantido para não trocar de lado
+  const g = faixa(d.uf && d.uf.em_2turno ? d.uf.gov : null, "Governador" + (E ? " de " + E : "")), pr = faixa(d.pres, "Presidente");
+  return g || pr ? `<div class="vences"><div>${g}</div><div>${pr}</div></div>` : "";
 }
 
 function pgTela(d) {
   const u = d.uf || {}, E = ESTADOS[u.sigla] || u.sigla || "Estado", ao = d.pres && d.pres.ao_vivo;
   garantirMapas("3");
-  const esq = u.em_2turno ? cardDueloC("Governador", E, u.gov) + cardSerie(u.gov) + cardMunicipios(d) : cardUfSemT2(d);
-  const dir = cardDueloC("Presidente da República", "Brasil", d.pres) + cardSerie(d.pres) + cardCartograma(d);
+  const esq = u.em_2turno ? cardPlacar("Governador", E, u.gov, "gov") + cardMunicipios(d) : cardUfSemT2(d);
+  const dir = cardPlacar("Presidente da República", "Brasil", d.pres, "pres") + cardCartograma(d);
   return avisoSim(d) + blocoTitulo(ao ? "2º turno · apuração ao vivo" : "2º turno", `${E} e Brasil lado a lado. Ordem fixa, alfabética.`, d) +
     bannerVencedor(d) + `<div class="tela"><div class="painel2">${esq}</div><div class="painel2">${dir}</div></div>`;
 }
@@ -1318,6 +1446,7 @@ function desenharMenu() {
   rodape();
 }
 function desenhar() {
+  document.body.classList.toggle("wide", turno === 2 && pag === "tela");         // a tela dividida usa a largura toda (16:9)
   desenharMenu();
   atualizarCtx();
   if (!ultimo || ultimo.turno !== turno) return;
@@ -1355,7 +1484,10 @@ function previewMun(k, fixar) {
   if (el) el.innerHTML = munDetHtml(k || foco.mun);
 }
 document.addEventListener("mousemove", e => {
-  const t = $("#tip"), p = e.target.closest && e.target.closest("path[data-k]");
+  const t = $("#tip"), rs = e.target.closest && e.target.closest("rect[data-serie]");
+  if (rs) { mostrarSerie(rs, e); return; }
+  if (cursorSerie) { cursorSerie.style.display = "none"; cursorSerie = null; }
+  const p = e.target.closest && e.target.closest("path[data-k]");
   if (!p) { t.style.display = "none"; return; }
   t.innerHTML = (tips[p.dataset.m] || {})[p.dataset.k] || "";
   t.style.display = "block";
@@ -1364,6 +1496,7 @@ document.addEventListener("mousemove", e => {
 const sobre = e => {
   const c = e.target.closest && e.target.closest("[data-cg]"); if (c) previewUf(c.dataset.cg);
   const m = e.target.closest && e.target.closest("[data-mun]"); if (m) previewMun(m.dataset.mun, false);
+  const pth = e.target.closest && e.target.closest('path[data-m="uf"]'); if (pth && $("#det-mun")) previewMun(pth.dataset.k, false);
 };
 document.addEventListener("mouseover", sobre);
 document.addEventListener("focusin", sobre);
@@ -1392,10 +1525,15 @@ document.addEventListener("click", e => {
     return;
   }
   // tema
+  if (t.closest("#tv-btn")) { alternarTv(true); return; }
   if (t.closest("#tema") || t.closest("#tema2")) { alternarTema(); return; }
   // 2º turno: cartograma, grade de municípios, modo
   const cg = t.closest("[data-cg]");
   if (cg) { irPara(pag, cg.dataset.cg); return; }
+  const pv = t.closest("[data-pv]");
+  if (pv) { const [pid, pvv] = pv.dataset.pv.split(":"); placarVista[pid] = pvv; $("#app")._h = null; desenhar(); return; }
+  const bv = t.closest("[data-bv]");
+  if (bv) { brVista = bv.dataset.bv; $("#app")._h = null; desenhar(); return; }
   const mm = t.closest("[data-mm]");
   if (mm) { munModo = mm.dataset.mm; $("#app")._h = null; desenhar(); return; }
   const cel = t.closest("[data-mun]");
@@ -1436,7 +1574,7 @@ async function carregar() {
   if (abortCarga) abortCarga.abort();
   const ac = abortCarga = new AbortController(), prazo = setTimeout(() => ac.abort(), 9000);
   try {
-    const r = await fetch(`/api?uf=${uf || ""}&turno=${turno}`, {signal: ac.signal});
+    const r = await fetch(`/api?uf=${uf || ""}&turno=${turno}`, {signal: ac.signal, cache: "no-cache"});
     if (!r.ok) throw new Error(r.status);
     const j = await r.json();
     if (j.turno !== turno || (uf && j.uf && j.uf.sigla !== uf)) return;        // resposta de uma escolha anterior
@@ -1451,7 +1589,7 @@ async function carregar() {
     falhasRede++;
   } finally {
     clearTimeout(prazo);
-    if (abortCarga === ac) timerCarga = setTimeout(carregar, falhasRede ? Math.min(30000, 3000 * falhasRede) : 10000);
+    if (abortCarga === ac) timerCarga = setTimeout(carregar, falhasRede ? Math.min(30000, 3000 * falhasRede) : ultimo && ultimo.meta && ultimo.meta.simulado ? 2000 : 10000);
     atualizarStatus();
   }
 }
@@ -1501,29 +1639,47 @@ function preencherContagem() {
 const qs = new URLSearchParams(location.search);
 let tv = qs.get("tv") === "1", wake = null;
 function ajustarZoom() {       // a TV é vista de longe: o layout de 1280 px é ampliado até preencher a tela
-  document.body.style.zoom = tv ? String(Math.max(0.6, Math.min(innerWidth / 1280, innerHeight / 800)).toFixed(3)) : "";
+  document.body.style.zoom = tv ? String(Math.max(0.6, Math.min(innerWidth / 1280, innerHeight / 920)).toFixed(3)) : "";
 }
 async function pedirWake() {
   try { if (tv && "wakeLock" in navigator && document.visibilityState === "visible") wake = await navigator.wakeLock.request("screen"); } catch (e) {}
 }
 function aplicarTv() {
   document.documentElement.classList.toggle("tv", tv);
+  const b = $("#tv-btn");
+  if (b) { b.textContent = tv ? "Sair do modo TV" : "Modo TV"; b.setAttribute("aria-pressed", String(tv)); }
   ajustarZoom(); pedirWake();
   const u = new URL(location.href); tv ? u.searchParams.set("tv", "1") : u.searchParams.delete("tv");
   history.replaceState(null, "", u);
+  if (ultimo) { $("#app")._h = null; desenhar(); }            // os cartões e os gráficos mudam de formato no modo TV
 }
-window.addEventListener("resize", ajustarZoom);
+function alternarTv(telaCheia) {
+  tv = !tv; aplicarTv();
+  if (telaCheia) {                                            // o clique no botão é um gesto do usuário: pode pedir tela cheia
+    if (tv && !document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+    if (!tv && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }
+}
+let tMouse = null;                                            // no modo TV o cursor some; mexeu o mouse, ele (e o botão de sair) voltam por 3 s
+document.addEventListener("mousemove", () => {
+  if (!tv) return;
+  document.documentElement.classList.add("mouse"); clearTimeout(tMouse);
+  tMouse = setTimeout(() => document.documentElement.classList.remove("mouse"), 3000);
+});
+let tRedim = null;
+window.addEventListener("resize", () => { ajustarZoom(); clearTimeout(tRedim); tRedim = setTimeout(() => { if (ultimo) { $("#app")._h = null; desenhar(); } }, 250); });
 document.addEventListener("visibilitychange", () => { pedirWake(); if (document.visibilityState === "visible" && Date.now() - ultimaCarga > 15000) carregar(); });
 document.addEventListener("keydown", e => {
   if (e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target || {}).tagName || "")) return;
-  if (e.key === "t" || e.key === "T") { tv = !tv; aplicarTv(); }
+  if (e.key === "t" || e.key === "T") alternarTv(false);
+  if (e.key === "m" || e.key === "M") alternarBr();
   if (e.key === "f" || e.key === "F") { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {}); }
 });
-if (tv) {                                                            // quiosque: recarrega de tempos em tempos (memória limpa, versão nova)
-  setTimeout(() => location.reload(), 4 * 3600 * 1000);
-  const seg = +qs.get("rodar") || 0;
-  if (seg >= 10) setInterval(() => { const ids = paginasAtuais().map(x => x[0]); irPara(ids[(ids.indexOf(pag) + 1) % ids.length]); }, seg * 1000);
-}
+function alternarBr() { brVista = brVista === "mapa" ? "tabela" : "mapa"; $("#app")._h = null; desenhar(); }
+setInterval(() => { if (tv && pag === "tela") alternarBr(); }, 15000);        // na TV não há mouse: alterna sozinho entre o mapa e a tabela de votos
+setInterval(() => { if (tv) location.reload(); }, 4 * 3600 * 1000);             // quiosque: recarrega de tempos em tempos (memória limpa, versão nova)
+const segRodar = +qs.get("rodar") || 0;
+if (segRodar >= 10) setInterval(() => { if (tv) { const ids = paginasAtuais().map(x => x[0]); irPara(ids[(ids.indexOf(pag) + 1) % ids.length]); } }, segRodar * 1000);
 
 montarWidget(); sincronizar(); desenharMenu(); aplicarTv(); carregar(); setInterval(tique, 1000);
 </script>

@@ -48,8 +48,13 @@ This project started as a terminal script and grew into a full-stack portfolio p
   or true-shape map, hover/focus/click detail panel).
 - **Floating chat assistant on every page** that knows what is on screen ("who leads *here*?"), cites its sources and
   lets you open the original plan passage and page.
-- **Built-in simulator** (`--simular-2t`) that fabricates runoff files from first-round data so the live screen can be
-  tested end-to-end before election day (clearly labelled "SIMULAÇÃO").
+- **Built-in simulator** (`--simular-2t`) that replays election night from 17:00 to 22:00 in minutes: zeroed files until
+  19:00, then each state counts at its own pace (fast at first, slow at the end), the lead can flip, and Brazil is the sum of
+  the 27 states, as in the real feed. Clearly labelled "SIMULAÇÃO", with the simulated clock on screen.
+- **Score history chart** with a time axis: the % each candidate had at every update, hover for the exact moment, plus
+  snapshots every 30 minutes under the chart.
+- **Brazil by state** as a cartogram or as a table (`Votos` button; `M` key; TV mode alternates every 15 s) with % and total
+  votes of each finalist per state, sorted from most to fewest votes, plus the national total.
 - **Light/dark theme**, responsive layout (bottom-sheet chat on phones), accessible party colours (WCAG AA contrast),
   10-second polling that keeps your scroll position.
 
@@ -71,7 +76,7 @@ order** (enforced in the browser, not just requested from the model), with `[n]`
 | Data | TSE results JSON (`resultados.tse.jus.br`), IBGE meshes API (GeoJSON), TSE candidate-registration PDFs | Official public sources |
 | Retrieval | **PyMuPDF** extraction → heading-aware chunking → **BM25** with Portuguese normalisation and stemming | Exact-term queries (names, programmes, numbers) work well; no vector DB needed at this corpus size |
 | LLM | **Anthropic Claude** via the official Python SDK (tool use + streaming), **Haiku 4.5** by default | Cheap and good enough; model is configurable |
-| Tests | `unittest` — 75 tests, plus a retrieval evaluation harness | Runs offline, no API key |
+| Tests | `unittest` — 81 tests, plus a retrieval evaluation harness | Runs offline, no API key |
 
 Only two third-party packages: `anthropic` and `pymupdf`.
 
@@ -130,7 +135,9 @@ Useful flags:
 ```bash
 python painel_server.py --uf pe                                # different initial state
 python painel_server.py --uma-vez                              # terminal version (1st round), prints once
-python painel_server.py --web --simular-2t --sim-duracao 120   # runoff test with fabricated data
+python painel_server.py --web --simular-2t                     # simulated runoff: starts at 18:55, ends 22:00 (1 min = 1 s)
+python painel_server.py --web --simular-2t --sim-inicio 17:00  # from 17:00, with the whole wait until 19:00
+python painel_server.py --web --simular-2t --sim-duracao 120   # faster: 17:00→22:00 in 2 min
 python -m rag.ingestao                                         # rebuild the index from data/planos/*.pdf
 ```
 
@@ -174,7 +181,7 @@ and `HOST` environment variables are honoured) behind a tunnel/proxy such as Clo
 ## Testing and evaluation
 
 ```bash
-python -m unittest discover -s tests -v   # 75 tests: TSE client, runoff state, duel status, history, cache, chat, search
+python -m unittest discover -s tests -v   # 81 tests: TSE client, runoff state, duel status, history, cache, chat, search
 python -m rag.avaliacao                    # retrieval quality, no cost: hit@k and MRR on data/rag/avaliacao.json
 ```
 
@@ -256,8 +263,13 @@ O projeto começou como um script de terminal e virou uma peça de portfólio fu
   de detalhe por passar o mouse, foco ou clique).
 - **Chat flutuante em todas as páginas** que sabe o que está na tela ("quem lidera *aqui*?"), cita as fontes e abre o
   trecho original e a página do plano.
-- **Simulador** (`--simular-2t`) que fabrica arquivos do 2º turno a partir do 1º para testar a tela ao vivo antes da
-  eleição (com aviso "SIMULAÇÃO").
+- **Simulador** (`--simular-2t`) que reproduz a noite da eleição das 17h às 22h em poucos minutos: arquivos zerados até
+  as 19h, depois cada estado apura no seu ritmo (rápido no começo, devagar no fim), a liderança pode virar e o Brasil é a
+  soma dos 27 estados, como na divulgação real. Com aviso "SIMULAÇÃO" e o relógio simulado na tela.
+- **Gráfico da evolução do placar** com eixo de horário: quantos % cada um tinha a cada atualização, com o momento exato
+  ao passar o mouse e instantâneos a cada 30 minutos sob o gráfico.
+- **Brasil por estado** como cartograma ou tabela (botão `Votos`; tecla `M`; o modo TV alterna a cada 15 s) com % e votos
+  totais de cada finalista por estado, do maior para o menor, mais o total nacional.
 - **Tema claro/escuro**, layout responsivo (chat em folha inferior no celular), cores de partido acessíveis (contraste AA),
   atualização a cada 10 s preservando a rolagem.
 
@@ -275,7 +287,7 @@ ordem alfabética** (garantido no navegador, e não só pedido ao modelo), e cit
 | Dados | JSON do TSE, API de malhas do IBGE (GeoJSON), PDFs de registro de candidatura do TSE | Fontes públicas oficiais |
 | Recuperação | **PyMuPDF** → trechos por seção → **BM25** com normalização e stemmer em português | Bom para termos exatos (nomes, programas, números); não precisa de banco vetorial neste volume |
 | LLM | **Anthropic Claude** (SDK oficial, tool use + streaming), **Haiku 4.5** por padrão | Barato e suficiente; modelo configurável |
-| Testes | `unittest` — 75 testes + avaliação da busca | Roda offline, sem chave |
+| Testes | `unittest` — 81 testes + avaliação da busca | Roda offline, sem chave |
 
 Só duas dependências externas: `anthropic` e `pymupdf`.
 
@@ -313,7 +325,9 @@ No Windows, dê duplo clique em `iniciar.bat`. Opções:
 ```bash
 python painel_server.py --uf pe                                # estado inicial diferente
 python painel_server.py --uma-vez                              # versão terminal (1º turno), imprime uma vez
-python painel_server.py --web --simular-2t --sim-duracao 120   # teste do 2º turno com dados fabricados
+python painel_server.py --web --simular-2t                     # 2º turno simulado: começa 18h55 e vai até 22h (1 min = 1 s)
+python painel_server.py --web --simular-2t --sim-inicio 17:00  # desde as 17h, com toda a espera até as 19h
+python painel_server.py --web --simular-2t --sim-duracao 120   # mais rápido: 17h→22h em 2 min
 python -m rag.ingestao                                         # reconstrói o índice a partir de data/planos/*.pdf
 ```
 
@@ -354,7 +368,7 @@ variáveis `PORT` e `HOST` são respeitadas) atrás de um túnel/proxy como Clou
 ## Testes e avaliação
 
 ```bash
-python -m unittest discover -s tests -v   # 75 testes: cliente do TSE, estado do 2º turno, situação do duelo, histórico, cache, chat, busca
+python -m unittest discover -s tests -v   # 81 testes: cliente do TSE, estado do 2º turno, situação do duelo, histórico, cache, chat, busca
 python -m rag.avaliacao                    # qualidade da busca, sem custo: hit@k e MRR em data/rag/avaliacao.json
 ```
 

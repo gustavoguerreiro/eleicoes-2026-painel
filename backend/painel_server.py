@@ -7,7 +7,7 @@ e (no estado) deputado estadual; no 2º turno, o duelo de presidente e de govern
 Uso:
     python painel_server.py --web                 # servidor em http://localhost:8765
     python painel_server.py --web --host 0.0.0.0  # acessível na rede (TV, celular); ver README para produção
-    python painel_server.py --web --simular-2t    # TESTE com dados fabricados
+    python painel_server.py --web --simular-2t    # TESTE: noite de eleição simulada (começa 18h55; --sim-inicio 17:00 p/ tudo)
     python painel_server.py --uma-vez             # terminal, 1º turno, imprime uma vez e sai
 
 Só usa a biblioteca padrão do Python. Fonte: https://resultados.tse.jus.br/oficial (divulgação oficial).
@@ -560,7 +560,6 @@ def dados_web(uf, so_uf, so_br):
 
 
 # ---- 2º turno ----------------------------------------------------------------------------------------------
-SIM = dict(ativo=False, t0=0.0, duracao=600.0)
 _COD = dict(t=0.0, v=None)
 
 
@@ -601,40 +600,119 @@ def t2_disponivel():
 
 
 def meta():
-    return dict(t2_disponivel=t2_disponivel(), simulado=SIM["ativo"], data_2t=DATA_2T, inicio_2t=INICIO_DIVULGACAO_2T)
+    m = dict(t2_disponivel=t2_disponivel(), simulado=SIM["ativo"], data_2t=DATA_2T, inicio_2t=INICIO_DIVULGACAO_2T)
+    if SIM["ativo"]:                                   # a contagem regressiva e o relógio seguem o tempo simulado
+        agora = minuto_sim()
+        seg_por_min = SIM["duracao"] / (SIM_FIM_MIN - SIM_INICIO_MIN)
+        falta = max(0.0, SIM_ABERTURA_MIN - agora) * seg_por_min
+        m["inicio_2t"] = (datetime.now(BRT) + timedelta(seconds=falta)).isoformat(timespec="seconds")
+        m["relogio_sim"] = hhmm_sim(int(agora))
+    return m
+
+
+# ---- simulador do 2º turno (--simular-2t) -------------------------------------------------------------------
+# Um relógio simulado vai de 17h a 22h em SIM["duracao"] segundos reais. Os arquivos zerados duram até as 19h (a divulgação
+# só começa depois do fim da votação no Acre); depois cada arquivo (estado, município) começa e termina de ser contado em
+# momentos diferentes, rápido no começo e devagar no fim, e o primeiro colocado do 1º turno aparece inflado no início
+# (as primeiras seções costumam favorecer um lado). O arquivo do Brasil é a SOMA dos 27 estados, como no TSE.
+SIM = dict(ativo=False, t0=0.0, duracao=300.0)
+SIM_INICIO_MIN, SIM_ABERTURA_MIN, SIM_FIM_MIN = 17 * 60, 19 * 60, 22 * 60
+SIM_LEAN = 0.40            # fatia dos votos dos eliminados que vai para o 1º colocado do 1º turno: deixa a disputa apertada
+_SIM_1T = {}
+
+
+def minuto_sim():
+    """Minuto do dia no relógio simulado (fracionário)."""
+    prog = min(1.0, max(0.0, (time.time() - SIM["t0"]) / SIM["duracao"]))
+    return SIM_INICIO_MIN + prog * (SIM_FIM_MIN - SIM_INICIO_MIN)
+
+
+def hhmm_sim(minuto):
+    return f"{minuto // 60:02d}:{minuto % 60:02d}"
+
+
+def _1t_fixo(url):
+    """No simulador o 1º turno não muda: baixa uma vez só (não martela o TSE a cada segundo)."""
+    if url not in _SIM_1T:
+        j = _baixar_http(url)
+        if j is None:
+            return None
+        _SIM_1T[url] = j
+    return _SIM_1T[url]
 
 
 def simulado(url):
-    """Modo --simular-2t: devolve um arquivo de 2º turno fabricado a partir do equivalente do 1º (False = não é 2º turno)."""
+    """Devolve um arquivo de 2º turno fabricado a partir do equivalente do 1º (False = não é um arquivo de 2º turno)."""
     c = codigos_turno()
     for k1, k2 in (("pres1", "pres2"), ("dem1", "dem2")):
         e1, e2 = c[k1], c[k2]
         if f"/{e2}/" in url and f"e{int(e2):06d}" in url:
-            u1 = url.replace(f"/{e2}/", f"/{e1}/").replace(f"e{int(e2):06d}", f"e{int(e1):06d}")
-            j1 = baixar_cache(u1)
-            return sintetizar_2t(j1, url) if j1 else None
+            j1 = _1t_fixo(url.replace(f"/{e2}/", f"/{e1}/").replace(f"e{int(e2):06d}", f"e{int(e1):06d}"))
+            if not j1:
+                return None
+            if k1 == "pres1" and "/br/br-" in url:
+                return sintetizar_br(j1)
+            nums = None
+            if k1 == "pres1":                           # nos estados do presidente, os finalistas são os do Brasil
+                jbr = _1t_fixo(url_u(e1, "br", 1))
+                nums = {x["n"] for x in finalistas_1t(jbr)} if jbr else None
+            return sintetizar_2t(j1, url, nums)
     return False
 
 
-def sintetizar_2t(j1, url):
-    """Só para testar: os dois finalistas ficam com os votos do 1º turno + uma divisão pseudo-aleatória (estável por
-    arquivo) dos votos dos demais, e a apuração avança com o tempo até 100% em SIM['duracao'] segundos."""
-    import copy
+def _andamento(rnd, minuto):
+    """Fração das seções apuradas de UM arquivo no minuto dado: começa entre 19h08 e 19h30, leva de 40 a 150 min."""
+    inicio, dur = 8 + rnd.random() * 22, 40 + rnd.random() * 110
+    x = min(1.0, max(0.0, (minuto - SIM_ABERTURA_MIN - inicio) / dur))
+    return 1 - (1 - x) ** 2
+
+
+def sintetizar_2t(j1, url, nums=None):
+    """Arquivo de um estado/município: os dois finalistas ficam com os votos do 1º turno + uma divisão estável dos votos dos
+    eliminados. Votos contados = final × (andamento ± viés inicial); no fim (andamento 1) o viés some e o total é exato."""
     import hashlib
     import random
     rnd = random.Random(int(hashlib.md5(url.encode()).hexdigest(), 16) % 2 ** 32)
     cs = [c for c in candidatos(j1) if c["valido"]]
-    fin = ([c for c in cs if c["t2"]] or cs[:2])[:2]
+    fin = ([c for c in cs if c["n"] in nums] if nums else ([c for c in cs if c["t2"]] or cs))[:2]
     if len(fin) < 2:
         return None
-    prog = min(1.0, (time.time() - SIM["t0"]) / SIM["duracao"])
-    local = min(1.0, max(0.0, prog * 1.25 - 0.25 * rnd.random()))
+    minuto = int(minuto_sim())
+    local = _andamento(rnd, minuto)
+    lean = min(0.9, max(0.1, SIM_LEAN + (rnd.random() - 0.5) * 0.3))
+    beta = 0.10 + (rnd.random() - 0.5) * 0.12
     outros = sum(c["votos"] for c in cs if c["n"] not in {f["n"] for f in fin})
-    lean = 0.5 + (rnd.random() - 0.5) * 0.3
-    novos = {fin[0]["n"]: round((fin[0]["votos"] + lean * outros) * local),
-             fin[1]["n"]: round((fin[1]["votos"] + (1 - lean) * outros) * local)}
+    desvio = beta * local * (1 - local)                      # nunca decresce: a contagem só acumula
+    novos = {fin[0]["n"]: round((fin[0]["votos"] + lean * outros) * (local + desvio)),
+             fin[1]["n"]: round((fin[1]["votos"] + (1 - lean) * outros) * (local - desvio))}
+    ts = int(num(j1["s"]["ts"]))
+    return _montar_2t(j1, novos, round(ts * local), ts, minuto, local >= 1)
+
+
+def sintetizar_br(j1):
+    """O Brasil é a soma dos estados (votos e seções), como na divulgação real."""
+    c = codigos_turno()
+    nums = [x["n"] for x in finalistas_1t(j1)]
+    soma, st, ts = {n: 0 for n in nums}, 0, 0
+    for uf in UFS:
+        ju1 = _1t_fixo(url_u(c["pres1"], uf, 1))
+        ju = sintetizar_2t(ju1, url_u(c["pres2"], uf, 1), set(nums)) if ju1 else None
+        if not ju:
+            continue
+        for x in candidatos(ju):
+            if x["n"] in soma:
+                soma[x["n"]] += x["votos"]
+        st, ts = st + int(num(ju["s"]["st"])), ts + int(num(ju["s"]["ts"]))
+    if not ts:
+        return None
+    return _montar_2t(j1, {n: round(v) for n, v in soma.items()}, st, ts, int(minuto_sim()), st >= ts)
+
+
+def _montar_2t(j1, novos, st, ts, minuto, completo):
+    import copy
     total = sum(novos.values())
     fmt = lambda x: f"{x:.2f}".replace(".", ",")
+    pc = st / ts * 100 if ts else 0.0
     j = copy.deepcopy(j1)
     for cg in j.get("carg", []):
         agrs = []
@@ -645,21 +723,20 @@ def sintetizar_2t(j1, url):
                 for c in pa["cand"]:
                     v = novos[str(c["n"])]
                     p = v / total * 100 if total else 0.0
-                    c.update(vap=str(v), pvap=fmt(p), pvapn=f"{p:.9f}".replace(".", ","))
-                    venceu = local >= 1 and v == max(novos.values())
-                    c.update(e="s" if venceu else "n", st=("Eleito" if venceu else "Não eleito") if local >= 1 else "")
+                    c.update(vap=str(v), pvap=fmt(p), pvapn=f"{p:.9f}".replace(".", ","), dvt="Válido")
+                    venceu = completo and v == max(novos.values())
+                    c.update(e="s" if venceu else "n", st=("Eleito" if venceu else "Não eleito") if completo else "")
                 if pa["cand"]:
                     pars.append(pa)
             if pars:
                 ag["par"] = pars
                 agrs.append(ag)
         cg["agr"] = agrs
-    ts = int(num(j["s"]["ts"]))
-    j["s"].update(st=str(round(ts * local)), pst=fmt(local * 100), pstn=f"{local * 100:.9f}".replace(".", ","))
+    j["s"].update(ts=str(ts), st=str(st), pst=fmt(pc), pstn=f"{pc:.9f}".replace(".", ","))
     j["v"].update(vv=str(total), vvc=str(total))
     j["t"] = "2"
-    agora = datetime.now(BRT)
-    j["dg"], j["hg"], j["ht"] = agora.strftime("%d/%m/%Y"), agora.strftime("%H:%M:%S"), agora.strftime("%H:%M:%S")
+    dia = datetime.now(BRT)
+    j["dg"], j["hg"], j["ht"] = dia.strftime("%d/%m/%Y"), hhmm_sim(minuto) + ":00", hhmm_sim(minuto) + ":00"
     return j
 
 
@@ -936,7 +1013,7 @@ def criar_servidor(host, porta, uf, so_uf, so_br, intervalo):
 
     def gerar_mapa(sigla, cargo, turno=1):
         return cache.obter(("mapa", sigla, cargo, turno), lambda: _json(mapa_municipios(sigla, cargo, turno)),
-                           ttl=max(intervalo, 45))
+                           ttl=intervalo if SIM["ativo"] else max(intervalo, 60))     # 167 arquivos por vez: quase tudo 304
 
     # ---- chat (RAG + ferramentas): ver chat.py -----------------------------------------------------------------
     def dados_do_painel(sigla, turno):
@@ -1118,19 +1195,28 @@ def main():
     ap.add_argument("--sem-navegador", action="store_true", help="não abre o navegador (automático fora do localhost)")
     ap.add_argument("--simular-2t", action="store_true",
                     help="TESTE: fabrica arquivos de 2º turno a partir do 1º, com apuração que avança até 100%%")
-    ap.add_argument("--sim-duracao", type=int, default=600, help="segundos até a apuração simulada chegar a 100%%")
-    ap.add_argument("--intervalo", type=int, default=None, help="segundos entre consultas (padrão: 60 no terminal, 15 no navegador)")
+    ap.add_argument("--sim-inicio", default="18:55", help="hora (HH:MM) em que o relógio simulado começa; 17:00 mostra a espera inteira até as 19h")
+    ap.add_argument("--sim-duracao", type=int, default=300, help="segundos reais para o relógio simulado ir de 17h a 22h (1 min simulado = duração/300 s)")
+    ap.add_argument("--intervalo", type=int, default=None, help="segundos entre consultas (padrão: 60 no terminal, 15 no navegador, 2 na simulação)")
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s", datefmt="%H:%M:%S")
     uf = a.uf.lower()
     if uf not in UFS:
         sys.exit(f"UF inválida: {a.uf}")
     if a.simular_2t:
-        SIM.update(ativo=True, t0=time.time(), duracao=float(a.sim_duracao))
-        log.warning("*** SIMULAÇÃO DE 2º TURNO ATIVA (dados fabricados; 100%% em %ss) ***", a.sim_duracao)
+        try:
+            h, m = a.sim_inicio.split(":")
+            inicio = int(h) * 60 + int(m)
+        except ValueError:
+            sys.exit(f"--sim-inicio inválido: {a.sim_inicio} (use HH:MM)")
+        inicio = min(max(inicio, SIM_INICIO_MIN), SIM_FIM_MIN)
+        # começar mais tarde = voltar o "t0": o relógio já nasce em `inicio`, sem a espera das horas puladas
+        t0 = time.time() - (inicio - SIM_INICIO_MIN) * a.sim_duracao / (SIM_FIM_MIN - SIM_INICIO_MIN)
+        SIM.update(ativo=True, t0=t0, duracao=float(a.sim_duracao))
+        log.warning("*** SIMULAÇÃO DE 2º TURNO ATIVA (dados fabricados; relógio simulado 17h→22h em %ss) ***", a.sim_duracao)
     if a.web:
         local = a.host in ("127.0.0.1", "localhost", "::1")
-        servir(a.host, a.porta, uf, a.so_uf, a.so_br, a.intervalo or 15,
+        servir(a.host, a.porta, uf, a.so_uf, a.so_br, a.intervalo or (2 if a.simular_2t else 15),
                abrir_navegador=local and not a.sem_navegador and "PORT" not in os.environ)
         return
     while True:
