@@ -43,9 +43,9 @@ Esse volume acertou o que faltava com cerca de **±1%** em qualquer ponto da apu
 Seja $x_u = \dfrac{a^{1T}_u}{a^{1T}_u + b^{1T}_u}$ a fração do candidato A entre A e B no **1º turno** da unidade e $o_u$ a fração
 dos votos válidos que foi para os demais candidatos. O prior é
 
-$$\pi_u = \operatorname{expit}\!\Big(\alpha + \beta \,\operatorname{logit}(x_u) + \gamma\, o_u\Big)$$
+$$\pi_u = \mathrm{expit}\!\Big(\alpha + \beta \,\mathrm{logit}(x_u) + \gamma\, o_u\Big)$$
 
-com $\operatorname{logit}(t)=\ln\frac{t}{1-t}$ e $\operatorname{expit}$ a função inversa. Usamos a escala *logit* porque nela um
+com $\mathrm{logit}(t)=\ln\frac{t}{1-t}$ e $\mathrm{expit}$ a função inversa. Usamos a escala *logit* porque nela um
 deslocamento geral de opinião é uma **soma**. Parâmetros do presidente: $\beta = 0{,}975$, $\gamma = -0{,}023$. O intercepto
 $\alpha$ **não importa** (próximo passo).
 
@@ -53,7 +53,7 @@ $\alpha$ **não importa** (próximo passo).
 
 A contagem de cada unidade tem um desvio em relação ao seu prior:
 
-$$r_u = \operatorname{logit}\!\Big(\tfrac{a_u}{a_u+b_u}\Big) - \operatorname{logit}(\pi_u)$$
+$$r_u = \mathrm{logit}\!\Big(\tfrac{a_u}{a_u+b_u}\Big) - \mathrm{logit}(\pi_u)$$
 
 A **maré** $\theta$ é a média desses desvios ponderada pelos votos já contados ($w_u = a_u+b_u$):
 
@@ -67,7 +67,7 @@ porque os candidatos mudaram), a maré corrige exatamente, e isso é verificado 
 
 Para o que falta em cada unidade, a escala *logit* da fração de A é
 
-$$\operatorname{logit} q_u \;=\; \operatorname{logit}\pi_u \;+\; \theta \;+\; \kappa_u\,(r_u-\theta) \;+\; \underbrace{\psi + \psi_1\operatorname{logit}\pi_u + \psi_2\, p_u}_{\text{correção de ordem}}$$
+$$\mathrm{logit} q_u \;=\; \mathrm{logit}\pi_u \;+\; \theta \;+\; \kappa_u\,(r_u-\theta) \;+\; \underbrace{\psi + \psi_1\mathrm{logit}\pi_u + \psi_2\, p_u}_{\text{correção de ordem}}$$
 
 - $\pi_u + \theta$: o prior deslocado pela maré;
 - $\kappa_u = p_u$: **quanto mais a unidade já apurou, mais confiamos no desvio dela própria** $(r_u - \theta)$ em vez da média;
