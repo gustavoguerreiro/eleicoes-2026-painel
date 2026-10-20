@@ -1,4 +1,4 @@
-"""Dados e instantâneo para os experimentos 9 e 13 (RN): backtest REALISTA do governador. Resultado verdadeiro = RN 2018 (Fátima/PT x Carlos Eduardo), um par real
+"""Dados e instantâneo para o exp13.py (RN): backtest REALISTA do governador. Resultado verdadeiro = RN 2018 (Fátima/PT x Carlos Eduardo), um par real
 de 1º e 2º turno de governador. Ordem de apuração = o perfil de chegada dos boletins de CADA município no 1º turno de 2026
 (dentro do município, a ordem é sorteada; opcionalmente soma-se um deslocamento de ordem em logit)."""
 import gzip

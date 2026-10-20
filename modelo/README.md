@@ -15,10 +15,10 @@ O modelo corrige isso usando (1) o 1º turno de cada unidade e (2) o que o 2º t
 Para cada unidade *u* (estado no Brasil; município no governador), com `a`, `b` = votos já apurados dos dois finalistas:
 
 1. **Quanto falta.** `faltam_u = (aptos_total − aptos_apurados) × (a+b)/aptos_apurados`. Em 2022 isso acertou o volume
-   restante com **±1%** em qualquer ponto da apuração (`exp2.py`).
+   restante com **±1%** em qualquer ponto da apuração (medido na exploração inicial; ver o fim deste arquivo).
 2. **Prior do 1º turno.** `π_u = invlogit(α + β·logit(a1/(a1+b1)) + γ·outros1)`, só com o 1º turno. O intercepto α não importa.
 3. **Maré.** `θ` = desvio médio (em logit, ponderado pelos votos) entre o que cada unidade já mostrou e o seu prior, encolhido do
-   estado para o país. Um erro de nível no prior é absorvido por completo pela maré (testado, `exp3.py`/`test_projecao.py`).
+   estado para o país. Um erro de nível no prior é absorvido por completo pela maré (testado em `tests/test_projecao.py`).
 4. **O que falta vota assim:** `logit q_u = logit π_u + θ + κ·(r_u − θ) + ψ + ψ₁·logit π_u + ψ₂·p_u`, com `κ = p_u` (fração
    apurada da unidade) e `r_u` o desvio da própria unidade. `ψ`, `ψ₁`, `ψ₂` corrigem o **viés de ordem**: as últimas seções a chegar
    são, em média, mais favoráveis a um lado (em 2022, ao PT) do que as primeiras, e mais ainda onde o lado é forte.
@@ -42,7 +42,7 @@ As contas batem com os totais oficiais (Lula 60.345.999 × Bolsonaro 58.206.354 
 
 Erro da % final do candidato A (PT) entre os dois finalistas, em pontos percentuais (RMS dos instantes da faixa).
 
-### Brasil: 2º turno de 2022 com a ordem real dos boletins (`backtest.py`, `exp11.py`, `exp12.py`)
+### Brasil: 2º turno de 2022 com a ordem real dos boletins (`backtest.py` e `tests/test_projecao.py`)
 
 | Apurado (seções) | Placar bruto | Reponderação por estado | Modelo entregue (estados) | Modelo com municípios |
 |---|---|---|---|---|
@@ -55,7 +55,7 @@ Pontos a saber:
   em volta). Na eleição de 2026 eles podem ser diferentes: por isso a faixa é um cenário `ψ ± σ`, e o teste automático
   (`tests/test_projecao.py::NoiteDe2022`) exige só que o modelo seja ≥3× melhor que o placar e que a faixa contenha o resultado final.
 - O prior usa coeficientes de outros estados (leave-one-state-out); a inclinação do prior pode errar 40% sem estragar o resultado (`backtest.py`).
-- O viés de ordem **varia por estado**: de −0,01 (RJ, AC) a +0,12 (MA, PI, CE) em logit (`exp5.py`); o modelo captura a parte
+- O viés de ordem **varia por estado**: de −0,01 (RJ, AC) a +0,12 (MA, PI, CE) em logit (exploração inicial); o modelo captura a parte
   explicada pela força do lado (`ψ₁`) e deixa o resto na faixa.
 
 ### Teste fora da amostra: 1º turno de 2026 no RN (`exp14.py`)
@@ -80,7 +80,7 @@ perfil `presidente` usa `σ = 0,05`. Falta testar o país inteiro com a ordem de
 ### RN, governador: o que o painel mostra de verdade
 
 O prior do 1º turno prevê **mal** o 2º turno de governador município a município (erro de 6–7 p.p. em 2018 contra 0,8 p.p. do
-presidente nacional em 2022, `exp8.py`). Então a projeção do RN depende mais da contagem, e o viés de ordem foi medido nos dados
+presidente nacional em 2022, exploração inicial). Então a projeção do RN depende mais da contagem, e o viés de ordem foi medido nos dados
 de 2026:
 
 | Medida do viés de ordem dentro do município (logit; + = o que falta é mais do candidato A) | Valor |
@@ -122,11 +122,23 @@ python modelo/dados_2022.py              # 66 MB
 python modelo/dados_2022_municipios.py   # 271 MB
 python modelo/dados_rn.py                # 75 MB
 python modelo/backtest.py                # tabela principal
-python modelo/exp13.py                   # RN
+python modelo/exp13.py                   # RN governador (par real de 2018 + ordem real de 2026)
+python modelo/exp14.py                   # teste fora da amostra: RN, 1º turno de 2026
 python -m unittest tests.test_projecao   # regressão (a noite de 2022 só roda se os dados estiverem baixados)
 ```
 
-Experimentos (cada um responde a uma pergunta; os números acima vêm deles): `exp1` placar x reponderação por estado,
-`exp2` volume que falta e viés por faixa, `exp3` primeiro modelo por município, `exp5` viés por estado, `exp6` psi₁,
-`exp7`/`exp11` modelo só com estados, `exp8` RN (prior de 2018 e viés de ordem em 2026), `exp9`/`exp13` RN com par real,
-`exp10` RN 2026 com ordem real, `exp12` psi₂, `exp14` teste fora da amostra (RN, 1º turno de 2026).
+## Scripts que estão aqui e o que ficou de fora
+
+| Script | O que faz |
+|---|---|
+| `dados_2022.py`, `dados_2022_municipios.py`, `dados_rn.py` | baixam e resumem os dados abertos do TSE para `modelo/cache/` |
+| `replay.py`, `nucleo.py` | reproduzem a apuração de 2022 minuto a minuto; priors do 1º turno e avaliação de parâmetros |
+| `backtest.py` | tabela principal do Brasil (2º turno de 2022, ordem real) e testes de robustez |
+| `exp13.py`, `rn_2018.py` | RN governador: par real de 2018 com a ordem real de chegada de 2026 |
+| `exp14.py` | teste fora da amostra: RN, 1º turno de 2026, prior só do 1º turno de 2022 |
+
+Alguns números deste arquivo vieram de **scripts de exploração que não estão no repositório** (comparação do placar com a
+reponderação por estado, o erro do volume que falta, o viés de ordem por estado, a escolha dos parâmetros ψ₁ e ψ₂ numa grade, o erro do
+prior de governador em 2018 e a medida do viés de ordem dentro do município). Eles usaram as mesmas funções de `nucleo.py` e `replay.py` sobre
+os mesmos dados; o teste `tests/test_projecao.py::NoiteDe2022` e os scripts acima reproduzem o essencial: a projeção entregue contra
+a ordem real de 2022 e os testes do RN.
