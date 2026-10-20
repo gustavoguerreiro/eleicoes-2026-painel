@@ -48,6 +48,13 @@ This project started as a terminal script and grew into a full-stack portfolio p
   or true-shape map, hover/focus/click detail panel).
 - **Floating chat assistant on every page** that knows what is on screen ("who leads *here*?"), cites its sources and
   lets you open the original plan passage and page.
+- **Projection of the final result** (own estimate, not official): from the first-round result of each state (or municipality, for
+  the governor) and what each one already showed, with a scenario band and the *turnaround point* ("to win, the trailing candidate
+  needs X% of what is left"). Backtested minute by minute on the real order in which the 2022 runoff ballots arrived: error of
+  about 0.06 p.p. against 1.9 p.p. for the raw count at 15–50% counted (the math is explained step by step in
+  [docs/projecao.md](docs/projecao.md); data, limits and how to reproduce in [modelo/README.md](modelo/README.md)); the dashboard links to it.
+- **Replay of the real 2022 runoff night** (`--replay-2022`): the dashboard reproduces the actual order of arrival of the
+  2022 ballots with 2026 candidates, to rehearse and to watch the projection work.
 - **Built-in simulator** (`--simular-2t`) that replays election night from 17:00 to 22:00 in minutes: zeroed files until
   19:00, then each state counts at its own pace (fast at first, slow at the end), the lead can flip, and Brazil is the sum of
   the 27 states, as in the real feed. Clearly labelled "SIMULAÇÃO", with the simulated clock on screen.
@@ -137,6 +144,7 @@ python painel_server.py --uf pe                                # different initi
 python painel_server.py --uma-vez                              # terminal version (1st round), prints once
 python painel_server.py --web --simular-2t                     # simulated runoff: starts at 18:55, ends 22:00 (1 min = 1 s)
 python painel_server.py --web --simular-2t --sim-inicio 17:00  # from 17:00, with the whole wait until 19:00
+python painel_server.py --web --replay-2022                    # the REAL 2022 runoff night (needs modelo/dados_*.py, ~340 MB)
 python painel_server.py --web --simular-2t --sim-duracao 120   # faster: 17:00→22:00 in 2 min
 python -m rag.ingestao                                         # rebuild the index from data/planos/*.pdf
 ```
@@ -270,6 +278,13 @@ O projeto começou como um script de terminal e virou uma peça de portfólio fu
   de detalhe por passar o mouse, foco ou clique).
 - **Chat flutuante em todas as páginas** que sabe o que está na tela ("quem lidera *aqui*?"), cita as fontes e abre o
   trecho original e a página do plano.
+- **Projeção do resultado final** (estimativa própria, não oficial): parte do 1º turno de cada estado (ou município, no governador) e
+  do que cada um já mostrou, com uma faixa de cenários e o *ponto de virada* ("para virar, quem está atrás precisa de X% do que
+  falta"). Testada minuto a minuto com a ordem real de chegada dos boletins do 2º turno de 2022: erro de cerca de 0,06 p.p. contra
+  1,9 p.p. do placar bruto com 15–50% apurado (a matemática, passo a passo, em [docs/projecao.md](docs/projecao.md); dados, limites e como reproduzir em
+  [modelo/README.md](modelo/README.md)); o painel tem um link para ela.
+- **Replay da noite real do 2º turno de 2022** (`--replay-2022`): o painel reproduz a ordem real de chegada dos boletins de 2022
+  com os candidatos de 2026, para ensaiar e ver a projeção funcionando.
 - **Simulador** (`--simular-2t`) que reproduz a noite da eleição das 17h às 22h em poucos minutos: arquivos zerados até
   as 19h, depois cada estado apura no seu ritmo (rápido no começo, devagar no fim), a liderança pode virar e o Brasil é a
   soma dos 27 estados, como na divulgação real. Com aviso "SIMULAÇÃO" e o relógio simulado na tela.
@@ -334,6 +349,7 @@ python painel_server.py --uf pe                                # estado inicial 
 python painel_server.py --uma-vez                              # versão terminal (1º turno), imprime uma vez
 python painel_server.py --web --simular-2t                     # 2º turno simulado: começa 18h55 e vai até 22h (1 min = 1 s)
 python painel_server.py --web --simular-2t --sim-inicio 17:00  # desde as 17h, com toda a espera até as 19h
+python painel_server.py --web --replay-2022                    # a noite REAL do 2º turno de 2022 (precisa de modelo/dados_*.py, ~340 MB)
 python painel_server.py --web --simular-2t --sim-duracao 120   # mais rápido: 17h→22h em 2 min
 python -m rag.ingestao                                         # reconstrói o índice a partir de data/planos/*.pdf
 ```

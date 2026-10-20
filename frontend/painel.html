@@ -434,6 +434,15 @@ html.tv body.wide .tela .mcard{padding:10px}
 .tela{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
 .painel2{display:flex;flex-direction:column;gap:14px;min-width:0}
 .dc{gap:12px;padding:16px}
+.proj{display:flex;flex-direction:column;gap:4px;padding:8px 12px;border-radius:var(--r-box);border:1px dashed var(--line);background:var(--surface-2)}
+.pj-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.pj-c{font-size:var(--fs-cap);font-weight:700;color:var(--ink-3)}.pj-c.c-a{color:var(--ok)}.pj-c.c-b{color:var(--warn)}
+.pj-l{display:flex;gap:6px 22px;flex-wrap:wrap;align-items:baseline}
+.pj strong{font-size:var(--fs-lg);font-weight:800}.pj b{font-weight:800}.pj small{color:var(--ink-3);font-size:var(--fs-cap)}
+.pj-n{font-size:var(--fs-cap);color:var(--ink-3)}.pj-m{color:var(--acc);font-weight:700;white-space:nowrap}.pj-m:hover{text-decoration:underline}
+.pj-f{font-size:var(--fs-cap);color:var(--ink-2)}.pj-f b{color:var(--ink)}.pj-f i{color:var(--ink-3)}
+.tv .pj-f i,.tv .proj .pj-h .cap,.tv .pj-n{display:none}
+.tv .proj{padding:5px 10px;gap:2px}.tv .pj strong{font-size:16px}
 .dc .dtop>div{flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap}
 .dc .dtop h2{font-size:var(--fs-h2);font-weight:800}
 .dc .st{flex-direction:row;align-items:baseline;gap:4px 10px;flex-wrap:wrap;padding:8px 12px}
@@ -1315,6 +1324,25 @@ function pgGovernador2(d) {
 }
 
 /* ---- tela dividida: governador do estado (RN) e presidente (Brasil) lado a lado ---- */
+/* ---- projeção do resultado final (estimativa; modelo em backend/projecao.py) ---- */
+const METODO_URL = "https://github.com/gustavoguerreiro/eleicoes-2026-painel/blob/main/docs/projecao.md";   // método matemático da projeção
+const milhoes = n => n >= 1e6 ? (n / 1e6).toLocaleString("pt-BR", {maximumFractionDigits: 1}) + " milhões" : milhar(n);
+function projHtml(d, a, b) {                  // a, b: candidatos na ordem alfabética do cartão
+  const pj = d.projecao;
+  if (!pj || !d.ao_vivo || d.situacao && d.situacao.tipo === "eleito") return "";
+  const de = c => c.n === pj.a ? [pj.pct_a, pj.lo, pj.hi] : [100 - pj.pct_a, 100 - pj.hi, 100 - pj.lo];
+  const fx = c => { const [v, lo, hi] = de(c); return `<span class="pj"><b style="color:${corPura(c.sg)}">${esc(curto(c))}</b> <strong>${pct(v)}</strong> <small>${pct1(lo).replace("%", "")} a ${pct1(hi)}</small></span>`; };
+  const atras = [a, b].find(c => (c.n === pj.a) === (pj.atras === "a")) || b;
+  const virada = pj.decidido ? `<b>A diferença é maior que todo o resto a apurar: resultado praticamente definido, aguardando o TSE.</b>`
+    : pj.virada == null ? "" : `Para virar, <b>${esc(curto(atras))}</b> precisa de <b>${pct1(pj.virada)}</b> do que falta.`;
+  return `<div class="proj" title="Estimativa própria, não oficial: parte do 1º turno e do que já foi apurado em cada ${pj.perfil === "presidente" ? "estado" : "município"}. A faixa mostra cenários de viés de ordem da apuração, não uma probabilidade.">
+    <div class="pj-h"><span class="cap">Projeção do resultado final</span><span class="pj-c c-${pj.confianca === "baixa" ? "b" : pj.confianca === "alta" ? "a" : "m"}">confiança ${esc(pj.confianca)}${pj.confianca === "baixa" ? " (cedo)" : ""}</span></div>
+    <div class="pj-l">${fx(a)}${fx(b)}</div>
+    <div class="pj-f">Faltam ~${milhoes(pj.faltam)} de votos válidos. ${virada} <i>Estimativa, não oficial.</i></div>
+    <div class="pj-n">${pj.perfil === "presidente" ? "A faixa vai de «sem viés na ordem em que os boletins chegam» até «o dobro do viés de 2022»; não é uma probabilidade." : "A faixa cobre hipóteses sobre a ordem em que os municípios chegam; no governador a incerteza é maior; não é uma probabilidade."}
+      <a class="pj-m" href="${METODO_URL}" target="_blank" rel="noopener">Como calculamos ↗</a></div></div>`;
+}
+
 const placarVista = {};                       // id do painel -> "num" | "graf" (na TV os dois aparecem juntos)
 function cardPlacar(cargo, escopo, d, id) {
   if (!d || d.cands.length < 2) return cardVazio(escopo);
@@ -1331,7 +1359,8 @@ function cardPlacar(cargo, escopo, d, id) {
     <div class="b50"><div class="tr">${segs.map(([w, bg]) => `<i style="width:${w}%;background:${bg}"></i>`).join("")}</div><span class="mk"></span></div>
     <div class="dft${ao ? " ao" : ""}"><span>${ao ? "Diferença" : "Diferença no 1º turno"}: ${pp2(dpp)} p.p. · ${milhar(dv)} votos</span></div>`;
   const status = `<div class="st ${tom}"><b>${esc(s.rotulo || "")}</b><span>${esc(bonito(s.texto || ""))}</span></div>`;
-  const corpo = vista === "graf" ? serieInner(d, id) + status : vista === "num" ? numeros + status : numeros + status + serieInner(d, id);
+  const pj = projHtml(d, a, b);
+  const corpo = vista === "graf" ? serieInner(d, id) + status + pj : vista === "num" ? numeros + status + pj : numeros + status + pj + serieInner(d, id);
   const chave = v => `<button data-pv="${id}:${v}" class="${vista === v ? "on" : ""}">${v === "num" ? "Números" : "Gráfico"}</button>`;
   return `<section class="dcard dc"><div class="dtop"><div><span class="cg">${esc(cargo)}</span><h2>${esc(escopo)}</h2></div>
       <div class="dtop-d"><span class="meta">${ao ? pct(d.apur) + " apurado" : "2º turno em " + dataBr(ultimo.meta.data_2t)}</span>
@@ -1438,7 +1467,7 @@ const setHtml = (el, h) => { if (el && el._h !== h) { el.innerHTML = h; el._h = 
 function rodape() {
   const t2 = turno === 2;
   setHtml($("#rodape"), `<div class="topo">${t2 ? `<a class="link" href="${hashDe("resumo", uf, 1)}">Resultado final do 1º turno →</a>` : `<a class="link" href="${hashDe("resumo", uf, 2)}">← Voltar ao 2º turno</a>`}
-    <span><strong>Painel não oficial.</strong> Fonte: divulgação oficial de resultados do TSE. O resultado oficial é o que o TSE marcar como eleito. ${t2 ? "A ordem dos candidatos é alfabética e não muda com o placar."
+    <span><strong>Painel não oficial.</strong> Fonte: divulgação oficial de resultados do TSE. O resultado oficial é o que o TSE marcar como eleito. ${t2 ? `A ordem dos candidatos é alfabética e não muda com o placar. A projeção é uma estimativa própria: <a class="pj-m" href="${METODO_URL}" target="_blank" rel="noopener">veja o método matemático ↗</a>.`
       : "<strong>Como ler:</strong> ★ eleito (confirmado pelo TSE) · ② vai ao 2º turno (confirmado pelo TSE) · ▶ se elegeria com os votos de agora. Projeções de deputados são estimativas próprias (quociente eleitoral, cláusulas de 80%/20% e sobras)."}</span>
     <button class="tm" id="tema2">Alternar tema claro/escuro</button></div>`);
 }

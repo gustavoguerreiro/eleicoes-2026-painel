@@ -27,6 +27,8 @@ from collections import namedtuple
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 
+import projecao                                  # noqa: E402  (modelo de projeção: backend/projecao.py)
+
 BASE = "https://resultados.tse.jus.br/oficial"
 RAIZ = BASE + "/ele2026"
 DATA_2T = "2026-10-25"
@@ -102,11 +104,12 @@ def url_u(ele, uf, cargo):
 CACHE_URL, CACHE_TTL = {}, 0          # url -> {t, j, etag}; no modo web, o que foi baixado é reaproveitado por CACHE_TTL s
 
 
-def baixar_cache(url):
-    """Baixa com cache. Usa ETag (o TSE responde 304 quando nada mudou) e, se o TSE falhar, devolve o último dado bom
+def baixar_cache(url, ttl=None):
+    """Baixa com cache (`ttl` em segundos; padrão = CACHE_TTL). Usa ETag (o TSE responde 304 quando nada mudou) e, se o TSE falhar, devolve o último dado bom
     em vez de "sem dados": uma falha de rede no meio da apuração não pode apagar a tela."""
     e, agora = CACHE_URL.get(url), time.time()
-    if e and CACHE_TTL and agora - e["t"] < CACHE_TTL:
+    vida = CACHE_TTL if ttl is None else ttl
+    if e and vida and agora - e["t"] < vida:
         return e["j"]
     if SIM["ativo"]:
         fab = simulado(url)
@@ -169,9 +172,14 @@ def apurado(j):
 
 
 def restantes(j):
-    """Votos válidos ainda por apurar, projetados pelo % de seções apuradas."""
-    p = apurado(j)
+    """Votos válidos ainda por apurar. Usa o ELEITORADO apurado (estimou o volume restante com ~1% de erro em 2022, modelo/README.md)
+    e, se o arquivo não o trouxer, o % de seções apuradas."""
     vv = num(j["v"]["vv"])
+    e = j.get("e") or {}
+    te, est = num(e.get("te")), num(e.get("est"))
+    if te > 0 and est > 0:
+        return max(0.0, vv * (te - est) / est)
+    p = apurado(j)
     return vv * (100 - p) / p if p > 0 else float("inf")
 
 
@@ -559,6 +567,71 @@ def dados_web(uf, so_uf, so_br):
     return out
 
 
+# ---- projeção do resultado final (modelo em backend/projecao.py, calibrado em modelo/README.md) --------------------------
+def _lados(j1):
+    """(numero de A, numero de B) dos finalistas: A é o candidato do PT (o viés de ordem do modelo é medido em relação a ele)."""
+    fin = finalistas_1t(j1) if j1 else []
+    if len(fin) < 2:
+        return None
+    a = next((x for x in fin if x["sg"] == "PT"), fin[0])
+    b = next(x for x in fin if x["n"] != a["n"])
+    return a, b
+
+
+def _unidade(uid, grupo, j1, j2, a_n, b_n, coef):
+    c1 = {x["n"]: x for x in candidatos(j1)} if j1 else {}
+    c2 = {x["n"]: x for x in candidatos(j2)} if j2 else {}
+    val1 = sum(x["votos"] for x in c1.values() if x["valido"])
+    e2 = (j2 or j1 or {}).get("e", {})
+    return dict(id=uid, grupo=grupo, a=c2.get(a_n, {}).get("votos", 0.0), b=c2.get(b_n, {}).get("votos", 0.0),
+                apt_c=num((j2 or {}).get("e", {}).get("est", 0)), apt_t=num(e2.get("te", 0)),
+                prior=projecao.prior_1t(c1.get(a_n, {}).get("votos", 0.0), c1.get(b_n, {}).get("votos", 0.0), val1, coef))
+
+
+def _resultado_projecao(us, perfil, lados):
+    r = projecao.projetar_com_faixa(us, perfil)
+    if not r:
+        return None
+    r = {k: (round(v, 4) if isinstance(v, float) else v) for k, v in r.items()}
+    r["a"], r["b"] = lados[0]["n"], lados[1]["n"]
+    r["perfil"] = perfil
+    return r
+
+
+def projecao_brasil(d1, d2):
+    """Presidente: 27 estados + exterior como unidades (o 1º turno de cada um é o prior)."""
+    lados = _lados(d1.get(("br", 1)))
+    if not lados:
+        return None
+    coef = projecao.PERFIS["presidente"]["coef"]
+    us = []
+    for u in UFS + ["zz"]:
+        j1, j2 = d1.get((u, 1)), d2.get((u, 1))
+        if j1 and j2:
+            us.append(_unidade(u, "BR", j1, j2, lados[0]["n"], lados[1]["n"], coef))
+    return _resultado_projecao(us, "presidente", lados) if len(us) >= 20 else None
+
+
+def url_mun(ele, uf, tse, cargo):
+    return f"{RAIZ}/{ele}/dados/{uf}/{uf}{tse}-c{cargo:04d}-e{int(ele):06d}-u.json"
+
+
+def projecao_municipios(uf, c, cargo=3):
+    """Governador do estado: os municípios são as unidades (1º turno de cada município = prior; os arquivos municipais do 1º
+    turno ficam em cache por 1 h e os do 2º turno por 60 s, os mesmos que o mapa usa)."""
+    muns = municipios_tse().get(uf, [])
+    j1uf = baixar_cache(url_u(c["dem1"], uf, cargo), 3600)
+    lados = _lados(j1uf)
+    if not muns or not lados:
+        return None
+    coef = projecao.PERFIS["governador"]["coef"]
+    with ThreadPoolExecutor(max_workers=16) as ex:
+        r1 = list(ex.map(lambda m: baixar_cache(url_mun(c["dem1"], uf, m[0], cargo), 3600), muns))
+        r2 = list(ex.map(lambda m: baixar_cache(url_mun(c["dem2"], uf, m[0], cargo), 60), muns))
+    us = [_unidade(m[0], uf.upper(), j1, j2, lados[0]["n"], lados[1]["n"], coef) for m, j1, j2 in zip(muns, r1, r2) if j1]
+    return _resultado_projecao(us, "governador", lados) if len(us) >= 20 else None
+
+
 # ---- 2º turno ----------------------------------------------------------------------------------------------
 _COD = dict(t=0.0, v=None)
 
@@ -644,6 +717,10 @@ def _1t_fixo(url):
 def simulado(url):
     """Devolve um arquivo de 2º turno fabricado a partir do equivalente do 1º (False = não é um arquivo de 2º turno)."""
     c = codigos_turno()
+    if SIM.get("replay"):
+        r = _replay_arquivo(url, c)
+        if r is not False:
+            return r
     for k1, k2 in (("pres1", "pres2"), ("dem1", "dem2")):
         e1, e2 = c[k1], c[k2]
         if f"/{e2}/" in url and f"e{int(e2):06d}" in url:
@@ -658,6 +735,68 @@ def simulado(url):
                 nums = {x["n"] for x in finalistas_1t(jbr)} if jbr else None
             return sintetizar_2t(j1, url, nums)
     return False
+
+
+_REPLAY = {"obj": None}
+_URL = __import__("re").compile(r"/(\d+)/dados/([a-z]{2})/\2(\d*)-c(\d{4})-e\d+-u\.json$")
+
+
+def _ajusta_1t(j1, votos_ab, a_n, b_n, validos_2022):
+    """Arquivo de 1º turno de 2026 com os votos de 2022: finalistas = os de 2022; os demais candidatos são reescalados."""
+    import copy
+    j = copy.deepcopy(j1)
+    cands = [c for cg in j.get("carg", []) for ag in cg.get("agr", []) for pa in ag.get("par", []) for c in pa.get("cand", [])]
+    outros_t = sum(num(c["vap"]) for c in cands if str(c["n"]) not in (a_n, b_n))
+    outros_2022 = max(0.0, validos_2022 - sum(votos_ab))
+    f = outros_2022 / outros_t if outros_t > 0 else 0.0
+    novos = {}
+    for c in cands:
+        n = str(c["n"])
+        novos[n] = votos_ab[0] if n == a_n else votos_ab[1] if n == b_n else num(c["vap"]) * f
+    total = sum(novos.values())
+    fmt = lambda x: f"{x:.2f}".replace(".", ",")
+    for c in cands:
+        v = novos[str(c["n"])]
+        c.update(vap=str(round(v)), pvap=fmt(v / total * 100 if total else 0), pvapn=fmt(v / total * 100 if total else 0))
+    j["v"].update(vv=str(round(total)), vvc=str(round(total)))
+    return j
+
+
+def _replay_arquivo(url, c):
+    """Replay de 2022: devolve o arquivo (dict), None (sem dados) ou False (não é um arquivo do replay: vale o dado real)."""
+    m = _URL.search(url)
+    if not m or not _REPLAY["obj"]:
+        return False
+    ele, uf, tse, cargo = m.group(1), m.group(2), m.group(3), int(m.group(4))
+    seg = ele in (c["pres2"], c["dem2"])
+    if ele not in (c["pres1"], c["pres2"], c["dem1"], c["dem2"]) or cargo not in (1, 3) or (cargo == 3 and uf != "rn"):
+        return False
+    rep = _REPLAY["obj"]
+    e1 = c["pres1"] if cargo == 1 else c["dem1"]
+    u1 = url if not seg else url.replace(f"/{ele}/", f"/{e1}/").replace(f"e{int(ele):06d}", f"e{int(e1):06d}")
+    j1 = _1t_fixo(u1)
+    lados = _lados(j1) if j1 else None
+    if not lados:
+        return None
+    a_n, b_n = lados[0]["n"], lados[1]["n"]
+    ref_b = "22"                                         # em 2022 o adversário do Lula era o Bolsonaro (22), qualquer que seja o rótulo de hoje
+    if not seg:                                           # 1º turno (prior) com os votos de 2022
+        v = rep.votos_1t(None if uf == "br" else uf, tse or None)
+        valid = sum(x for k, x in v.items() if k not in ("95", "96"))
+        if valid <= 0:
+            return None
+        return _ajusta_1t(j1, (v.get("13", 0), v.get(ref_b, 0)), a_n, b_n, valid)
+    minuto = int(minuto_sim())
+    if uf == "br":
+        u = rep.brasil(minuto)
+    elif tse:
+        u = rep.municipio(uf, tse, minuto)
+    else:
+        u = rep.estado(uf, minuto)
+    if not u or not u["secoes_t"]:
+        return None
+    return _montar_2t(j1, {a_n: u["a"], b_n: u["b"]}, u["secoes_c"], u["secoes_t"], minuto, u["secoes_c"] >= u["secoes_t"],
+                      apt=(u["apt_c"], u["apt_t"]))
 
 
 def _andamento(rnd, minuto):
@@ -708,7 +847,7 @@ def sintetizar_br(j1):
     return _montar_2t(j1, {n: round(v) for n, v in soma.items()}, st, ts, int(minuto_sim()), st >= ts)
 
 
-def _montar_2t(j1, novos, st, ts, minuto, completo):
+def _montar_2t(j1, novos, st, ts, minuto, completo, apt=None):
     import copy
     total = sum(novos.values())
     fmt = lambda x: f"{x:.2f}".replace(".", ",")
@@ -733,6 +872,13 @@ def _montar_2t(j1, novos, st, ts, minuto, completo):
                 agrs.append(ag)
         cg["agr"] = agrs
     j["s"].update(ts=str(ts), st=str(st), pst=fmt(pc), pstn=f"{pc:.9f}".replace(".", ","))
+    te = int(num(j["e"].get("te", 0)))                                       # eleitorado apurado = fração das seções apuradas
+    est = round(te * pc / 100)
+    if apt:                                                                  # replay de 2022: o eleitorado real de cada unidade
+        est, te = int(apt[0]), int(apt[1])
+        j["e"]["te"] = str(te)
+    j["e"].update(est=str(est), pest=fmt(est / te * 100 if te else 0), esnt=str(te - est),
+                  pesnt=fmt((te - est) / te * 100 if te else 0))
     j["v"].update(vv=str(total), vvc=str(total))
     j["t"] = "2"
     dia = datetime.now(BRT)
@@ -855,8 +1001,8 @@ def web_2t(j2, j1, serie=None):
 def dados_2t(uf):
     c = codigos_turno()
     ok = t2_disponivel()
-    d1 = coletar([(c["pres1"], "br", 1)] + [(c["pres1"], u, 1) for u in UFS] + [(c["dem1"], uf, 3)])
-    d2 = coletar([(c["pres2"], "br", 1)] + [(c["pres2"], u, 1) for u in UFS] + [(c["dem2"], uf, 3)]) if ok else {}
+    d1 = coletar([(c["pres1"], "br", 1)] + [(c["pres1"], u, 1) for u in UFS + ["zz"]] + [(c["dem1"], uf, 3)])
+    d2 = coletar([(c["pres2"], "br", 1)] + [(c["pres2"], u, 1) for u in UFS + ["zz"]] + [(c["dem2"], uf, 3)]) if ok else {}
     if ok:
         HIST.registrar("BR", d2.get(("br", 1)))
         HIST.registrar(uf.upper(), d2.get((uf, 3)))
@@ -876,6 +1022,14 @@ def dados_2t(uf):
         if r:
             mapa[u.upper()] = {"1": r}
     out["mapa_br"] = mapa
+    if ok:                                            # projeção: nunca derruba o painel se algo falhar
+        for destino, fn in ((out["pres"], lambda: projecao_brasil(d1, d2)),
+                            (out["uf"]["gov"] if out["uf"]["em_2turno"] else None, lambda: projecao_municipios(uf, c))):
+            if destino and destino.get("ao_vivo"):
+                try:
+                    destino["projecao"] = fn()
+                except Exception:                     # noqa: BLE001
+                    log.exception("falha na projeção")
     return out
 
 
@@ -1208,7 +1362,10 @@ def main():
     ap.add_argument("--sem-navegador", action="store_true", help="não abre o navegador (automático fora do localhost)")
     ap.add_argument("--simular-2t", action="store_true",
                     help="TESTE: fabrica arquivos de 2º turno a partir do 1º, com apuração que avança até 100%%")
-    ap.add_argument("--sim-inicio", default="18:55", help="hora (HH:MM) em que o relógio simulado começa; 17:00 mostra a espera inteira até as 19h")
+    ap.add_argument("--replay-2022", action="store_true",
+                    help="ENSAIO: reproduz a noite REAL do 2º turno de 2022 (ordem real dos boletins) com os candidatos de 2026; "
+                         "precisa de `python modelo/dados_2022.py` e `python modelo/dados_2022_municipios.py`")
+    ap.add_argument("--sim-inicio", default=None, help="hora (HH:MM) em que o relógio simulado começa; 17:00 mostra a espera inteira até as 19h")
     ap.add_argument("--sim-duracao", type=int, default=300, help="segundos reais para o relógio simulado ir de 17h a 22h (1 min simulado = duração/300 s)")
     ap.add_argument("--intervalo", type=int, default=None, help="segundos entre consultas (padrão: 60 no terminal, 15 no navegador, 2 na simulação)")
     a = ap.parse_args()
@@ -1216,7 +1373,15 @@ def main():
     uf = a.uf.lower()
     if uf not in UFS:
         sys.exit(f"UF inválida: {a.uf}")
+    if a.replay_2022:
+        import replay2022
+        if not replay2022.disponivel():
+            sys.exit("Faltam os dados de 2022: rode `python modelo/dados_2022.py` e `python modelo/dados_2022_municipios.py`.")
+        _REPLAY["obj"] = replay2022.Replay2022()
+        SIM["replay"] = True
+        a.simular_2t = True
     if a.simular_2t:
+        a.sim_inicio = a.sim_inicio or ("17:00" if a.replay_2022 else "18:55")
         try:
             h, m = a.sim_inicio.split(":")
             inicio = int(h) * 60 + int(m)
