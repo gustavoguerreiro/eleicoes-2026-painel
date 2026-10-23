@@ -1162,14 +1162,26 @@ function kicker(d) {
 }
 const blocoTitulo = (t, sub, d) => `<div class="tit"><div><h1>${esc(t)}</h1><div class="sub2">${esc(sub)}</div></div>${kicker(d)}</div>`;
 
+/* antes da apuração do 2º turno: só os nomes, sem nenhum número do 1º turno (que confundia quem abria o painel) */
+function cardEspera(cargo, escopo, d) {
+  const [a, b] = alfa(d.cands), s = d.situacao || {};
+  const lado = c => `<div class="lc"><span class="av2" style="background:${corChip(c.sg)}" aria-hidden="true">${esc(iniciais(c.nome))}</span>
+    <div class="lcb"><div class="nm">${esc(nome(c.nome))} ${chip(c.sg)}</div><div class="pc">—</div><div class="au">aguardando a apuração</div></div></div>`;
+  return `<section class="dcard dc"><div class="dtop"><div><span class="cg">${esc(cargo)}</span><h2>${esc(escopo)}</h2></div>
+      <div class="dtop-d"><span class="meta">2º turno em ${dataBr(ultimo.meta.data_2t)}</span></div></div>
+    <div class="pbody"><div class="lados2">${lado(a)}${lado(b)}</div>
+    <div class="st info"><b>Aguardando a apuração</b><span>Os números aparecem aqui assim que o TSE divulgar os primeiros resultados do 2º turno.</span></div></div></section>`;
+}
+
 function cardDuelo(cargo, escopo, d, link) {
   if (!d || d.cands.length < 2) return cardVazio(escopo);
+  if (!d.ao_vivo && turno === 2) return cardEspera(cargo, escopo, d);
   const ao = d.ao_vivo, [a, b] = alfa(d.cands), s = d.situacao || {};
   const tom = {aberto: "info", "2turno": "warn", eleito: "ok", "1turno": "ok"}[s.tipo] || "info";
   const lado = c => `<div class="lado2${marca("d" + escopo + c.nome, c.votos)}"><span class="av2" style="background:${corChip(c.sg)}" aria-hidden="true">${esc(iniciais(c.nome))}</span>
     <div class="nm">${c.eleito ? "★ " : ""}${esc(nome(c.nome))}</div>${chip(c.sg)}
     <div class="pc">${ao ? pct(c.pct) : pct1(c.pct)}</div>
-    <div class="au">${ao ? `${milhar(c.votos)} votos · 1º turno ${pct1(c.pct1t)}` : `${milhar(c.votos)} votos no 1º turno`}</div></div>`;
+    <div class="au">${ao ? `${milhar(c.votos)} votos` : `${milhar(c.votos)} votos no 1º turno`}</div></div>`;
   const resto = Math.max(0, 100 - a.pct - b.pct);
   const segs = ao ? [[a.pct, corPura(a.sg)], [b.pct, corPura(b.sg)]] : [[a.pct, corPura(a.sg)], [resto, "var(--n-elim)"], [b.pct, corPura(b.sg)]];
   const dpp = Math.abs(a.pct - b.pct), dv = Math.abs(a.votos - b.votos);
@@ -1242,7 +1254,9 @@ function tabelaEstados(d) {
     <p class="nota">${ao ? "Votos válidos apurados até agora" : "Votos válidos no 1º turno"}, do estado com mais votos para o com menos. % = fatia dos votos válidos dos dois finalistas.</p></div>`;
 }
 
+const cardMapaEspera = (t, sub) => `<section class="mcard"><div class="mhead"><div><h2>${esc(t)}</h2><span class="sub">${esc(sub)}</span></div></div><div class="vazio">Aguardando a apuração do 2º turno.</div></section>`;
 function cardCartograma(d) {
+  if (turno === 2 && !(d.pres && d.pres.ao_vivo)) return cardMapaEspera("Brasil por estado", "Quem lidera em cada estado, assim que a apuração começar.");
   const dados = d.mapa_br || {}, cont = {}, ao = d.pres && d.pres.ao_vivo;
   const tiles = Object.entries(POS).map(([u, [col, row]]) => {
     const r = dados[u] && dados[u]["1"], c = r && r.cands, pos = `grid-column:${col};grid-row:${row}`;
@@ -1273,6 +1287,7 @@ function munDetHtml(k) {
 
 function cardMunicipios(d) {
   const u = uf || "RN", v = munDados(), E = ESTADOS[u] || u;
+  if (turno === 2 && !(v && v.modo === "2t")) return cardMapaEspera(E + " por município", "Quem lidera em cada município, assim que a apuração começar.");
   const cargo = cargoDaPagina();
   let corpo = '<div class="skel"></div>', leg = "", n = 0;
   if (v) {
@@ -1305,24 +1320,23 @@ function pgResumo2(d) {
   const u = d.uf || {}, ao = d.pres && d.pres.ao_vivo, E = ESTADOS[u.sigla] || u.sigla;
   const gov = u.em_2turno ? cardDuelo("Governador", E, u.gov, "governador") : cardUfSemT2(d);
   const sub = ao ? "Apuração em andamento. Ordem fixa, alfabética."
-    : (u.em_2turno ? `Presidente e governador de ${E}. Abaixo, como cada finalista foi no 1º turno.` : "Presidente. Abaixo, como cada finalista foi no 1º turno.");
+    : (u.em_2turno ? `Presidente e governador de ${E}.` : "Presidente.");
   return avisoSim(d) + blocoTitulo(ao ? "2º turno · apuração" : "2º turno", sub, d) +
     `<div class="g2">${cardDuelo("Presidente da República", "Brasil", d.pres, "presidente")}${gov}</div>
-    <div class="sec"><h2>O que está em disputa</h2></div>
-    <div class="g2">${cardDisputa("Brasil", d.pres)}${u.em_2turno ? cardDisputa(u.sigla, u.gov) : ""}</div>`;
+`;
 }
 function pgPresidente2(d) {
   garantirMapas("1");
   const ao = d.pres && d.pres.ao_vivo;
-  return avisoSim(d) + blocoTitulo("Presidente da República", `Duelo nacional, o que está em disputa e o mapa do ${ao ? "2º" : "1º"} turno.`, d) +
-    `<div class="g2">${cardDuelo("Presidente da República", "Brasil", d.pres)}${cardDisputa("Brasil", d.pres)}</div>${cardCartograma(d)}${cardMunicipios(d)}`;
+  return avisoSim(d) + blocoTitulo("Presidente da República", `Duelo nacional e mapa do 2º turno.`, d) +
+    `<div class="g2">${cardDuelo("Presidente da República", "Brasil", d.pres)}</div>${cardCartograma(d)}${cardMunicipios(d)}`;
 }
 function pgGovernador2(d) {
   const u = d.uf || {}, ao = u.gov && u.gov.ao_vivo, E = ESTADOS[u.sigla] || u.sigla;
   if (!u.em_2turno) return avisoSim(d) + blocoTitulo("Governador", `O governo de ${E} foi decidido no 1º turno.`, d) + cardUfSemT2(d);
   garantirMapas("3");
-  return avisoSim(d) + blocoTitulo("Governador · " + E, `Duelo no seu estado e o mapa do ${ao ? "2º" : "1º"} turno por município.`, d) +
-    `<div class="g2">${cardDuelo("Governador", E, u.gov)}${cardDisputa(u.sigla, u.gov)}</div>${cardMunicipios(d)}`;
+  return avisoSim(d) + blocoTitulo("Governador · " + E, `Duelo no seu estado e mapa do 2º turno por município.`, d) +
+    `<div class="g2">${cardDuelo("Governador", E, u.gov)}</div>${cardMunicipios(d)}`;
 }
 
 /* ---- tela dividida: governador do estado (RN) e presidente (Brasil) lado a lado ---- */
@@ -1348,6 +1362,7 @@ function projHtml(d, a, b) {                  // a, b: candidatos na ordem alfab
 const placarVista = {};                       // id do painel -> "num" | "graf" (na TV os dois aparecem juntos)
 function cardPlacar(cargo, escopo, d, id) {
   if (!d || d.cands.length < 2) return cardVazio(escopo);
+  if (!d.ao_vivo && turno === 2) return cardEspera(cargo, escopo, d);
   const ao = d.ao_vivo, [a, b] = alfa(d.cands), s = d.situacao || {};
   const tom = {aberto: "info", "2turno": "warn", eleito: "ok", "1turno": "ok"}[s.tipo] || "info";
   const lado = c => `<div class="lc${marca("c" + escopo + c.nome, c.votos)}"><span class="av2" style="background:${corChip(c.sg)}" aria-hidden="true">${esc(iniciais(c.nome))}</span>
@@ -1468,7 +1483,7 @@ function pgTela(d) {
 const setHtml = (el, h) => { if (el && el._h !== h) { el.innerHTML = h; el._h = h; return true; } return false; };   // não recria nós se nada mudou
 function rodape() {
   const t2 = turno === 2;
-  setHtml($("#rodape"), `<div class="topo">${t2 ? `<a class="link" href="${hashDe("resumo", uf, 1)}">Resultado final do 1º turno →</a>` : `<a class="link" href="${hashDe("resumo", uf, 2)}">← Voltar ao 2º turno</a>`}
+  setHtml($("#rodape"), `<div class="topo">${t2 ? "" : `<a class="link" href="${hashDe("resumo", uf, 2)}">← Voltar ao 2º turno</a>`}
     <span><strong>Painel não oficial.</strong> Fonte: divulgação oficial de resultados do TSE. O resultado oficial é o que o TSE marcar como eleito. ${t2 ? `A ordem dos candidatos é alfabética e não muda com o placar. A projeção é uma estimativa própria: <a class="pj-m" href="${METODO_URL}" target="_blank" rel="noopener">veja o método matemático ↗</a>.`
       : "<strong>Como ler:</strong> ★ eleito (confirmado pelo TSE) · ② vai ao 2º turno (confirmado pelo TSE) · ▶ se elegeria com os votos de agora. Projeções de deputados são estimativas próprias (quociente eleitoral, cláusulas de 80%/20% e sobras)."}</span>
     <button class="tm" id="tema2">Alternar tema claro/escuro</button></div>`);

@@ -81,6 +81,7 @@ cat > /etc/logrotate.d/painel <<'LOGROTATE'
 LOGROTATE
 
 echo "==> nginx"
+install -d -m 700 -o www-data -g adm /var/cache/nginx/painel     # pasta do microcache (o nginx não a cria sozinho)
 rm -f /etc/nginx/sites-enabled/default
 sed "s/__DOMINIO__/$DOMINIO/g" "$DIR/deploy/nginx/painel.conf.template" > /etc/nginx/conf.d/painel.conf
 nginx -t
